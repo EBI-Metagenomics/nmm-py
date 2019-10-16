@@ -10,7 +10,7 @@ def test_hmm_states():
     alphabet = "ACGU"
 
     hmm = HMM(alphabet)
-    hmm.add_state(SilentState("S", alphabet, False))
+    hmm.add_state(SilentState("S", alphabet))
     state = TripletState("M2", alphabet, {"AGU": LOG(0.8), "AGG": LOG(0.2)})
     hmm.add_state(state, LOG(0.0))
 
@@ -29,10 +29,10 @@ def test_hmm_states():
 def test_hmm_init_prob_trans_a():
     alphabet = "ACGU"
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state)
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state)
 
     hmm.normalize()
@@ -41,18 +41,18 @@ def test_hmm_init_prob_trans_a():
     assert_allclose(hmm.init_prob("E"), 0.5)
     assert_allclose(hmm.trans("S", "S"), 0.5)
     assert_allclose(hmm.trans("S", "E"), 0.5)
-    assert_allclose(hmm.trans("E", "S"), 0.0)
-    assert_allclose(hmm.trans("E", "E"), 1.0)
+    assert_allclose(hmm.trans("E", "S"), 0.5)
+    assert_allclose(hmm.trans("E", "E"), 0.5)
 
 
 def test_hmm_init_prob_trans_b():
     alphabet = "ACGU"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state, LOG(0.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(0.0))
 
     hmm.set_trans("S", "E", LOG(0.1))
@@ -67,10 +67,10 @@ def test_hmm_init_prob_trans_c():
     alphabet = "ACGU"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state, LOG(0.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(1.0))
 
     hmm.set_trans("S", "E", LOG(0.0))
@@ -86,10 +86,10 @@ def test_hmm_init_prob_trans_d():
     alphabet = "ACGU"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state)
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state)
 
     hmm.set_trans("S", "E", LOG(1.0))
@@ -102,10 +102,10 @@ def test_hmm_lik_1():
     alphabet = "ACGU"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state, LOG(1.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(0.0))
 
     M1 = NormalState("M1", {"A": LOG(0.8), "C": LOG(0.2), "G": LOG(0.0), "U": LOG(0.0)})
@@ -181,7 +181,7 @@ def test_hmm_lik_2():
     start_state = NormalState("S", {"A": LOG(0.8), "C": LOG(0.2)})
     hmm.add_state(start_state, LOG(1.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(0.0))
 
     hmm.set_trans("S", "E", LOG(1.0))
@@ -225,16 +225,16 @@ def test_hmm_lik_3():
     alphabet = "AC"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state, LOG(1.0))
 
-    M1 = SilentState("M1", alphabet, False)
+    M1 = SilentState("M1", alphabet)
     hmm.add_state(M1, LOG(0.0))
 
     M2 = NormalState("M2", {"A": LOG(0.8), "C": LOG(0.2)})
     hmm.add_state(M2, LOG(0.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(0.0))
 
     hmm.set_trans("S", "M1", LOG(1.0))
@@ -273,10 +273,10 @@ def test_hmm_viterbi_1():
     alphabet = "ACGU"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state, LOG(1.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(0.0))
 
     M1 = NormalState("M1", {"A": LOG(0.8), "C": LOG(0.2), "G": LOG(0.0), "U": LOG(0.0)})
@@ -311,10 +311,10 @@ def test_hmm_viterbi_2():
     alphabet = "AC"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state, LOG(1.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(0.0))
 
     M1 = NormalState("M1", {"A": LOG(0.8), "C": LOG(0.2)})
@@ -392,22 +392,22 @@ def test_hmm_viterbi_3():
     alphabet = "AC"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state, LOG(1.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(0.0))
 
     M1 = NormalState("M1", {"A": LOG(0.8), "C": LOG(0.2)})
     hmm.add_state(M1, LOG(0.0))
 
-    D1 = SilentState("D1", alphabet, False)
+    D1 = SilentState("D1", alphabet)
     hmm.add_state(D1, LOG(0.0))
 
     M2 = NormalState("M2", {"A": LOG(0.4), "C": LOG(0.6)})
     hmm.add_state(M2, LOG(0.0))
 
-    D2 = SilentState("D2", alphabet, False)
+    D2 = SilentState("D2", alphabet)
     hmm.add_state(D2, LOG(0.0))
 
     hmm.set_trans("S", "M1", LOG(0.8))
@@ -510,22 +510,22 @@ def _create_hmm():
     alphabet = "AC"
 
     hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
+    start_state = SilentState("S", alphabet)
     hmm.add_state(start_state, LOG(1.0))
 
-    end_state = SilentState("E", alphabet, True)
+    end_state = SilentState("E", alphabet)
     hmm.add_state(end_state, LOG(0.0))
 
     M1 = NormalState("M1", {"A": LOG(0.8), "C": LOG(0.2)})
     hmm.add_state(M1, LOG(0.0))
 
-    D1 = SilentState("D1", alphabet, False)
+    D1 = SilentState("D1", alphabet)
     hmm.add_state(D1, LOG(0.0))
 
     M2 = NormalState("M2", {"A": LOG(0.4), "C": LOG(0.6)})
     hmm.add_state(M2, LOG(0.0))
 
-    D2 = SilentState("D2", alphabet, False)
+    D2 = SilentState("D2", alphabet)
     hmm.add_state(D2, LOG(0.0))
 
     hmm.set_trans("S", "M1", LOG(0.8))

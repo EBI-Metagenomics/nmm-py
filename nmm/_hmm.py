@@ -205,7 +205,7 @@ class HMM:
         seq_end = len(seq) - ft
         prefix = seq[:seq_end]
         for qt_1 in self._states.values():
-            if qt_1.end_state or qt_1.min_len > len(prefix):
+            if qt_1.min_len > len(prefix):
                 continue
 
             T = self.trans(qt_1.name, qt.name, True)
@@ -244,7 +244,7 @@ class HMM:
     def _normalize_trans(self):
         from scipy.special import logsumexp
 
-        self._normalize_trans_end_states()
+        # self._normalize_trans_end_states()
 
         names = self._states.keys()
         nstates = len(names)
@@ -263,14 +263,14 @@ class HMM:
                     for b in self._trans[a].keys():
                         self._trans[a][b] -= logprob_norm
 
-    def _normalize_trans_end_states(self):
-        state_names = self._states.keys()
-        for state in self._states.values():
-            if state.end_state:
-                end_state_name = state.name
-                for state_name in state_names:
-                    self._trans[end_state_name][state_name] = LOG(0.0)
-                self._trans[end_state_name][end_state_name] = LOG(1.0)
+    # def _normalize_trans_end_states(self):
+    #     state_names = self._states.keys()
+    #     for state in self._states.values():
+    #         if state.end_state:
+    #             end_state_name = state.name
+    #             for state_name in state_names:
+    #                 self._trans[end_state_name][state_name] = LOG(0.0)
+    #             self._trans[end_state_name][end_state_name] = LOG(1.0)
 
     def _normalize_init_logps(self):
         from scipy.special import logsumexp

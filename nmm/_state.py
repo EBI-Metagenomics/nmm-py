@@ -4,7 +4,7 @@ from math import exp
 
 
 class State:
-    def __init__(self, name: str, alphabet: str, end_state: bool):
+    def __init__(self, name: str, alphabet: str):
         """
         Parameters
         ----------
@@ -12,11 +12,8 @@ class State:
             Name.
         alphabet : str
             Alphabet.
-        end_state : bool
-            End state.
         """
         self._name = name
-        self._end_state = end_state
         self._alphabet = alphabet
 
     @property
@@ -31,16 +28,12 @@ class State:
     def alphabet(self):
         return self._alphabet
 
-    @property
-    def end_state(self):
-        return self._end_state
-
     def __str__(self):
         return f"<{self._name}>"
 
 
 class SilentState(State):
-    def __init__(self, name: str, alphabet: str, end_state: bool):
+    def __init__(self, name: str, alphabet: str):
         """
         Parameters
         ----------
@@ -48,10 +41,8 @@ class SilentState(State):
             Name.
         alphabet : str
             Alphabet.
-        end_state : bool
-            End state.
         """
-        super(SilentState, self).__init__(name, alphabet, end_state)
+        super(SilentState, self).__init__(name, alphabet)
 
     def prob(self, seq: str, log_space: bool = False):
         """
@@ -100,7 +91,7 @@ class NormalState(State):
         alphabet = "".join(list(emission.keys()))
         normalize_emission(emission)
         self._emission = emission
-        super(NormalState, self).__init__(name, alphabet, False)
+        super(NormalState, self).__init__(name, alphabet)
 
     def prob(self, seq: str, log_space: bool = False):
         """
@@ -145,7 +136,7 @@ class TripletState(State):
         """
         normalize_emission(emission)
         self._emission = emission
-        super(TripletState, self).__init__(name, alphabet, False)
+        super(TripletState, self).__init__(name, alphabet)
 
     def prob(self, seq: str, log_space: bool = False):
         """

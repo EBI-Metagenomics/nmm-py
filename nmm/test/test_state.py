@@ -7,7 +7,7 @@ from nmm import FrameState, NormalState, SilentState, TripletState, LOG
 
 
 def test_states():
-    start_state = SilentState("S", "ACGU", False)
+    start_state = SilentState("S", "ACGU")
     assert start_state.name == "S"
     assert start_state.alphabet == "ACGU"
     assert_allclose(start_state.prob(""), 1.0)
@@ -25,7 +25,7 @@ def test_states():
     assert table[0][0] == ""
     assert table[0][1] == LOG(1.0)
 
-    end_state = SilentState("E", "ACGU", True)
+    end_state = SilentState("E", "ACGU")
     assert end_state.name == "E"
     assert start_state.alphabet == "ACGU"
 
