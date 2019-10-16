@@ -1,4 +1,4 @@
-# hseq
+# nmm
 
 ## Authors
 
@@ -6,4 +6,4 @@
 
 ## License
 
-This project is licensed under the [MIT License](https://raw.githubusercontent.com/limix/glimix-core/master/LICENSE.md).
+This project is licensed under the [MIT License](https://raw.githubusercontent.com/EBI-Metagenomics/nmm-py/master/LICENSE.md).
