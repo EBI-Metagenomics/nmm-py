@@ -98,79 +98,6 @@ def test_hmm_init_prob_trans_d():
     assert_allclose(hmm.trans("S", "S"), 0.0)
 
 
-def test_hmm_emit_path():
-    alphabet = "ACGU"
-
-    hmm = HMM(alphabet)
-    start_state = SilentState("S", alphabet, False)
-    hmm.add_state(start_state, LOG(1.0))
-
-    end_state = SilentState("E", alphabet, True)
-    hmm.add_state(end_state)
-
-    M1 = NormalState("M1", {"A": LOG(0.8), "C": LOG(0.2), "G": LOG(0.0), "U": LOG(0.0)})
-    hmm.add_state(M1, LOG(0.0))
-
-    hmm.set_trans("S", "E", LOG(0.0))
-    hmm.set_trans("S", "M1", LOG(1.0))
-    hmm.set_trans("M1", "E", LOG(1.0))
-    hmm.normalize()
-
-    random = RandomState(0)
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "E"]
-    assert "".join(s[1] for s in path) == "A"
-
-    M2 = TripletState("M2", alphabet, {"AGU": LOG(0.8), "AGG": LOG(0.2)})
-    hmm.add_state(M2, LOG(0.0))
-
-    hmm.set_trans("M1", "M2", LOG(1.0))
-    hmm.set_trans("M1", "E", LOG(0.0))
-    hmm.set_trans("M2", "E", LOG(1.0))
-    hmm.normalize()
-
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
-    assert "".join(s[1] for s in path) == "AAGG"
-
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
-    assert "".join(s[1] for s in path) == "AAGU"
-
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
-    assert "".join(s[1] for s in path) == "AAGG"
-
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
-    assert "".join(s[1] for s in path) == "AAGU"
-
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
-    assert "".join(s[1] for s in path) == "AAGU"
-
-    base_emission = {"A": LOG(0.25), "C": LOG(0.25), "G": LOG(0.25), "U": LOG(0.25)}
-    codon_emission = {"AGU": LOG(0.8), "AGG": LOG(0.2)}
-    epsilon = 0.1
-    M3 = FrameState("M3", base_emission, codon_emission, epsilon)
-    hmm.add_state(M3, LOG(0.0))
-
-    hmm.set_trans("M2", "E", LOG(0.0))
-    hmm.set_trans("M2", "M3", LOG(1.0))
-    hmm.set_trans("M3", "E", LOG(1.0))
-    hmm.normalize()
-    assert_allclose(hmm.trans("S", "M1"), 1)
-    assert_allclose(hmm.trans("M1", "M2"), 1)
-    assert_allclose(hmm.trans("M2", "M3"), 1)
-    assert_allclose(hmm.trans("M3", "E"), 1)
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "M2", "M3", "E"]
-    assert "".join(s[1] for s in path) == "AAGGAGU"
-    states_path = [("S", 0), ("M1", 1), ("M2", 3), ("M3", 3), ("E", 0)]
-    loglik = hmm.likelihood("AAGGAGU", states_path, True)
-    assert abs(loglik + 2.472373518623133) < 1e-7
-
-
 def test_hmm_lik_1():
     alphabet = "ACGU"
 
@@ -191,11 +118,6 @@ def test_hmm_lik_1():
     hmm.set_trans("M1", "M2", LOG(1.0))
     hmm.set_trans("M2", "E", LOG(1.0))
     hmm.normalize()
-
-    random = RandomState(0)
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
-    assert "".join(s[1] for s in path) == "AC"
 
     p = hmm.likelihood("AC", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
     assert_allclose(p, 0.3)
@@ -367,11 +289,6 @@ def test_hmm_viterbi_1():
     hmm.set_trans("M1", "M2", LOG(1.0))
     hmm.set_trans("M2", "E", LOG(1.0))
     hmm.normalize()
-
-    random = RandomState(0)
-    path = hmm.emit(random)
-    assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
-    assert "".join(p[1] for p in path) == "AC"
 
     lik, path = hmm.viterbi("AC", "E")
     assert_allclose(lik, 0.3)

@@ -107,18 +107,6 @@ class HMM:
         self._normalize_trans()
         self._normalize_init_logps()
 
-    def emit(self, random, max_nstates=inf):
-        curr_state = self._draw_initial_state(random)
-        path = []
-        nstates = 1
-        while not curr_state.end_state and nstates < max_nstates:
-            seq = curr_state.emit(random)
-            path.append((curr_state, seq))
-            curr_state = self._transition(curr_state, random)
-            nstates += 1
-        path += [(curr_state, curr_state.emit(random))]
-        return [(p[0].name, p[1]) for p in path]
-
     def likelihood(self, seq: str, state_path: list, log_space: bool = False):
         if len(state_path) == 0:
             if len(seq) == 0:
@@ -156,10 +144,7 @@ class HMM:
         graph = Digraph()
 
         for state in self._states.values():
-            if state.end_state:
-                shape = "doublecircle"
-            else:
-                shape = "circle"
+            shape = "circle"
 
             if init_prob:
                 p = self.init_prob(state.name, log_space=False)
