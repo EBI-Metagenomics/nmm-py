@@ -45,19 +45,6 @@ class FrameState(State):
             return p
         return exp(p)
 
-    def emit(self, random):
-        lengths = [1, 2, 3, 4, 5]
-        probs = [exp(self._len_prob(f)) for f in [1, 2, 3, 4, 5]]
-        f = random.choice(lengths, p=probs)
-
-        def prob(z):
-            return exp(self._prob_z_given_f(z))
-
-        abc = self._alphabet
-        emission = {"".join(z): prob(z) for z in product(*[abc] * f)}
-        seq = random.choice(list(emission.keys()), p=list(emission.values()))
-        return seq
-
     def emission(self, log_space: bool = False):
         """
         Parameters

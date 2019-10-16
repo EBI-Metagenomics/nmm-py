@@ -53,10 +53,6 @@ class SilentState(State):
         """
         super(SilentState, self).__init__(name, alphabet, end_state)
 
-    def emit(self, random):
-        del random
-        return ""
-
     def prob(self, seq: str, log_space: bool = False):
         """
         Parameters
@@ -106,10 +102,6 @@ class NormalState(State):
         self._emission = emission
         super(NormalState, self).__init__(name, alphabet, False)
 
-    def emit(self, random):
-        probs = [exp(self._emission[a]) for a in self._alphabet]
-        return random.choice(list(self._alphabet), p=probs)
-
     def prob(self, seq: str, log_space: bool = False):
         """
         Parameters
@@ -154,11 +146,6 @@ class TripletState(State):
         normalize_emission(emission)
         self._emission = emission
         super(TripletState, self).__init__(name, alphabet, False)
-
-    def emit(self, random):
-        triplets = list(self._emission.keys())
-        probs = [exp(v) for v in self._emission.values()]
-        return random.choice(triplets, p=probs)
 
     def prob(self, seq: str, log_space: bool = False):
         """
