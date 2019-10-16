@@ -4,7 +4,7 @@ from math import log, exp
 from numpy.random import RandomState
 from numpy.testing import assert_allclose
 
-from hseq import FrameState, NormalState, SilentState, TripletState, LOG
+from nmm import FrameState, NormalState, SilentState, TripletState, LOG
 
 
 def test_states():

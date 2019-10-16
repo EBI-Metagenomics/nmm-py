@@ -2,8 +2,8 @@ from math import isinf
 import pytest
 from numpy.testing import assert_allclose
 from numpy.random import RandomState
-from hseq import SilentState, NormalState, TripletState, FrameState
-from hseq import HMM, LOG
+from nmm import SilentState, NormalState, TripletState, FrameState
+from nmm import HMM, LOG
 
 
 def test_hmm_states():
