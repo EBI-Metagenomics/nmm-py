@@ -430,19 +430,19 @@ def test_hmm_viterbi_3():
     p = hmm.likelihood("AC", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
     assert_allclose(p, 0.3072)
 
-    # lik, path = hmm.viterbi("AA", "E")
-    # assert_allclose(lik, 0.2048)
-    # assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
-    # assert list(p[1] for p in path) == [0, 1, 1, 0]
-    # p = hmm.likelihood("AA", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    # assert_allclose(p, 0.2048)
+    lik, path = hmm.viterbi("AA", "E")
+    assert_allclose(lik, 0.2048)
+    assert [p[0] for p in path] == ["S", "M1", "M2", "E"]
+    assert list(p[1] for p in path) == [0, 1, 1, 0]
+    p = hmm.likelihood("AA", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
+    assert_allclose(p, 0.2048)
 
-    # lik, path = hmm.viterbi("A", "E")
-    # assert_allclose(lik, 0.128)
-    # assert [p[0] for p in path] == ["S", "M1", "D2", "E"]
-    # assert list(p[1] for p in path) == [0, 1, 0, 0]
-    # p = hmm.likelihood("A", [("S", 0), ("M1", 1), ("D2", 0), ("E", 0)])
-    # assert_allclose(p, 0.128)
+    lik, path = hmm.viterbi("A", "E")
+    assert_allclose(lik, 0.128)
+    assert [p[0] for p in path] == ["S", "M1", "D2", "E"]
+    assert list(p[1] for p in path) == [0, 1, 0, 0]
+    p = hmm.likelihood("A", [("S", 0), ("M1", 1), ("D2", 0), ("E", 0)])
+    assert_allclose(p, 0.128)
 
 
 def test_hmm_draw(tmp_path):
