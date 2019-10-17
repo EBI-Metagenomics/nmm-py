@@ -1,3 +1,4 @@
+from ._alphabet import Alphabet
 from ._norm import normalize_emission
 from ._log import LOG
 from math import exp
@@ -7,7 +8,7 @@ from ._ffi import ffi, lib
 
 
 class State:
-    def __init__(self, name: str, alphabet: str):
+    def __init__(self, alphabet: Alphabet):
         """
         Parameters
         ----------
@@ -16,22 +17,38 @@ class State:
         alphabet : str
             Alphabet.
         """
-        self._name = name
+        self._state = ffi.NULL
         self._alphabet = alphabet
 
     @property
-    def name(self):
-        return self._name
+    def name(self) -> str:
+        n = ffi.string(lib.imm_state_get_name(self._cstate))
+        return n.decode()
 
-    @name.setter
-    def name(self, v: str):
-        self._name = v
+    # @name.setter
+    # def name(self, v: str):
+    #     self._name = v
 
     @property
-    def alphabet(self):
+    def alphabet(self) -> Alphabet:
         return self._alphabet
 
-    def __str__(self):
+    def lprob(self, seq: str) -> float:
+        return lib.imm_state_lprob(self._cstate, make_sure_bytes(seq), len(seq))
+
+    @property
+    def min_seq(self) -> int:
+        return lib.imm_state_min_seq(self._cstate)
+
+    @property
+    def max_seq(self) -> int:
+        return lib.imm_state_max_seq(self._cstate)
+
+    @property
+    def _cstate(self):
+        return lib.imm_state_cast_c(self._state)
+
+    def __str__(self) -> str:
         return f"<{self._name}>"
 
 
@@ -85,9 +102,8 @@ class SilentState(State):
 #                                                  const struct imm_abc *abc,
 #                                                  const double *lprobs);
 # void imm_normal_state_destroy(struct imm_normal_state *state);
-# int imm_normal_state_normalize(struct imm_normal_state *state);
 class NormalState(State):
-    def __init__(self, name: str, emission: dict):
+    def __init__(self, name: str, alphabet: Alphabet, lprobs: list):
         """
         Parameters
         ----------
@@ -96,11 +112,27 @@ class NormalState(State):
         emission : dict
             Emission probabilities in log space.
         """
-        alphabet = "".join(list(emission.keys()))
-        normalize_emission(emission)
-        self._emission = emission
-        super(NormalState, self).__init__(name, alphabet)
-        # lib.imm_normal_state_create(make_sure_bytes(name, abc, lprobs))
+        super(NormalState, self).__init__(alphabet)
+
+        if len(lprobs) != alphabet.length:
+            err = "Number of symbols is not equal to the probabilities list length."
+            raise ValueError(err)
+
+        name = make_sure_bytes(name)
+        self._state = lib.imm_normal_state_create(name, alphabet.cdata, lprobs)
+        # normalize_emission(emission)
+
+    def __del__(self):
+        if self._state != ffi.NULL:
+            lib.imm_normal_state_destroy(self._state)
+
+    def normalize(self):
+        err = lib.imm_normal_state_normalize(self._state)
+        if err != 0:
+            raise ValueError("Normalization error.")
+
+    # const struct imm_abc *imm_state_get_abc(const struct imm_state *state);
+    # double imm_state_lprob(const struct imm_state *state, const char *seq, int seq_len);
 
     def prob(self, seq: str, log_space: bool = False):
         """

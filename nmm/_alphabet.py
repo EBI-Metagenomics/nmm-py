@@ -3,7 +3,7 @@ from ._ffi import ffi, lib
 
 
 class Alphabet:
-    def __init__(self, symbols: bytes):
+    def __init__(self, symbols: str):
         self._abc = ffi.NULL
         self._abc = lib.imm_abc_create(make_sure_bytes(symbols))
         if self._abc == ffi.NULL:
@@ -14,13 +14,17 @@ class Alphabet:
             lib.imm_abc_destroy(self._abc)
 
     @property
+    def cdata(self):
+        return self._abc
+
+    @property
     def length(self):
         return lib.imm_abc_length(self._abc)
 
-    def has_symbol(self, symbol_id: bytes):
+    def has_symbol(self, symbol_id: str):
         return lib.imm_abc_has_symbol(self._abc, make_sure_bytes(symbol_id))
 
-    def symbol_idx(self, symbol_id: bytes):
+    def symbol_idx(self, symbol_id: str):
         return lib.imm_abc_symbol_idx(self._abc, make_sure_bytes(symbol_id))
 
     def symbol_id(self, symbol_idx: int):

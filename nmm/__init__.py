@@ -2,6 +2,7 @@ from ._frame_state import FrameState
 from ._hmm import HMM
 from ._log import LOG
 from ._state import NormalState, SilentState, TripletState
+from ._alphabet import Alphabet
 
 _ffi_err = """
 It is likely caused by a broken installation of this package.
@@ -26,4 +27,5 @@ __all__ = [
     "TripletState",
     "FrameState",
     "LOG",
+    "Alphabet",
 ]
