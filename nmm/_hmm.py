@@ -175,6 +175,7 @@ class HMM:
         graph.render(filepath, view=view)
 
     def viterbi(self, seq: str, end_state: str, log_space: bool = False):
+        self._check_mute_cycle()
         self._vcache = {}
         max_logp = LOG(0.0)
         best_path = []
@@ -244,33 +245,23 @@ class HMM:
     def _normalize_trans(self):
         from scipy.special import logsumexp
 
-        # self._normalize_trans_end_states()
-
         names = self._states.keys()
         nstates = len(names)
         for a in names:
             logprobs = list(self._trans[a].values())
 
             if len(logprobs) == 0:
+                continue
+                # for b in names:
+                #     self._trans[a][b] = -LOG(nstates)
+            # else:
+            logprob_norm = logsumexp(logprobs)
+            if isinf(logprob_norm):
                 for b in names:
                     self._trans[a][b] = -LOG(nstates)
             else:
-                logprob_norm = logsumexp(logprobs)
-                if isinf(logprob_norm):
-                    for b in names:
-                        self._trans[a][b] = -LOG(nstates)
-                else:
-                    for b in self._trans[a].keys():
-                        self._trans[a][b] -= logprob_norm
-
-    # def _normalize_trans_end_states(self):
-    #     state_names = self._states.keys()
-    #     for state in self._states.values():
-    #         if state.end_state:
-    #             end_state_name = state.name
-    #             for state_name in state_names:
-    #                 self._trans[end_state_name][state_name] = LOG(0.0)
-    #             self._trans[end_state_name][end_state_name] = LOG(1.0)
+                for b in self._trans[a].keys():
+                    self._trans[a][b] -= logprob_norm
 
     def _normalize_init_logps(self):
         from scipy.special import logsumexp
@@ -291,6 +282,27 @@ class HMM:
         for state in states:
             if state not in self._states:
                 raise ValueError(f"State `{state}` does not exist.")
+
+    def _check_mute_cycle(self):
+        state_marks = {name: "initial" for name in self._states}
+        for state_name in self._states:
+            self._mute_cycle_visit(state_name, state_marks)
+
+    def _mute_cycle_visit(self, state: str, state_marks):
+        if self._states[state].min_len > 0:
+            return
+        if state_marks[state] == "permament":
+            return
+        if state_marks[state] == "temporary":
+            raise ValueError("Mute cycles are not allowed.")
+
+        state_marks[state] = "temporary"
+        for dst in self._trans[state]:
+
+            if self._trans[state][dst] > float("-inf"):
+                self._mute_cycle_visit(dst, state_marks)
+
+        state_marks[state] = "permanent"
 
 
 def _format_emission_table(emission, name, digits):
