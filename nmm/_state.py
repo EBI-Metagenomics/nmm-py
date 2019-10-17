@@ -1,6 +1,9 @@
 from ._norm import normalize_emission
 from ._log import LOG
 from math import exp
+from ._string import make_sure_bytes
+
+from ._ffi import ffi, lib
 
 
 class State:
@@ -78,6 +81,11 @@ class SilentState(State):
         return f"<{self.__class__.__name__}:{self._name}>"
 
 
+# struct imm_normal_state *imm_normal_state_create(const char *name,
+#                                                  const struct imm_abc *abc,
+#                                                  const double *lprobs);
+# void imm_normal_state_destroy(struct imm_normal_state *state);
+# int imm_normal_state_normalize(struct imm_normal_state *state);
 class NormalState(State):
     def __init__(self, name: str, emission: dict):
         """
@@ -92,6 +100,7 @@ class NormalState(State):
         normalize_emission(emission)
         self._emission = emission
         super(NormalState, self).__init__(name, alphabet)
+        # lib.imm_normal_state_create(make_sure_bytes(name, abc, lprobs))
 
     def prob(self, seq: str, log_space: bool = False):
         """
