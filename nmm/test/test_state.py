@@ -1,10 +1,10 @@
-import pytest
 from itertools import product
-from math import log, exp
+from math import exp, log
 
+import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import FrameState, NormalState, SilentState, TripletState, LOG, Alphabet
+from nmm import LOG, Alphabet, FrameState, MuteState, NormalState, TableState
 
 
 def test_normal_state():
@@ -12,32 +12,79 @@ def test_normal_state():
     with pytest.raises(ValueError):
         NormalState("M0", alphabet, [LOG(v) for v in [0.1, 0.2, 0.3]])
 
-    M0 = NormalState("M0", alphabet, [LOG(v) for v in [0.1, 0.2, 0.3, 0.3]])
-    assert_equal(M0.name, "M0")
-    assert_equal(M0.lprob("A"), LOG(0.1))
-    assert_equal(M0.lprob("C"), LOG(0.2))
-    assert_equal(M0.lprob("G"), LOG(0.3))
-    assert_equal(M0.lprob("T"), LOG(0.3))
-    assert_equal(M0.min_seq, 1)
-    assert_equal(M0.max_seq, 1)
+    state = NormalState("M0", alphabet, [LOG(v) for v in [0.1, 0.2, 0.3, 0.3]])
+    assert_equal(state.name, "M0")
+    assert_equal(state.lprob("A"), LOG(0.1))
+    assert_equal(state.lprob("C"), LOG(0.2))
+    assert_equal(state.lprob("G"), LOG(0.3))
+    assert_equal(state.lprob("T"), LOG(0.3))
+    assert_equal(state.min_seq, 1)
+    assert_equal(state.max_seq, 1)
 
-    M0.normalize()
+    state.normalize()
 
-    assert_equal(M0.lprob("A"), LOG(0.1) - LOG(0.9))
-    assert_equal(M0.lprob("C"), LOG(0.2) - LOG(0.9))
-    assert_equal(M0.lprob("G"), LOG(0.3) - LOG(0.9))
-    assert_equal(M0.lprob("T"), LOG(0.3) - LOG(0.9))
-    pass
+    assert_equal(state.lprob("A"), LOG(0.1) - LOG(0.9))
+    assert_equal(state.lprob("C"), LOG(0.2) - LOG(0.9))
+    assert_equal(state.lprob("G"), LOG(0.3) - LOG(0.9))
+    assert_equal(state.lprob("T"), LOG(0.3) - LOG(0.9))
+
+    assert_equal(state.alphabet.length, alphabet.length)
+    assert_equal(state.alphabet.cdata, alphabet.cdata)
+
+    table = state.emission()
+    assert_equal(table[0][0], "G")
+    assert_allclose(table[0][1], LOG(0.3) - LOG(0.9))
+    assert_equal(table[1][0], "T")
+    assert_allclose(table[1][1], LOG(0.3) - LOG(0.9))
+    assert_equal(table[2][0], "C")
+    assert_allclose(table[2][1], LOG(0.2) - LOG(0.9))
+    assert_equal(table[3][0], "A")
+    assert_allclose(table[3][1], LOG(0.1) - LOG(0.9))
+
+    assert_equal(str(state), "<M0>")
+    assert_equal(repr(state), "<NormalState:M0>")
+
+
+def test_mute_state():
+    alphabet = Alphabet("ACGU")
+    state = MuteState("S", alphabet)
+    assert_equal(state.name, "S")
+    assert_equal(state.alphabet.symbols, "ACGU")
+    assert_equal(state.lprob(""), LOG(1.0))
+    assert_equal(state.lprob("A"), LOG(0.0))
+    assert_equal(str(state), "<S>")
+    assert_equal(repr(state), "<MuteState:S>")
+
+    table = state.emission()
+    assert_equal(len(table), 1)
+    assert_equal(table[0][0], "")
+    assert_equal(table[0][1], LOG(1.0))
+
+
+def test_table_state():
+    alphabet = Alphabet("ACGU")
+    state = TableState("M2", alphabet, {"AUG": log(0.8), "AUU": log(0.4)})
+    assert_equal(state.name, "M2")
+    assert_equal(set(state.alphabet.symbols), set("ACGU"))
+    assert_allclose(state.lprob("AUG"), log(0.8))
+    assert_allclose(state.lprob("AUU"), log(0.4))
+    assert_equal(state.lprob("AGU"), LOG(0.0))
+    assert_equal(str(state), "<M2>")
+    assert_equal(repr(state), "<TableState:M2>")
+    state.normalize()
+    assert_allclose(state.lprob("AUG"), log(0.8) - log(1.2))
+    assert_allclose(state.lprob("AUU"), log(0.4) - log(1.2))
+    assert_equal(state.lprob("AGU"), LOG(0.0))
 
 
 # def test_states():
-#     start_state = SilentState("S", "ACGU")
+#     start_state = MuteState("S", "ACGU")
 #     assert start_state.name == "S"
 #     assert start_state.alphabet == "ACGU"
 #     assert_allclose(start_state.prob(""), 1.0)
 #     assert_allclose(start_state.prob("A"), 0.0, atol=1e-7)
 #     assert str(start_state) == "<S>"
-#     assert repr(start_state) == "<SilentState:S>"
+#     assert repr(start_state) == "<MuteState:S>"
 
 #     table = start_state.emission()
 #     assert len(table) == 1
@@ -49,7 +96,7 @@ def test_normal_state():
 #     assert table[0][0] == ""
 #     assert table[0][1] == LOG(1.0)
 
-#     end_state = SilentState("E", "ACGU")
+#     end_state = MuteState("E", "ACGU")
 #     assert end_state.name == "E"
 #     assert start_state.alphabet == "ACGU"
 

@@ -5,7 +5,8 @@ from ._ffi import ffi, lib
 class Alphabet:
     def __init__(self, symbols: str):
         self._abc = ffi.NULL
-        self._abc = lib.imm_abc_create(make_sure_bytes(symbols))
+        self._symbols = make_sure_bytes(symbols)
+        self._abc = lib.imm_abc_create(self._symbols)
         if self._abc == ffi.NULL:
             raise RuntimeError(f"Could not create alphabet.")
 
@@ -30,3 +31,6 @@ class Alphabet:
     def symbol_id(self, symbol_idx: int):
         return lib.imm_abc_symbol_id(self._abc, symbol_idx).decode()
 
+    @property
+    def symbols(self):
+        return self._symbols.decode()

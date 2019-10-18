@@ -21,3 +21,4 @@ def test_alphabet():
     assert_equal(abc.symbol_id(2), "G")
     assert_equal(abc.symbol_id(3), "T")
 
+    assert_equal(abc.symbols, "ACGT")
