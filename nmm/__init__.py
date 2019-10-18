@@ -3,6 +3,7 @@ from ._hmm import HMM
 from ._log import LOG
 from ._state import NormalState, MuteState, TableState
 from ._alphabet import Alphabet
+from ._codon import Codon
 
 _ffi_err = """
 It is likely caused by a broken installation of this package.
@@ -12,7 +13,7 @@ and reinstall the package again."""
 try:
     from ._ffi import ffi as _
 
-    assert _ is not None
+    del _
 except Exception as e:
     e.msg = e.msg + _ffi_err
     raise e
@@ -28,4 +29,5 @@ __all__ = [
     "FrameState",
     "LOG",
     "Alphabet",
+    "Codon",
 ]
