@@ -1,4 +1,5 @@
 struct imm_abc;
+struct imm_hmm;
 struct imm_mute_state;
 struct imm_normal_state;
 struct imm_state;
@@ -55,3 +56,16 @@ int              nmm_base_set_lprob(struct nmm_base *base, char nucleotide, doub
 double           nmm_base_get_lprob(const struct nmm_base *base, char nucleotide);
 int              nmm_base_normalize(struct nmm_base *base);
 void             nmm_base_destroy(struct nmm_base *base);
+
+struct imm_hmm *imm_hmm_create(const struct imm_abc *abc);
+void            imm_hmm_destroy(struct imm_hmm *hmm);
+int imm_hmm_add_state(struct imm_hmm *hmm, const struct imm_state *state, double start_lprob);
+int imm_hmm_del_state(struct imm_hmm *hmm, const struct imm_state *state);
+int imm_hmm_set_start_lprob(struct imm_hmm *hmm, const struct imm_state *state, double start_lprob);
+int imm_hmm_set_trans(struct imm_hmm *hmm, const struct imm_state *src_state,
+                      const struct imm_state *dst_state, double lprob);
+double imm_hmm_get_trans(const struct imm_hmm *hmm, const struct imm_state *src_state,
+                         const struct imm_state *dst_state);
+double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq, const struct imm_path *path);
+double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq, const struct imm_state *end_state);
+int    imm_hmm_normalize(struct imm_hmm *hmm);

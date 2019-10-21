@@ -20,7 +20,7 @@ class State:
 
     @property
     def name(self) -> str:
-        n = ffi.string(lib.imm_state_get_name(self._cstate))
+        n = ffi.string(lib.imm_state_get_name(self.cdata))
         return n.decode()
 
     @property
@@ -36,18 +36,18 @@ class State:
         seq : str
             Sequence.
         """
-        return lib.imm_state_lprob(self._cstate, make_sure_bytes(seq), len(seq))
+        return lib.imm_state_lprob(self.cdata, make_sure_bytes(seq), len(seq))
 
     @property
     def min_seq(self) -> int:
-        return lib.imm_state_min_seq(self._cstate)
+        return lib.imm_state_min_seq(self.cdata)
 
     @property
     def max_seq(self) -> int:
-        return lib.imm_state_max_seq(self._cstate)
+        return lib.imm_state_max_seq(self.cdata)
 
     @property
-    def _cstate(self):
+    def cdata(self):
         return lib.imm_state_cast_c(self._state)
 
     def __str__(self) -> str:

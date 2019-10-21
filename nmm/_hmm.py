@@ -1,16 +1,21 @@
 from math import exp, isinf, inf
 from ._log import LOG
 from ._state import State
+from ._alphabet import Alphabet
 import functools
+
+from ._ffi import ffi, lib
 
 
 class HMM:
-    def __init__(self, alphabet: str):
-        self._init_logps = {}
-        self._states = {}
-        self._trans = {}
+    def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
-        self._vcache = {}
+        self._hmm = lib.imm_hmm_create(self._alphabet.cdata)
+        self._states = {}
+
+    def __del__(self):
+        if self._hmm != ffi.NULL:
+            lib.imm_hmm_destroy(self._hmm)
 
     def init_prob(self, name, log_space=False):
         v = self._init_logps.get(name, LOG(0.0))
@@ -55,26 +60,19 @@ class HMM:
     def alphabet(self):
         return self._alphabet
 
-    def add_state(self, state: State, init_logp: float = LOG(0.0)):
+    def add_state(self, state: State, start_lprob: float = LOG(0.0)):
         """
         Parameters
         ----------
         state
             Add state.
-        init_logp : bool
-            Probability, in log space, of being the initial state.
+        start_lprob : bool
+            Log-space probability of being the initial state.
         """
-        if state.name in self._states:
-            raise ValueError(f"State {state.name} already exists.")
-
-        if set(state.alphabet) != set(self.alphabet):
-            raise ValueError(f"Alphabet mismatch.")
-
-        self._states[state.name] = state
-        self._trans[state.name] = {}
-        self._init_logps[state.name] = init_logp
-
-        return state
+        err: int = lib.imm_hmm_add_state(self._hmm, state.cdata, start_lprob)
+        if err != 0:
+            raise ValueError("Could not add state %s.", state)
+        self._states[state.cdata] = state
 
     def rename_state(self, old_name: str, new_name: str):
         if old_name not in self._states:

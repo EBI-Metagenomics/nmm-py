@@ -1,5 +1,3 @@
-from math import log, exp
-
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
@@ -71,26 +69,26 @@ def test_mute_state():
 
 def test_table_state():
     alphabet = Alphabet("ACGU")
-    state = TableState("M2", alphabet, {"AUG": log(0.8), "AUU": log(0.4)})
+    state = TableState("M2", alphabet, {"AUG": LOG(0.8), "AUU": LOG(0.4)})
     assert_equal(state.name, "M2")
     assert_equal(set(state.alphabet.symbols), set("ACGU"))
-    assert_allclose(state.lprob("AUG"), log(0.8))
-    assert_allclose(state.lprob("AUU"), log(0.4))
+    assert_allclose(state.lprob("AUG"), LOG(0.8))
+    assert_allclose(state.lprob("AUU"), LOG(0.4))
     assert_equal(state.lprob("AGU"), LOG(0.0))
     assert_equal(str(state), "<M2>")
     assert_equal(repr(state), "<TableState:M2>")
     state.normalize()
-    assert_allclose(state.lprob("AUG"), log(0.8) - log(1.2))
-    assert_allclose(state.lprob("AUU"), log(0.4) - log(1.2))
+    assert_allclose(state.lprob("AUG"), LOG(0.8) - LOG(1.2))
+    assert_allclose(state.lprob("AUU"), LOG(0.4) - LOG(1.2))
     assert_equal(state.lprob("AGU"), LOG(0.0))
 
 
 def test_frame_state():
     alphabet = Alphabet("ACGU")
     base = Base(
-        alphabet, {"A": log(0.25), "C": log(0.25), "G": log(0.25), "U": log(0.25)}
+        alphabet, {"A": LOG(0.25), "C": LOG(0.25), "G": LOG(0.25), "U": LOG(0.25)}
     )
-    codon = Codon(alphabet, {"AUG": log(0.8), "AUU": log(0.1)})
+    codon = Codon(alphabet, {"AUG": LOG(0.8), "AUU": LOG(0.1)})
 
     frame_state = FrameState("M1", base, codon, epsilon=0.0)
     assert_allclose(frame_state.lprob("AUA"), LOG(0.0))
@@ -113,8 +111,8 @@ def test_frame_state():
     assert_allclose(frame_state.lprob("AUUAAA"), LOG(0.0))
 
     alphabet = Alphabet("ACGT")
-    base = Base(alphabet, {"A": log(0.1), "C": log(0.2), "G": log(0.3), "T": log(0.4)})
-    codon = Codon(alphabet, {"ATG": log(0.8), "ATT": log(0.1), "GTC": log(0.4)})
+    base = Base(alphabet, {"A": LOG(0.1), "C": LOG(0.2), "G": LOG(0.3), "T": LOG(0.4)})
+    codon = Codon(alphabet, {"ATG": LOG(0.8), "ATT": LOG(0.1), "GTC": LOG(0.4)})
     codon.normalize()
     frame_state = FrameState("M2", base, codon, 0.1)
     assert_allclose(frame_state.lprob("A"), -6.282228286097171)

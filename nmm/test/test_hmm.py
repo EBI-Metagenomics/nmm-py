@@ -1,29 +1,24 @@
 from math import isinf
 import pytest
 from numpy.testing import assert_allclose
-from numpy.random import RandomState
-from nmm import MuteState, NormalState, TableState, FrameState
+from nmm import MuteState, NormalState, TableState, FrameState, Alphabet
 from nmm import HMM, LOG
 
 
 def test_hmm_states():
-    alphabet = "ACGU"
+    alphabet = Alphabet("ACGU")
 
     hmm = HMM(alphabet)
-    hmm.add_state(MuteState("S", alphabet))
-    state = TableState("M2", alphabet, {"AGU": LOG(0.8), "AGG": LOG(0.2)})
-    hmm.add_state(state, LOG(0.0))
-
-    states = hmm.states
-    assert "S" in states
-    assert "M2" in states
-    assert len(states) == 2
+    S = MuteState("S", alphabet)
+    hmm.add_state(S)
+    M = TableState("M", alphabet, {"AGU": LOG(0.8), "AGG": LOG(0.2)})
+    hmm.add_state(M, LOG(0.0))
 
     with pytest.raises(ValueError):
-        hmm.add_state(NormalState("S", {a: LOG(1.0) for a in alphabet}))
+        hmm.add_state(S)
 
     with pytest.raises(ValueError):
-        hmm.add_state(NormalState("S2", {a: LOG(1.0) for a in alphabet[:-1]}))
+        hmm.add_state(M)
 
 
 def test_hmm_init_prob_trans_a():
