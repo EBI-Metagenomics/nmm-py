@@ -1,4 +1,4 @@
-from math import exp, isinf, inf
+from math import exp, isinf, inf, isnan
 from ._log import LOG
 from ._state import State
 from ._alphabet import Alphabet
@@ -17,44 +17,43 @@ class HMM:
         if self._hmm != ffi.NULL:
             lib.imm_hmm_destroy(self._hmm)
 
-    def init_prob(self, name, log_space=False):
-        v = self._init_logps.get(name, LOG(0.0))
-        if not log_space:
-            v = exp(v)
-        return v
-
     @property
     def states(self):
         return self._states
 
-    def trans(self, name_a: str, name_b: str, log_space: bool = False):
-        """
-        Parameters
-        ----------
-        name_a : str
-            Source state name.
-        name_b : str
-            Destination state name.
-        log_space : bool
-            ``True`` to return in log space. Defaults to ``False``.
-        """
-        v = self._trans.get(name_a, {}).get(name_b, LOG(0.0))
-        if not log_space:
-            v = exp(v)
-        return v
+    def set_start_lprob(self, state: State, lprob: float):
+        err: int = lib.imm_hmm_set_start_lprob(self._hmm, state.cdata, lprob)
+        if err != 0:
+            raise ValueError("Could not set start probability.")
 
-    def set_trans(self, name_a: str, name_b: str, logp: float):
+    def trans(self, a: State, b: State):
         """
         Parameters
         ----------
-        name_a : str
-            Source state name.
-        name_b : str
-            Destination state name.
-        logp : bool
-            Transition probability in log space.
+        a : State
+            Source state.
+        b : State
+            Destination state.
         """
-        self._trans[name_a][name_b] = logp
+        lprob: float = lib.imm_hmm_get_trans(self._hmm, a.cdata, b.cdata)
+        if isnan(lprob):
+            raise ValueError("Could not retrieve transition probability.")
+        return lprob
+
+    def set_trans(self, a: State, b: State, lprob: float):
+        """
+        Parameters
+        ----------
+        a : State
+            Source state name.
+        b : State
+            Destination state name.
+        lprob : float
+            Transition probability in log-space.
+        """
+        err: int = lib.imm_hmm_set_trans(self._hmm, a.cdata, b.cdata, lprob)
+        if err != 0:
+            raise ValueError("Could not set transition probability.")
 
     @property
     def alphabet(self):
@@ -102,8 +101,9 @@ class HMM:
                 del v[name]
 
     def normalize(self):
-        self._normalize_trans()
-        self._normalize_init_logps()
+        err: int = lib.imm_hmm_normalize(self._hmm)
+        if err != 0:
+            raise ValueError("Normalization error.")
 
     def likelihood(self, seq: str, state_path: list, log_space: bool = False):
         if len(state_path) == 0:
