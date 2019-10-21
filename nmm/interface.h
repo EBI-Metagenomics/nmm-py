@@ -3,7 +3,9 @@ struct imm_mute_state;
 struct imm_normal_state;
 struct imm_state;
 struct imm_table_state;
+struct nmm_base;
 struct nmm_codon;
+struct nmm_frame_state;
 
 struct imm_abc *imm_abc_create(const char *symbols);
 void            imm_abc_destroy(struct imm_abc *abc);
@@ -39,8 +41,19 @@ void imm_table_state_add(struct imm_table_state *state, const char *seq, double 
 int  imm_table_state_normalize(struct imm_table_state *state);
 
 struct nmm_codon *nmm_codon_create(const struct imm_abc *abc);
-struct nmm_codon *nmm_codon_clone(const struct nmm_codon *codon);
 int               nmm_codon_set_lprob(struct nmm_codon *codon, char a, char b, char c, double lprob);
 double            nmm_codon_get_lprob(const struct nmm_codon *codon, char a, char b, char c);
 int               nmm_codon_normalize(struct nmm_codon *codon);
 void              nmm_codon_destroy(struct nmm_codon *codon);
+
+struct nmm_frame_state *nmm_frame_state_create(const char *name, const struct imm_abc *bases,
+                                               const double *          base_lprobs,
+                                               const struct nmm_codon *codon, double epsilon);
+void                    nmm_frame_state_destroy(struct nmm_frame_state *state);
+int                     nmm_frame_state_normalize(struct nmm_frame_state *state);
+
+struct nmm_base *nmm_base_create(const struct imm_abc *abc);
+int              nmm_base_set_lprob(struct nmm_base *base, char nucleotide, double lprob);
+double           nmm_base_get_lprob(const struct nmm_base *base, char nucleotide);
+int              nmm_base_normalize(struct nmm_base *base);
+void             nmm_base_destroy(struct nmm_base *base);

@@ -4,6 +4,7 @@ from ._log import LOG
 from ._state import NormalState, MuteState, TableState
 from ._alphabet import Alphabet
 from ._codon import Codon
+from ._base import Base
 
 _ffi_err = """
 It is likely caused by a broken installation of this package.
@@ -30,4 +31,5 @@ __all__ = [
     "LOG",
     "Alphabet",
     "Codon",
+    "Base",
 ]
