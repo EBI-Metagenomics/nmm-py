@@ -2,7 +2,7 @@ from math import isinf
 import pytest
 from numpy.testing import assert_allclose
 from nmm import MuteState, NormalState, TableState, FrameState, Alphabet
-from nmm import HMM, LOG
+from nmm import HMM, LOG, Path
 
 
 def test_hmm_states():
@@ -72,67 +72,69 @@ def test_hmm_lik_1():
     hmm.add_state(M1, LOG(0.0))
 
     M2 = NormalState("M2", alphabet, [LOG(0.4), LOG(0.6), LOG(0.0), LOG(0.6)])
+    M2.normalize()
     hmm.add_state(M2, LOG(0.0))
 
     hmm.set_trans(S, M1, LOG(1.0))
     hmm.set_trans(M1, M2, LOG(1.0))
     hmm.set_trans(M2, E, LOG(1.0))
-    return
+    hmm.set_trans(E, E, LOG(1.0))
     hmm.normalize()
 
-    p = hmm.likelihood("AC", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.3)
+    p = hmm.likelihood("AC", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.3))
 
-    p = hmm.likelihood("AA", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.2)
+    p = hmm.likelihood("AA", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.2))
 
-    p = hmm.likelihood("AG", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0, atol=1e-7)
+    p = hmm.likelihood("AG", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0))
 
-    p = hmm.likelihood("AU", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.3)
+    p = hmm.likelihood("AU", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.3))
 
-    p = hmm.likelihood("CC", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.075)
+    p = hmm.likelihood("CC", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.075))
 
-    p = hmm.likelihood("CA", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.05)
+    p = hmm.likelihood("CA", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.05))
 
-    p = hmm.likelihood("CG", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("CG", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    logp = hmm.likelihood("CG", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)], True)
-    assert isinf(logp)
+    p = hmm.likelihood("CG", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    p = hmm.likelihood("CU", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.075)
+    p = hmm.likelihood("CU", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.075))
 
-    p = hmm.likelihood("GC", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("GC", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    p = hmm.likelihood("GA", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("GA", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    p = hmm.likelihood("GG", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("GG", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    p = hmm.likelihood("GU", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("GU", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    p = hmm.likelihood("UC", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("UC", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    p = hmm.likelihood("UA", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("UA", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    p = hmm.likelihood("UG", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("UG", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
-    p = hmm.likelihood("UU", [("S", 0), ("M1", 1), ("M2", 1), ("E", 0)])
-    assert_allclose(p, 0.0, atol=1e-7)
+    p = hmm.likelihood("UU", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    assert_allclose(p, LOG(0.0))
 
+    M3 = NormalState("M2", alphabet, [LOG(0.4), LOG(0.6), LOG(0.0), LOG(0.6)])
     with pytest.raises(ValueError):
-        hmm.likelihood("UU", [("S", 0), ("M1", 1), ("M22", 1), ("E", 0)])
+        hmm.likelihood("UU", Path([(S, 0), (M1, 1), (M3, 1), (E, 0)]))
 
 
 # def test_hmm_lik_2():

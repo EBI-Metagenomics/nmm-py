@@ -5,6 +5,7 @@ from ._state import NormalState, MuteState, TableState
 from ._alphabet import Alphabet
 from ._codon import Codon
 from ._base import Base
+from ._path import Path
 
 _ffi_err = """
 It is likely caused by a broken installation of this package.
@@ -32,4 +33,5 @@ __all__ = [
     "Alphabet",
     "Codon",
     "Base",
+    "Path",
 ]

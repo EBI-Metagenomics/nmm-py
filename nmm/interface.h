@@ -2,6 +2,7 @@ struct imm_abc;
 struct imm_hmm;
 struct imm_mute_state;
 struct imm_normal_state;
+struct imm_path;
 struct imm_state;
 struct imm_table_state;
 struct nmm_base;
@@ -69,3 +70,7 @@ double imm_hmm_get_trans(const struct imm_hmm *hmm, const struct imm_state *src_
 double imm_hmm_likelihood(const struct imm_hmm *hmm, const char *seq, const struct imm_path *path);
 double imm_hmm_viterbi(const struct imm_hmm *hmm, const char *seq, const struct imm_state *end_state);
 int    imm_hmm_normalize(struct imm_hmm *hmm);
+
+struct imm_path *imm_path_create(void);
+void             imm_path_destroy(struct imm_path *path);
+void             imm_path_add(struct imm_path *path, const struct imm_state *state, int seq_len);

@@ -1,4 +1,6 @@
 from math import exp, isinf, inf, isnan
+from ._string import make_sure_bytes
+from ._path import Path
 from ._log import LOG
 from ._state import State
 from ._alphabet import Alphabet
@@ -105,72 +107,48 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def likelihood(self, seq: str, state_path: list, log_space: bool = False):
-        if len(state_path) == 0:
-            if len(seq) == 0:
-                if log_space:
-                    return LOG(1.0)
-                return 1.0
-            if log_space:
-                return LOG(0.0)
-            return 0.0
+    def likelihood(self, seq: str, path: Path):
+        seq = make_sure_bytes(seq)
+        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq, path.cdata)
+        if isnan(lprob):
+            raise ValueError("Could not calculate the likelihood.")
+        return lprob
 
-        self._assure_states_exist([i[0] for i in state_path])
-        head = state_path[0]
-        qt = self._states[head[0]]
-        ft = head[1]
-        if ft > len(seq):
-            return 0.0
-        logp = self.init_prob(qt.name, True) + qt.prob(seq[:ft], True)
+    # def draw(self, filepath, emissions=0, init_prob=True, digits=3, view=False):
+    #     from graphviz import Digraph
 
-        seq = seq[ft:]
-        qt_1 = qt
-        for head in state_path[1:]:
-            qt = self._states[head[0]]
-            ft = head[1]
-            logp += qt.prob(seq[:ft], True) + self.trans(qt_1.name, qt.name, True)
-            seq = seq[ft:]
-            qt_1 = qt
+    #     graph = Digraph()
 
-        if log_space:
-            return logp
-        return exp(logp)
+    #     for state in self._states.values():
+    #         shape = "circle"
 
-    def draw(self, filepath, emissions=0, init_prob=True, digits=3, view=False):
-        from graphviz import Digraph
+    #         if init_prob:
+    #             p = self.init_prob(state.name, log_space=False)
+    #             p = round(p, digits)
+    #             if p > 0:
+    #                 state_label = f"{state.name}: {p}"
+    #             else:
+    #                 state_label = f"{state.name}"
+    #         else:
+    #             state_label = f"{state.name}"
 
-        graph = Digraph()
+    #         if emissions > 0:
+    #             emission = state.emission(log_space=False)
+    #             emission = emission[:emissions]
+    #             label = _format_emission_table(emission, state_label, digits)
+    #         else:
+    #             label = state_label
 
-        for state in self._states.values():
-            shape = "circle"
+    #         graph.node(state.name, label, shape=shape)
 
-            if init_prob:
-                p = self.init_prob(state.name, log_space=False)
-                p = round(p, digits)
-                if p > 0:
-                    state_label = f"{state.name}: {p}"
-                else:
-                    state_label = f"{state.name}"
-            else:
-                state_label = f"{state.name}"
+    #     for state0, trans in self._trans.items():
+    #         for state1, logp in trans.items():
+    #             p = exp(logp)
+    #             p = round(p, digits)
+    #             if p > 0:
+    #                 graph.edge(state0, state1, label=f"{p}")
 
-            if emissions > 0:
-                emission = state.emission(log_space=False)
-                emission = emission[:emissions]
-                label = _format_emission_table(emission, state_label, digits)
-            else:
-                label = state_label
-
-            graph.node(state.name, label, shape=shape)
-
-        for state0, trans in self._trans.items():
-            for state1, logp in trans.items():
-                p = exp(logp)
-                p = round(p, digits)
-                if p > 0:
-                    graph.edge(state0, state1, label=f"{p}")
-
-        graph.render(filepath, view=view)
+    #     graph.render(filepath, view=view)
 
     def viterbi(self, seq: str, end_state: str, log_space: bool = False):
         self._check_mute_cycle()
