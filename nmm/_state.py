@@ -1,7 +1,5 @@
 from ._alphabet import Alphabet
-from ._norm import normalize_emission
 from ._log import LOG
-from math import exp
 from ._string import make_sure_bytes
 
 from ._ffi import ffi, lib
