@@ -46,11 +46,9 @@ double            nmm_codon_get_lprob(const struct nmm_codon *codon, char a, cha
 int               nmm_codon_normalize(struct nmm_codon *codon);
 void              nmm_codon_destroy(struct nmm_codon *codon);
 
-struct nmm_frame_state *nmm_frame_state_create(const char *name, const struct imm_abc *bases,
-                                               const double *          base_lprobs,
+struct nmm_frame_state *nmm_frame_state_create(const char *name, const struct nmm_base *base,
                                                const struct nmm_codon *codon, double epsilon);
 void                    nmm_frame_state_destroy(struct nmm_frame_state *state);
-int                     nmm_frame_state_normalize(struct nmm_frame_state *state);
 
 struct nmm_base *nmm_base_create(const struct imm_abc *abc);
 int              nmm_base_set_lprob(struct nmm_base *base, char nucleotide, double lprob);

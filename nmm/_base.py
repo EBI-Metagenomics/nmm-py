@@ -5,10 +5,20 @@ from ._ffi import ffi, lib
 
 
 class Base:
-    def __init__(self, alphabet: Alphabet):
+    def __init__(self, alphabet: Alphabet, lprobs: dict = {}):
         self._alphabet = alphabet
         self._base = ffi.NULL
         self._base = lib.nmm_base_create(self._alphabet.cdata)
+        for letter, lprob in lprobs.items():
+            self.set_lprob(letter, lprob)
+
+    @property
+    def cdata(self):
+        return self._base
+
+    @property
+    def alphabet(self):
+        return self._alphabet
 
     def set_lprob(self, nucleotide: str, lprob: float):
         nucleotide = make_sure_bytes(nucleotide)

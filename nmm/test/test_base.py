@@ -27,3 +27,12 @@ def test_base():
     with pytest.raises(ValueError):
         base.get_lprob("XX")
 
+    base.normalize()
+
+    assert_allclose(base.get_lprob("A"), LOG(0.3) - LOG(0.6))
+    assert_allclose(base.get_lprob("T"), LOG(0.3) - LOG(0.6))
+
+    assert_equal(base.get_lprob("C"), LOG(0.0))
+    assert_equal(base.get_lprob("G"), LOG(0.0))
+
+    assert_equal(base.get_lprob("X"), nan)
