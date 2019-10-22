@@ -1,0 +1,6 @@
+include LICENSE.md
+include README.md
+include version.py
+include nmm/test/PF02545.hmm
+include nmm/test/PF03373.hmm
+include nmm/test/PF03373.seq

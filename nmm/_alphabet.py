@@ -34,3 +34,9 @@ class Alphabet:
     @property
     def symbols(self):
         return self._symbols.decode()
+
+    def __str__(self) -> str:
+        return f"{{{self.symbols}}}"
+
+    def __repr__(self) -> str:
+        return f"{{{self.__class__.__name__}:{self.symbols}}}"

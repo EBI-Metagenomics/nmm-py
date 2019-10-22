@@ -6,19 +6,20 @@ from ._alphabet import Alphabet
 from ._codon import Codon
 from ._base import Base
 from ._path import Path
+from . import hmmer
 
-_ffi_err = """
-It is likely caused by a broken installation of this package.
-Please, make sure you have a C compiler and try to uninstall
-and reinstall the package again."""
 
 try:
     from ._ffi import ffi as _
 
     del _
 except Exception as e:
-    e.msg = e.msg + _ffi_err
-    raise e
+    _ffi_err = """
+It is likely caused by a broken installation of this package.
+Please, make sure you have a C compiler and try to uninstall
+and reinstall the package again."""
+
+    raise RuntimeError(str(e) + _ffi_err)
 
 __version__ = "0.0.1"
 
@@ -34,4 +35,5 @@ __all__ = [
     "Codon",
     "Base",
     "Path",
+    "hmmer",
 ]

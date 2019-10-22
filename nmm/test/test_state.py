@@ -16,9 +16,11 @@ from nmm import (
 def test_normal_state():
     alphabet = Alphabet("ACGT")
     with pytest.raises(ValueError):
-        NormalState("M0", alphabet, [LOG(v) for v in [0.1, 0.2, 0.3]])
+        NormalState("M0", alphabet, {"A": LOG(0.1), "C": LOG(0.2), "X": LOG(0.3)})
 
-    state = NormalState("M0", alphabet, [LOG(v) for v in [0.1, 0.2, 0.3, 0.3]])
+    state = NormalState(
+        "M0", alphabet, {"A": LOG(0.1), "C": LOG(0.2), "G": LOG(0.3), "T": LOG(0.3)}
+    )
     assert_equal(state.name, "M0")
     assert_equal(state.lprob("A"), LOG(0.1))
     assert_equal(state.lprob("C"), LOG(0.2))

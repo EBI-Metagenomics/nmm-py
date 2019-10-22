@@ -20,6 +20,9 @@ class State:
 
     @property
     def name(self) -> str:
+        # Refer to https://github.com/pytest-dev/pytest/issues/4659
+        if self._state == ffi.NULL:
+            return "unknown-name"
         n = ffi.string(lib.imm_state_get_name(self.cdata))
         return n.decode()
 
@@ -80,7 +83,7 @@ class MuteState(State):
 
 
 class NormalState(State):
-    def __init__(self, name: str, alphabet: Alphabet, lprobs: list):
+    def __init__(self, name: str, alphabet: Alphabet, lprobs: dict):
         """
         Parameters
         ----------
@@ -93,12 +96,13 @@ class NormalState(State):
         """
         super(NormalState, self).__init__(alphabet)
 
-        if len(lprobs) != alphabet.length:
-            err = "Number of symbols is not equal to the probabilities list length."
-            raise ValueError(err)
+        if len(set(lprobs.keys() - set(alphabet.symbols))) > 0:
+            raise ValueError("Unrecognized alphabet symbol.")
+
+        lprobs_arr = [lprobs.get(symb, LOG(0.0)) for symb in alphabet.symbols]
 
         name = make_sure_bytes(name)
-        self._state = lib.imm_normal_state_create(name, alphabet.cdata, lprobs)
+        self._state = lib.imm_normal_state_create(name, alphabet.cdata, lprobs_arr)
 
     def __del__(self):
         if self._state != ffi.NULL:
