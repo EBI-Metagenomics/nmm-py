@@ -21,7 +21,9 @@ def test_read_hmmer_1(tmp_path):
     path += [(hmm.find_state("E"), 0)]
     most_likely_seq = "PGKEDNNK"
     lik = hmm.likelihood(most_likely_seq, nmm.Path(path))
-    assert_allclose(lik, -3.910292822282004)
+    assert_allclose(lik, -3.910270475034747)
+    score = hmm.viterbi(most_likely_seq, hmm.find_state("E"))
+    assert_allclose(score, -3.9102704750347463)
 
     seq = "PGKEDNNSQ"
     path = [
@@ -39,4 +41,4 @@ def test_read_hmmer_1(tmp_path):
     ]
     path = [(hmm.find_state(step[0]), step[1]) for step in path]
 
-    assert_allclose(hmm.likelihood(seq, nmm.Path(path)), -14.730611581031962)
+    assert_allclose(hmm.likelihood(seq, nmm.Path(path)), -14.730593544566743)

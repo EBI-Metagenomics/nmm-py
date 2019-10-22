@@ -84,7 +84,7 @@ def create_profile(hmmfile: hmmer_reader.HMMEReader):
     hmm.set_trans(curr.D, E, trans["DM"])
 
     hmm.del_state(D0)
-    # hmm.rename_state("M0", "B")
-    # hmm.normalize()
+    hmm.normalize()
+    hmm.set_trans(E, E, LOG(0.0))
 
     return hmm
