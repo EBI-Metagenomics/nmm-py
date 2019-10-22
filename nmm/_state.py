@@ -75,6 +75,9 @@ class MuteState(State):
         if self._state != ffi.NULL:
             lib.imm_mute_state_destroy(self._state)
 
+    def normalize(self):
+        pass
+
     def emission(self):
         return [("", LOG(1.0))]
 

@@ -4,7 +4,8 @@ from ._path import Path
 from ._log import LOG
 from ._state import State
 from ._alphabet import Alphabet
-from typing import Dict
+from bidict import bidict
+from typing import Dict, Optional, Union
 
 from ._ffi import ffi, lib
 
@@ -12,8 +13,9 @@ from ._ffi import ffi, lib
 class HMM:
     def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
-        self._hmm = lib.imm_hmm_create(self._alphabet.cdata)
         self._states: Dict[ffi.CData, State] = {}
+        self._state_names = bidict()
+        self._hmm = lib.imm_hmm_create(self._alphabet.cdata)
 
     def __del__(self):
         if self._hmm != ffi.NULL:
@@ -47,9 +49,9 @@ class HMM:
         Parameters
         ----------
         a : State
-            Source state name.
+            Source state.
         b : State
-            Destination state name.
+            Destination state.
         lprob : float
             Transition probability in log-space.
         """
@@ -57,11 +59,16 @@ class HMM:
         if err != 0:
             raise ValueError("Could not set transition probability.")
 
+    def find_state(self, state_name: str):
+        return self._states[self._state_names.inverse[state_name]]
+
     @property
     def alphabet(self):
         return self._alphabet
 
-    def add_state(self, state: State, start_lprob: float = LOG(0.0)):
+    def add_state(
+        self, state: State, start_lprob: float = LOG(0.0), name: Optional[str] = None
+    ):
         """
         Parameters
         ----------
@@ -74,6 +81,8 @@ class HMM:
         if err != 0:
             raise ValueError("Could not add state %s.", state)
         self._states[state.cdata] = state
+        if name is not None:
+            self._state_names[state.cdata] = name
 
     def del_state(self, state: State):
         if state.cdata not in self._states:
@@ -84,6 +93,10 @@ class HMM:
             raise ValueError(f"Could not delete state {state}.")
 
         del self._states[state.cdata]
+        try:
+            self._state_names.pop(state.cdata)
+        except KeyError:
+            pass
 
     def normalize(self):
         err: int = lib.imm_hmm_normalize(self._hmm)
