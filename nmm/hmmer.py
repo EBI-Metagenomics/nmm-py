@@ -29,38 +29,53 @@ def create_profile(hmmfile: hmmer_reader.HMMEReader):
 
     hmm = HMM(alphabet)
 
-    breakpoint()
-    hmm.add_state(MuteState("M0", alphabet), LOG(1.0))
-    hmm.add_state(NormalState("I0", alphabet, hmmfile.insert(0, True)))
-    hmm.add_state(MuteState("D0", alphabet))
+    D0 = MuteState("D0", alphabet)
+    prev = {
+        "M": MuteState("B", alphabet),
+        "I": NormalState("I0", alphabet, hmmfile.insert(0, True)),
+        "D": D0,
+    }
+    hmm.add_state(prev["M"], LOG(1.0))
+    hmm.add_state(prev["I"])
+    hmm.add_state(prev["D"])
 
     for m in range(1, hmmfile.M + 1):
-        hmm.add_state(NormalState(f"M{m}", hmmfile.match(m, True)))
-        hmm.add_state(NormalState(f"I{m}", hmmfile.insert(m, True)))
-        hmm.add_state(MuteState(f"D{m}", alphabet, False))
+        curr = {
+            "M": NormalState(f"M{m}", alphabet, hmmfile.match(m, True)),
+            "I": NormalState(f"I{m}", alphabet, hmmfile.insert(m, True)),
+            "D": MuteState(f"D{m}", alphabet),
+        }
+        hmm.add_state(curr["M"])
+        hmm.add_state(curr["I"])
+        hmm.add_state(curr["D"])
 
         trans = hmmfile.trans(m - 1, True)
 
-        hmm.set_trans(f"M{m-1}", f"M{m}", trans["MM"])
-        hmm.set_trans(f"M{m-1}", f"I{m-1}", trans["MI"])
-        hmm.set_trans(f"M{m-1}", f"D{m}", trans["MD"])
-        hmm.set_trans(f"I{m-1}", f"M{m}", trans["IM"])
-        hmm.set_trans(f"I{m-1}", f"I{m-1}", trans["II"])
-        hmm.set_trans(f"D{m-1}", f"M{m}", trans["DM"])
-        hmm.set_trans(f"D{m-1}", f"D{m}", trans["DD"])
+        hmm.set_trans(prev["M"], curr["M"], trans["MM"])
+        hmm.set_trans(prev["M"], prev["I"], trans["MI"])
+        hmm.set_trans(prev["M"], curr["D"], trans["MD"])
+        hmm.set_trans(prev["I"], curr["M"], trans["IM"])
+        hmm.set_trans(prev["I"], prev["I"], trans["II"])
+        hmm.set_trans(prev["D"], curr["M"], trans["DM"])
+        hmm.set_trans(prev["D"], curr["D"], trans["DD"])
 
-    hmm.add_state(MuteState("E", alphabet, True))
-    hmm.set_trans("E", "E", LOG(1.0))
+        prev = curr
+
+    E = MuteState("E", alphabet)
+    hmm.add_state(E)
+    hmm.set_trans(E, E, LOG(1.0))
 
     M = hmmfile.M
     trans = hmmfile.trans(M, True)
-    hmm.set_trans(f"M{M}", f"E", trans["MM"])
-    hmm.set_trans(f"M{M}", f"I{M}", trans["MI"])
-    hmm.set_trans(f"I{M}", f"E", trans["IM"])
-    hmm.set_trans(f"I{M}", f"I{M}", trans["II"])
-    hmm.set_trans(f"D{M}", f"E", trans["DM"])
 
-    hmm.delete_state("D0")
-    hmm.rename_state("M0", "B")
-    hmm.normalize()
+    hmm.set_trans(curr["M"], E, trans["MM"])
+    hmm.set_trans(curr["M"], curr["I"], trans["MI"])
+    hmm.set_trans(curr["I"], E, trans["IM"])
+    hmm.set_trans(curr["I"], curr["I"], trans["II"])
+    hmm.set_trans(curr["D"], E, trans["DM"])
+
+    hmm.del_state(D0)
+    # hmm.rename_state("M0", "B")
+    # hmm.normalize()
+
     return hmm
