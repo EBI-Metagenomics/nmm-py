@@ -104,6 +104,9 @@ class NormalState(State):
         if self._state == ffi.NULL:
             raise RuntimeError("Could not create state.")
 
+    def emission_table(self) -> Dict[str, float]:
+        return {s: self.lprob(s) for s in self.alphabet.symbols}
+
     def normalize(self) -> None:
         err = lib.imm_normal_state_normalize(self._state)
         if err != 0:
