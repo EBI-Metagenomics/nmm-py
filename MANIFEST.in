@@ -4,3 +4,4 @@ include version.py
 include nmm/test/PF02545.hmm
 include nmm/test/PF03373.hmm
 include nmm/test/PF03373.seq
+include nmm/test/Nckap1.hmm

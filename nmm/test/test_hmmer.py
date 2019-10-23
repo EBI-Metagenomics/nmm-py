@@ -148,6 +148,36 @@ def test_hmmer_global_profile(tmp_path):
     pv = hmmer.gumbel("SSSSSSSS"[::-1], mu, lamb)
 
 
+def test_hmmer_speed(tmp_path):
+    from random import choices
+    from time import time
+
+    filename = "PF02545.hmm"
+    text = pkg_resources.read_text(nmm.test, filename)
+
+    with open(tmp_path / filename, "w") as f:
+        f.write(text)
+
+    hmmer = nmm.hmmer.read_file2(tmp_path / filename)
+    seq = "".join(choices(list(hmmer.hmm.alphabet.symbols), k=166))
+    start = time()
+    hmmer.viterbi(seq)
+    print("Elapsed: {}".format(time() - start))
+
+    filename = "Nckap1.hmm"
+    text = pkg_resources.read_text(nmm.test, filename)
+
+    with open(tmp_path / filename, "w") as f:
+        f.write(text)
+
+    hmmer = nmm.hmmer.read_file2(tmp_path / filename)
+    # seq = "".join(choices(list(hmmer.hmm.alphabet.symbols), k=1118))
+    seq = "".join(choices(list(hmmer.hmm.alphabet.symbols), k=100))
+    start = time()
+    hmmer.viterbi(seq)
+    print("Elapsed: {}".format(time() - start))
+
+
 @pytest.fixture
 def PF03373(tmp_path):
     filename = "PF03373.hmm"
@@ -157,3 +187,4 @@ def PF03373(tmp_path):
         f.write(text)
 
     return nmm.hmmer.read_file(tmp_path / filename)
+
