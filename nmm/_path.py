@@ -1,10 +1,11 @@
+from typing import List, Tuple
 from ._state import State
 
 from ._ffi import ffi, lib
 
 
 class Path:
-    def __init__(self, path: list):
+    def __init__(self, path: List[Tuple[State, int]]):
         self._path = lib.imm_path_create()
         for step in path:
             self._add(step[0].cdata, step[1])

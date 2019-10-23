@@ -57,6 +57,12 @@ class System(object):
     def add_include_dir(self, d):
         self._include_dirs.append(d)
 
+    def get_library_dirs(self) -> list:
+        raise NotImplementedError
+
+    def get_include_dirs(self) -> list:
+        raise NotImplementedError
+
 
 class Windows(System):
     def get_programfiles(self):
@@ -64,7 +70,7 @@ class Windows(System):
             return self.get_32bits_programfiles()
         return self.get_64bits_programfiles()
 
-    def get_64bits_programfiles(self):
+    def get_64bits_programfiles(self) -> str:
         n = "PROGRAMW6432"
         if n not in os.environ:
             raise RuntimeError("{} variable is not defined.".format(n))
@@ -75,7 +81,7 @@ class Windows(System):
 
         return f
 
-    def get_32bits_programfiles(self):
+    def get_32bits_programfiles(self) -> str:
         n = "PROGRAMFILES"
         if n not in os.environ:
             raise RuntimeError("{} variable is not defined.".format(n))
@@ -96,7 +102,7 @@ class Windows(System):
         dirs = [d for d in dirs if len(d) > 0 and exists(d)]
         return self._include_dirs + dirs
 
-    def get_library_dirs(self):
+    def get_library_dirs(self) -> list:
         dirs = [join(get_config_var("prefix"), "lib")]
 
         names = ["LIBRARY_LIB"]
@@ -139,7 +145,7 @@ class Unix(System):
         dirs = [d for d in dirs if len(d) > 0 and exists(d)]
         return self._include_dirs + dirs
 
-    def get_library_dirs(self):
+    def get_library_dirs(self) -> list:
         dirs = [join(get_config_var("prefix"), "lib")]
         dirs += ["/usr/lib", "/usr/local/lib"]
         vals = [os.environ[n] for n in ["LIBRARY_PATH"] if n in os.environ]

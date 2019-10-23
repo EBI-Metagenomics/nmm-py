@@ -4,7 +4,7 @@ from os.path import join
 
 from cffi import FFI
 
-from libpath import Unix, Windows
+from libpath import System, Unix, Windows
 
 ffibuilder = FFI()
 libs = ["imm", "nmm"]
@@ -15,17 +15,18 @@ with open(join(folder, "nmm", "interface.h"), "r") as f:
     ffibuilder.cdef(f.read())
 
 if platform.system() == "Windows":
-    s = Windows()
-    f = s.get_programfiles()
+    win = Windows()
+    progfiles = win.get_programfiles()
     for lib in libs:
-        s.add_library_dir(join(f, lib, "lib"))
-        s.add_include_dir(join(f, lib, "include"))
+        win.add_library_dir(join(progfiles, lib, "lib"))
+        win.add_include_dir(join(progfiles, lib, "include"))
 
-    libs = [s.find_libname(lib) for lib in libs]
+    libs = [win.find_libname(lib) for lib in libs]
+    system: System = win
 else:
-    s = Unix()
+    system = Unix()
 
-library_dirs = s.get_library_dirs()
+library_dirs = system.get_library_dirs()
 extra_link_args = []
 if platform.system() == "Darwin":
     if len(library_dirs) > 0:
@@ -39,7 +40,7 @@ ffibuilder.set_source(
     """,
     libraries=libs,
     library_dirs=library_dirs,
-    include_dirs=s.get_include_dirs(),
+    include_dirs=system.get_include_dirs(),
     extra_link_args=extra_link_args,
     language="c",
 )
