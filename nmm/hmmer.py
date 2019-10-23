@@ -296,11 +296,11 @@ class HMMERProfile:
         score1 = self.viterbi(seq)
         return score1 - score0
 
-    def gumbel(self, seq: str, loc: float, scale: float) -> float:
+    def gumbel(self, seq: str, loc: float, lamb: float) -> float:
         import scipy.stats as st
 
         lr = self.lr(seq)
-        return 1 - st.gumbel_r(loc=loc, scale=scale).cdf(lr)
+        return 1 - st.gumbel_r(loc=loc, scale=1 / lamb).cdf(lr)
 
 
 class _HMMERCoreModel:
