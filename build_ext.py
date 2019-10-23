@@ -1,6 +1,7 @@
 import os
 import platform
 from os.path import join
+from typing import List
 
 from cffi import FFI
 
@@ -27,7 +28,7 @@ else:
     system = Unix()
 
 library_dirs = system.get_library_dirs()
-extra_link_args = []
+extra_link_args: List[str] = []
 if platform.system() == "Darwin":
     if len(library_dirs) > 0:
         extra_link_args += ["-Wl,-rpath," + ",-rpath,".join(library_dirs)]

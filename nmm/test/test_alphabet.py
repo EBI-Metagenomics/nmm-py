@@ -1,4 +1,5 @@
 from numpy.testing import assert_equal
+
 from nmm import Alphabet
 
 

@@ -1,11 +1,11 @@
 from ._alphabet import Alphabet
-from ._string import make_sure_bytes
+from typing import Dict
 
 from ._ffi import ffi, lib
 
 
 class Base:
-    def __init__(self, alphabet: Alphabet, lprobs: dict = {}):
+    def __init__(self, alphabet: Alphabet, lprobs: Dict[str, float] = {}):
         self._alphabet = alphabet
         self._base = ffi.NULL
         self._base = lib.nmm_base_create(self._alphabet.cdata)
@@ -13,28 +13,28 @@ class Base:
             self.set_lprob(letter, lprob)
 
     @property
-    def cdata(self):
+    def cdata(self) -> ffi.CData:
         return self._base
 
     @property
-    def alphabet(self):
+    def alphabet(self) -> Alphabet:
         return self._alphabet
 
-    def set_lprob(self, nucleotide: str, lprob: float):
-        nucleotide = make_sure_bytes(nucleotide)
-        if len(nucleotide) != 1:
+    def set_lprob(self, nucleotide: str, lprob: float) -> None:
+        letter = nucleotide.encode()
+        if len(letter) != 1:
             raise ValueError("Nucleotide must be a single letter.")
-        err: int = lib.nmm_base_set_lprob(self._base, nucleotide, lprob)
+        err: int = lib.nmm_base_set_lprob(self._base, letter, lprob)
         if err != 0:
             raise ValueError(f"Could not set a probability for `{nucleotide}`.")
 
     def get_lprob(self, nucleotide: str) -> float:
-        nucleotide = make_sure_bytes(nucleotide)
-        if len(nucleotide) != 1:
+        letter = nucleotide.encode()
+        if len(letter) != 1:
             raise ValueError("Nucleotide must be a single letter.")
-        return lib.nmm_base_get_lprob(self._base, nucleotide)
+        return lib.nmm_base_get_lprob(self._base, letter)
 
-    def normalize(self):
+    def normalize(self) -> None:
         err: int = lib.nmm_base_normalize(self._base)
         if err != 0:
             raise ValueError("Normalization error.")

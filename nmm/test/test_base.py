@@ -1,20 +1,22 @@
+from math import log
 import pytest
 from numpy import nan
 from numpy.testing import assert_allclose, assert_equal
-from nmm import Base, Alphabet, LOG
+
+from nmm import LOG0, Alphabet, Base
 
 
 def test_base():
     alphabet = Alphabet("ACGT")
     base = Base(alphabet)
-    base.set_lprob("A", LOG(0.3))
-    base.set_lprob("T", LOG(0.3))
+    base.set_lprob("A", log(0.3))
+    base.set_lprob("T", log(0.3))
 
-    assert_allclose(base.get_lprob("A"), LOG(0.3))
-    assert_allclose(base.get_lprob("T"), LOG(0.3))
+    assert_allclose(base.get_lprob("A"), log(0.3))
+    assert_allclose(base.get_lprob("T"), log(0.3))
 
-    assert_equal(base.get_lprob("C"), LOG(0.0))
-    assert_equal(base.get_lprob("G"), LOG(0.0))
+    assert_equal(base.get_lprob("C"), LOG0)
+    assert_equal(base.get_lprob("G"), LOG0)
 
     assert_equal(base.get_lprob("X"), nan)
 
@@ -29,10 +31,10 @@ def test_base():
 
     base.normalize()
 
-    assert_allclose(base.get_lprob("A"), LOG(0.3) - LOG(0.6))
-    assert_allclose(base.get_lprob("T"), LOG(0.3) - LOG(0.6))
+    assert_allclose(base.get_lprob("A"), log(0.3) - log(0.6))
+    assert_allclose(base.get_lprob("T"), log(0.3) - log(0.6))
 
-    assert_equal(base.get_lprob("C"), LOG(0.0))
-    assert_equal(base.get_lprob("G"), LOG(0.0))
+    assert_equal(base.get_lprob("C"), LOG0)
+    assert_equal(base.get_lprob("G"), LOG0)
 
     assert_equal(base.get_lprob("X"), nan)

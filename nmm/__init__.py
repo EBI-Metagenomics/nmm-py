@@ -1,7 +1,6 @@
-from ._frame_state import FrameState
 from ._hmm import HMM
-from ._log import LOG
-from ._state import NormalState, MuteState, TableState
+from ._log import LOG0
+from ._state import NormalState, MuteState, TableState, FrameState
 from ._alphabet import Alphabet
 from ._codon import Codon
 from ._base import Base
@@ -30,10 +29,10 @@ __all__ = [
     "NormalState",
     "TableState",
     "FrameState",
-    "LOG",
     "Alphabet",
     "Codon",
     "Base",
     "Path",
     "hmmer",
+    "LOG0",
 ]

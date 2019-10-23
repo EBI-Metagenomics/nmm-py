@@ -33,7 +33,6 @@ Example
 import os
 import struct
 from os.path import exists, join
-from sysconfig import get_config_var
 
 __version__ = "0.0.2"
 
@@ -93,7 +92,7 @@ class Windows(System):
         return f
 
     def get_include_dirs(self):
-        dirs = [join(get_config_var("prefix"), "include")]
+        dirs = [join(_get_system_prefix(), "include")]
 
         names = ["INCLUDE", "LIBRARY_INC"]
         vals = [os.environ[n] for n in names if n in os.environ]
@@ -103,7 +102,7 @@ class Windows(System):
         return self._include_dirs + dirs
 
     def get_library_dirs(self) -> list:
-        dirs = [join(get_config_var("prefix"), "lib")]
+        dirs = [join(_get_system_prefix(), "lib")]
 
         names = ["LIBRARY_LIB"]
         vals = [os.environ[n] for n in names if n in os.environ]
@@ -138,7 +137,7 @@ class Windows(System):
 
 class Unix(System):
     def get_include_dirs(self):
-        dirs = [join(get_config_var("prefix"), "include")]
+        dirs = [join(_get_system_prefix(), "include")]
         dirs += ["/usr/include", "/usr/local/include"]
         vals = [os.environ[n] for n in ["C_INCLUDE_PATH"] if n in os.environ]
         dirs += [d for v in vals for d in v.split(":")]
@@ -146,7 +145,7 @@ class Unix(System):
         return self._include_dirs + dirs
 
     def get_library_dirs(self) -> list:
-        dirs = [join(get_config_var("prefix"), "lib")]
+        dirs = [join(_get_system_prefix(), "lib")]
         dirs += ["/usr/lib", "/usr/local/lib"]
         vals = [os.environ[n] for n in ["LIBRARY_PATH"] if n in os.environ]
         dirs += [d for v in vals for d in v.split(":")]
@@ -158,3 +157,12 @@ class Unix(System):
         msg += "Include dirs: {}\n".format(self.get_include_dirs())
         msg += "Library dirs: {}\n".format(self.get_library_dirs())
         return msg
+
+
+def _get_system_prefix() -> str:
+    from sysconfig import get_config_var
+
+    prefix = get_config_var("prefix")
+    if prefix is None:
+        raise RuntimeError("Could not find system's prefix.")
+    return prefix

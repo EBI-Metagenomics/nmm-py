@@ -1,6 +1,8 @@
 from ._alphabet import Alphabet
-from ._log import LOG
-from ._string import make_sure_bytes
+from ._base import Base
+from ._codon import Codon
+from ._log import LOG0
+from typing import Dict
 
 from ._ffi import ffi, lib
 
@@ -10,8 +12,6 @@ class State:
         """
         Parameters
         ----------
-        name : str
-            Name.
         alphabet : str
             Alphabet.
         """
@@ -22,9 +22,8 @@ class State:
     def name(self) -> str:
         # Refer to https://github.com/pytest-dev/pytest/issues/4659
         if self._state == ffi.NULL:
-            return "unknown-name"
-        n = ffi.string(lib.imm_state_get_name(self.cdata))
-        return n.decode()
+            raise RuntimeError("State has failed to initialize.")
+        return ffi.string(lib.imm_state_get_name(self.cdata)).decode()
 
     @property
     def alphabet(self) -> Alphabet:
@@ -32,14 +31,14 @@ class State:
 
     def lprob(self, seq: str) -> float:
         """
-        Log-probability of sequence emission.
+        Log-space probability of sequence emission.
 
         Parameters
         ----------
         seq : str
             Sequence.
         """
-        return lib.imm_state_lprob(self.cdata, make_sure_bytes(seq), len(seq))
+        return lib.imm_state_lprob(self.cdata, seq.encode(), len(seq))
 
     @property
     def min_seq(self) -> int:
@@ -50,7 +49,7 @@ class State:
         return lib.imm_state_max_seq(self.cdata)
 
     @property
-    def cdata(self):
+    def cdata(self) -> ffi.CData:
         return lib.imm_state_cast_c(self._state)
 
     def __str__(self) -> str:
@@ -68,25 +67,23 @@ class MuteState(State):
             Alphabet.
         """
         super(MuteState, self).__init__(alphabet)
-        name = make_sure_bytes(name)
-        self._state = lib.imm_mute_state_create(name, alphabet.cdata)
+        self._state = lib.imm_mute_state_create(name.encode(), alphabet.cdata)
+        if self._state == ffi.NULL:
+            raise ValueError("Could not create state.")
+
+    def normalize(self) -> None:
+        pass
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{self.name}>"
 
     def __del__(self):
         if self._state != ffi.NULL:
             lib.imm_mute_state_destroy(self._state)
 
-    def normalize(self):
-        pass
-
-    def emission(self):
-        return [("", LOG(1.0))]
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__}:{self.name}>"
-
 
 class NormalState(State):
-    def __init__(self, name: str, alphabet: Alphabet, lprobs: dict):
+    def __init__(self, name: str, alphabet: Alphabet, lprobs: Dict[str, float]):
         """
         Parameters
         ----------
@@ -94,7 +91,7 @@ class NormalState(State):
             Name.
         alphabet : Alphabet
             Alphabet.
-        lprobs : list
+        lprobs : dict
             List of probabilities in log-space.
         """
         super(NormalState, self).__init__(alphabet)
@@ -102,30 +99,26 @@ class NormalState(State):
         if len(set(lprobs.keys() - set(alphabet.symbols))) > 0:
             raise ValueError("Unrecognized alphabet symbol.")
 
-        lprobs_arr = [lprobs.get(symb, LOG(0.0)) for symb in alphabet.symbols]
+        arr = [lprobs.get(symb, LOG0) for symb in alphabet.symbols]
+        self._state = lib.imm_normal_state_create(name.encode(), alphabet.cdata, arr)
+        if self._state == ffi.NULL:
+            raise ValueError("Could not create state.")
 
-        name = make_sure_bytes(name)
-        self._state = lib.imm_normal_state_create(name, alphabet.cdata, lprobs_arr)
+    def normalize(self) -> None:
+        err = lib.imm_normal_state_normalize(self._state)
+        if err != 0:
+            raise ValueError("Normalization error.")
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{self.name}>"
 
     def __del__(self):
         if self._state != ffi.NULL:
             lib.imm_normal_state_destroy(self._state)
 
-    def normalize(self):
-        err = lib.imm_normal_state_normalize(self._state)
-        if err != 0:
-            raise ValueError("Normalization error.")
-
-    def emission(self):
-        emission = {symbol: self.lprob(symbol) for symbol in self.alphabet.symbols}
-        return emission_table(emission)
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__}:{self.name}>"
-
 
 class TableState(State):
-    def __init__(self, name: str, alphabet: Alphabet, emission: dict):
+    def __init__(self, name: str, alphabet: Alphabet, emission: Dict[str, float]):
         """
         Parameters
         ----------
@@ -138,33 +131,52 @@ class TableState(State):
         """
         super(TableState, self).__init__(alphabet)
 
-        name = make_sure_bytes(name)
-        self._state = lib.imm_table_state_create(name, alphabet.cdata)
+        self._state = lib.imm_table_state_create(name.encode(), alphabet.cdata)
+        if self._state == ffi.NULL:
+            raise ValueError("Could not create state.")
 
         for seq, lprob in emission.items():
-            seq = make_sure_bytes(seq)
-            lib.imm_table_state_add(self._state, seq, lprob)
+            lib.imm_table_state_add(self._state, seq.encode(), lprob)
 
-    def normalize(self):
+    def normalize(self) -> None:
         err = lib.imm_table_state_normalize(self._state)
         if err != 0:
             raise ValueError("Normalization error.")
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{self.name}>"
 
     def __del__(self):
         if self._state != ffi.NULL:
             lib.imm_table_state_destroy(self._state)
 
+
+class FrameState(State):
+    def __init__(self, name: str, base: Base, codon: Codon, epsilon: float):
+        """
+        Parameters
+        ----------
+        name : str
+            Name.
+        base : Base
+            Base.
+        codon : Codon
+            Codon.
+        epsilon : float
+            Epsilon.
+        """
+        super(FrameState, self).__init__(codon.alphabet)
+        self._base = base
+        self._codon = codon
+
+        n = name.encode()
+        self._state = lib.nmm_frame_state_create(n, base.cdata, codon.cdata, epsilon)
+        if self._state == ffi.NULL:
+            raise ValueError("Could not create state.")
+
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name}>"
 
-
-def emission_table(emission: dict):
-    """
-    Parameters
-    ----------
-    emission : dict
-        Emission probabilities in log-space.
-    """
-    table = list(emission.items())
-    table = sorted(table, key=lambda x: -x[1])
-    return table
+    def __del__(self):
+        if self._state != ffi.NULL:
+            lib.nmm_frame_state_destroy(self._state)

@@ -1,11 +1,10 @@
 from math import isnan
-from ._string import make_sure_bytes
 from ._path import Path
 from ._log import LOG
 from ._state import State
 from ._alphabet import Alphabet
 from bidict import bidict
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 
 from ._ffi import ffi, lib
 
@@ -104,15 +103,13 @@ class HMM:
             raise ValueError("Normalization error.")
 
     def likelihood(self, seq: str, path: Path):
-        seq = make_sure_bytes(seq)
-        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq, path.cdata)
+        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq.encode(), path.cdata)
         if isnan(lprob):
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
     def viterbi(self, seq: str, end_state: State):
-        seq = make_sure_bytes(seq)
-        lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, end_state.cdata)
+        lprob: float = lib.imm_hmm_viterbi(self._hmm, seq.encode(), end_state.cdata)
         if isnan(lprob):
             raise ValueError("Could not calculate the viterbi score.")
         return lprob
