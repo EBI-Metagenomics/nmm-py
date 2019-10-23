@@ -1,6 +1,6 @@
 from math import isnan
 from ._path import Path
-from ._log import LOG
+from ._log import LOG0
 from ._state import State
 from ._alphabet import Alphabet
 from bidict import bidict
@@ -27,7 +27,7 @@ class HMM:
     def set_start_lprob(self, state: State, lprob: float):
         err: int = lib.imm_hmm_set_start_lprob(self._hmm, state.cdata, lprob)
         if err != 0:
-            raise ValueError("Could not set start probability.")
+            raise RuntimeError("Could not set start probability.")
 
     def trans(self, a: State, b: State):
         """
@@ -40,7 +40,7 @@ class HMM:
         """
         lprob: float = lib.imm_hmm_get_trans(self._hmm, a.cdata, b.cdata)
         if isnan(lprob):
-            raise ValueError("Could not retrieve transition probability.")
+            raise RuntimeError("Could not retrieve transition probability.")
         return lprob
 
     def set_trans(self, a: State, b: State, lprob: float):
@@ -54,9 +54,15 @@ class HMM:
         lprob : float
             Transition probability in log-space.
         """
+        if a.cdata not in self._states:
+            raise ValueError(f"State {a} not found.")
+
+        if b.cdata not in self._states:
+            raise ValueError(f"State {b} not found.")
+
         err: int = lib.imm_hmm_set_trans(self._hmm, a.cdata, b.cdata, lprob)
         if err != 0:
-            raise ValueError("Could not set transition probability.")
+            raise RuntimeError("Could not set transition probability.")
 
     def find_state(self, state_name: str):
         return self._states[self._state_names.inverse[state_name]]
@@ -66,7 +72,7 @@ class HMM:
         return self._alphabet
 
     def add_state(
-        self, state: State, start_lprob: float = LOG(0.0), name: Optional[str] = None
+        self, state: State, start_lprob: float = LOG0, name: Optional[str] = None
     ):
         """
         Parameters
@@ -89,7 +95,7 @@ class HMM:
 
         err: int = lib.imm_hmm_del_state(self._hmm, state.cdata)
         if err != 0:
-            raise ValueError(f"Could not delete state {state}.")
+            raise RuntimeError(f"Could not delete state {state}.")
 
         del self._states[state.cdata]
         try:

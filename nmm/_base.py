@@ -37,7 +37,7 @@ class Base:
     def normalize(self) -> None:
         err: int = lib.nmm_base_normalize(self._base)
         if err != 0:
-            raise ValueError("Normalization error.")
+            raise RuntimeError("Normalization error.")
 
     def __del__(self):
         if self._base != ffi.NULL:

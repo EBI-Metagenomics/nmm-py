@@ -38,3 +38,13 @@ def test_base():
     assert_equal(base.get_lprob("G"), LOG0)
 
     assert_equal(base.get_lprob("X"), nan)
+
+    assert_equal(set(base.alphabet.symbols), set("ACGT"))
+
+    base.set_lprob("A", LOG0)
+    base.set_lprob("C", LOG0)
+    base.set_lprob("G", LOG0)
+    base.set_lprob("T", LOG0)
+
+    with pytest.raises(RuntimeError):
+        base.normalize()

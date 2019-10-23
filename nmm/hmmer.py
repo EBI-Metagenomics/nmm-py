@@ -1,9 +1,9 @@
 from pathlib import Path
-
-import hmmer_reader
 from typing import NamedTuple, Union
 
-from ._log import LOG
+import hmmer_reader
+
+from ._log import LOG0
 
 
 def read_file(file):
@@ -42,7 +42,7 @@ def create_profile(hmmfile: hmmer_reader.HMMEReader):
         D=D0,
     )
     curr.I.normalize()
-    hmm.add_state(curr.M, LOG(1.0), name="B")
+    hmm.add_state(curr.M, 0.0, name="B")
     hmm.add_state(curr.I, name="I0")
     hmm.add_state(curr.D, name="D0")
 
@@ -72,7 +72,7 @@ def create_profile(hmmfile: hmmer_reader.HMMEReader):
 
     E = MuteState("E", alphabet)
     hmm.add_state(E, name="E")
-    hmm.set_trans(E, E, LOG(1.0))
+    hmm.set_trans(E, E, 0.0)
 
     M = hmmfile.M
     trans = hmmfile.trans(M, True)
@@ -85,6 +85,6 @@ def create_profile(hmmfile: hmmer_reader.HMMEReader):
 
     hmm.del_state(D0)
     hmm.normalize()
-    hmm.set_trans(E, E, LOG(0.0))
+    hmm.set_trans(E, E, LOG0)
 
     return hmm

@@ -69,7 +69,7 @@ class MuteState(State):
         super(MuteState, self).__init__(alphabet)
         self._state = lib.imm_mute_state_create(name.encode(), alphabet.cdata)
         if self._state == ffi.NULL:
-            raise ValueError("Could not create state.")
+            raise RuntimeError("Could not create state.")
 
     def normalize(self) -> None:
         pass
@@ -102,12 +102,12 @@ class NormalState(State):
         arr = [lprobs.get(symb, LOG0) for symb in alphabet.symbols]
         self._state = lib.imm_normal_state_create(name.encode(), alphabet.cdata, arr)
         if self._state == ffi.NULL:
-            raise ValueError("Could not create state.")
+            raise RuntimeError("Could not create state.")
 
     def normalize(self) -> None:
         err = lib.imm_normal_state_normalize(self._state)
         if err != 0:
-            raise ValueError("Normalization error.")
+            raise RuntimeError("Normalization error.")
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name}>"
@@ -133,7 +133,7 @@ class TableState(State):
 
         self._state = lib.imm_table_state_create(name.encode(), alphabet.cdata)
         if self._state == ffi.NULL:
-            raise ValueError("Could not create state.")
+            raise RuntimeError("Could not create state.")
 
         for seq, lprob in emission.items():
             lib.imm_table_state_add(self._state, seq.encode(), lprob)
@@ -141,7 +141,7 @@ class TableState(State):
     def normalize(self) -> None:
         err = lib.imm_table_state_normalize(self._state)
         if err != 0:
-            raise ValueError("Normalization error.")
+            raise RuntimeError("Normalization error.")
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name}>"
@@ -172,7 +172,7 @@ class FrameState(State):
         n = name.encode()
         self._state = lib.nmm_frame_state_create(n, base.cdata, codon.cdata, epsilon)
         if self._state == ffi.NULL:
-            raise ValueError("Could not create state.")
+            raise RuntimeError("Could not create state.")
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name}>"

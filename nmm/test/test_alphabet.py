@@ -1,3 +1,4 @@
+import pytest
 from numpy.testing import assert_equal
 
 from nmm import Alphabet
@@ -23,3 +24,9 @@ def test_alphabet():
     assert_equal(abc.symbol_id(3), "T")
 
     assert_equal(abc.symbols, "ACGT")
+
+    assert_equal(str(abc), "{ACGT}")
+    assert_equal(repr(abc), "{Alphabet:ACGT}")
+
+    with pytest.raises(RuntimeError):
+        Alphabet("ACGTç")

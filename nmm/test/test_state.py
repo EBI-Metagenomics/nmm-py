@@ -44,6 +44,10 @@ def test_normal_state():
     assert_equal(str(state), "<M0>")
     assert_equal(repr(state), "<NormalState:M0>")
 
+    state = NormalState("M", alphabet, {"A": LOG0})
+    with pytest.raises(RuntimeError):
+        state.normalize()
+
 
 def test_mute_state():
     alphabet = Alphabet("ACGU")
@@ -70,6 +74,10 @@ def test_table_state():
     assert_allclose(state.lprob("AUG"), log(0.8) - log(1.2))
     assert_allclose(state.lprob("AUU"), log(0.4) - log(1.2))
     assert_equal(state.lprob("AGU"), LOG0)
+
+    state = TableState("M", alphabet, {"A": LOG0})
+    with pytest.raises(RuntimeError):
+        state.normalize()
 
 
 def test_frame_state():
@@ -121,3 +129,7 @@ def test_frame_state():
     assert_allclose(frame_state.lprob("ATTAA"), -14.288595853747417)
     assert_allclose(frame_state.lprob("GTCAA"), -12.902301492627526)
     assert_allclose(frame_state.lprob("ATTAAA"), LOG0)
+
+    assert_equal(str(frame_state), "<M2>")
+    assert_equal(repr(frame_state), "<FrameState:M2>")
+

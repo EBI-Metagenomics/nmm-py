@@ -1,7 +1,7 @@
-from math import log
+from math import log, nan
 
 import pytest
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 
 from nmm import HMM, LOG0, Alphabet, MuteState, NormalState, Path, TableState
 
@@ -21,16 +21,36 @@ def test_hmm_states():
     with pytest.raises(ValueError):
         hmm.add_state(M)
 
+    assert_equal(len(hmm.states), 2)
+
 
 def test_hmm_trans_prob():
     alphabet = Alphabet("ACGU")
     hmm = HMM(alphabet)
 
     S = MuteState("S", alphabet)
+    with pytest.raises(RuntimeError):
+        hmm.set_start_lprob(S, log(0.4))
     hmm.add_state(S)
 
     E = MuteState("E", alphabet)
+    E.normalize()
+    with pytest.raises(RuntimeError):
+        hmm.trans(S, E)
+
+    with pytest.raises(ValueError):
+        hmm.set_trans(S, E, LOG0)
+
+    with pytest.raises(ValueError):
+        hmm.set_trans(E, S, LOG0)
+
+    with pytest.raises(ValueError):
+        hmm.del_state(E)
+
     hmm.add_state(E)
+
+    with pytest.raises(RuntimeError):
+        hmm.set_trans(E, S, nan)
 
     with pytest.raises(ValueError):
         hmm.normalize()

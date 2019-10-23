@@ -37,7 +37,7 @@ class Codon:
     def normalize(self) -> None:
         err = lib.nmm_codon_normalize(self._codon)
         if err != 0:
-            raise ValueError("Normalization error.")
+            raise RuntimeError("Normalization error.")
 
     def __del__(self):
         if self._codon != ffi.NULL:
