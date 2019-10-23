@@ -136,6 +136,21 @@ def test_hmmer_global_profile(tmp_path):
     score = hmmer.viterbi(most_likely_seq)
     assert_allclose(score, -3.8921425128943143)
 
+    lr = hmmer.lr(most_likely_seq)
+    print(lr)
+
+    lr = hmmer.lr("ACDEFGHI")
+    print(lr)
+
+    # loc, scale = (-11.570078552677991, 2.579038545186777)
+    loc, scale = (-5.4106, 0.77110)
+    pv = hmmer.gumbel(most_likely_seq, loc, scale)
+    print(pv)
+    pv = hmmer.gumbel("ACDEFGHI", loc, scale)
+    print(pv)
+    pv = hmmer.gumbel("ACDEFGHI"[::-1], loc, scale)
+    print(pv)
+
 
 @pytest.fixture
 def PF03373(tmp_path):

@@ -1,4 +1,4 @@
-from pathlib import Path
+import pathlib
 from io import TextIOBase
 from math import log
 from typing import List, NamedTuple, Union, Dict
@@ -9,13 +9,14 @@ from ._alphabet import Alphabet
 from ._hmm import HMM
 from ._log import LOG0
 from ._state import MuteState, NormalState
+from ._path import Path
 
 
 def read_file(file):
 
     if not hasattr(file, "read"):
-        if not isinstance(file, Path):
-            file = Path(file)
+        if not isinstance(file, pathlib.Path):
+            file = pathlib.Path(file)
 
         if not file.exists():
             raise ValueError(f"`{file}` does not exist.")
@@ -207,6 +208,11 @@ class BackgroundModel:
     def set_trans(self, lprob: float):
         self._hmm.set_trans(self._state, self._state, lprob)
 
+    def likelihood(self, seq: str):
+        s = seq.encode()
+        path = [(self._state, 1)] * len(s)
+        return self._hmm.likelihood(seq, Path(path))
+
 
 class HMMERProfile:
     def __init__(self, bg_model: BackgroundModel):
@@ -257,12 +263,12 @@ class HMMERProfile:
         for node in self._core_nodes[1:]:
             self._hmm.set_trans(node.D, E, 0.0)
 
-        p = log(350) - log(352)
-        r = p
+    def _set_target_length(self, seq: str):
+        L = len(seq.encode())
+        p = log(L) - log(L + 2)
         q = LOG0
-        self.set_target_length(p, q, r)
+        r = log(L) - log(L + 1)
 
-    def set_target_length(self, p: float, q: float, r: float):
         special = self._special_states
         self._hmm.set_trans(special["S"], special["N"], p)
         self._hmm.set_trans(special["N"], special["N"], p)
@@ -281,7 +287,20 @@ class HMMERProfile:
         return self._hmm
 
     def viterbi(self, seq: str) -> float:
+        self._set_target_length(seq)
         return self._hmm.viterbi(seq, self._special_states["T"])
+
+    def lr(self, seq: str) -> float:
+        self._set_target_length(seq)
+        score0 = self._bg_model.likelihood(seq)
+        score1 = self.viterbi(seq)
+        return score1 - score0
+
+    def gumbel(self, seq: str, loc: float, scale: float) -> float:
+        import scipy.stats as st
+
+        lr = self.lr(seq)
+        return 1 - st.gumbel_r(loc=loc, scale=scale).cdf(lr)
 
 
 class _HMMERCoreModel:
@@ -328,11 +347,11 @@ class _HMMERCoreModel:
         del traceback
 
 
-def read_file2(file: Union[str, Path, TextIOBase]) -> HMMERProfile:
+def read_file2(file: Union[str, pathlib.Path, TextIOBase]) -> HMMERProfile:
     if isinstance(file, str):
-        file = Path(file)
+        file = pathlib.Path(file)
 
-    if isinstance(file, Path):
+    if isinstance(file, pathlib.Path):
         if not file.exists():
             raise ValueError(f"`{file}` does not exist.")
 
