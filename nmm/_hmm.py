@@ -108,6 +108,11 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
+    def normalize_trans(self, state: State):
+        err: int = lib.imm_hmm_normalize_trans(self._hmm, state.cdata)
+        if err != 0:
+            raise ValueError("Normalization error.")
+
     def likelihood(self, seq: str, path: Path):
         lprob: float = lib.imm_hmm_likelihood(self._hmm, seq.encode(), path.cdata)
         if isnan(lprob):

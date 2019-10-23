@@ -41,6 +41,8 @@ struct imm_table_state *imm_table_state_create(const char *name, const struct im
 void                    imm_table_state_destroy(struct imm_table_state *state);
 void imm_table_state_add(struct imm_table_state *state, const char *seq, double lprob);
 int  imm_table_state_normalize(struct imm_table_state *state);
+int  imm_hmm_normalize_start(struct imm_hmm *hmm);
+int  imm_hmm_normalize_trans(struct imm_hmm *hmm, const struct imm_state *src);
 
 struct nmm_codon *nmm_codon_create(const struct imm_abc *abc);
 int               nmm_codon_set_lprob(struct nmm_codon *codon, char a, char b, char c, double lprob);
