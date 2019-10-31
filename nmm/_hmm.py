@@ -25,7 +25,7 @@ class HMM:
         return self._states
 
     def set_start_lprob(self, state: State, lprob: float):
-        err: int = lib.imm_hmm_set_start_lprob(self._hmm, state.cdata, lprob)
+        err: int = lib.imm_hmm_set_start(self._hmm, state.cdata, lprob)
         if err != 0:
             raise RuntimeError("Could not set start probability.")
 
