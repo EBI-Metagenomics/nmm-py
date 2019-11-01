@@ -8,16 +8,18 @@ class Path:
     def __init__(self, path: Sequence[Tuple[State, int]]):
         self._path = lib.imm_path_create()
         for step in path:
-            self._add(step[0].cdata, step[1])
+            self._append(step[0].cdata, step[1])
 
     @property
     def cdata(self):
         return self._path
 
-    def _add(self, state: State, seq_len: int):
+    def _append(self, state: State, seq_len: int):
         if seq_len < 0:
             raise ValueError("Sequence length cannot be negative.")
-        lib.imm_path_add(self._path, state, seq_len)
+        err: int = lib.imm_path_append(self._path, state, seq_len)
+        if err != 0:
+            raise RuntimeError("Could not add step.")
 
     def __del__(self):
         if self._path != ffi.NULL:

@@ -39,8 +39,8 @@ if platform.system() == "Darwin":
 ffibuilder.set_source(
     "nmm._ffi",
     r"""
-    #include "imm.h"
-    #include "nmm.h"
+    #include "imm/imm.h"
+    #include "nmm/nmm.h"
     """,
     libraries=libs,
     library_dirs=library_dirs,

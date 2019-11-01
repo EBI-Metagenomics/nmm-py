@@ -120,7 +120,9 @@ class HMM:
         return lprob
 
     def viterbi(self, seq: str, end_state: State):
-        lprob: float = lib.imm_hmm_viterbi(self._hmm, seq.encode(), end_state.cdata)
+        lprob: float = lib.imm_hmm_viterbi(
+            self._hmm, seq.encode(), end_state.cdata, ffi.NULL
+        )
         if isnan(lprob):
             raise ValueError("Could not calculate the viterbi score.")
         return lprob

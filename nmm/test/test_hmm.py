@@ -188,20 +188,20 @@ def test_hmm_lik_2():
     p = hmm.likelihood("C", Path([(S, 1)]))
     assert_allclose(p, log(0.2))
 
-    with pytest.raises(ValueError):
-        hmm.likelihood("C", Path([(S, 2)]))
+    with pytest.raises(RuntimeError):
+        Path([(S, 2)])
+
+    with pytest.raises(RuntimeError):
+        Path([(S, 0)])
+
+    with pytest.raises(RuntimeError):
+        Path([(E, 1)])
 
     with pytest.raises(ValueError):
-        hmm.likelihood("C", Path([(S, 0)]))
+        hmm.likelihood("", Path([]))
 
-    p = hmm.likelihood("C", Path([(E, 1)]))
-    assert_allclose(p, LOG0)
-
-    p = hmm.likelihood("", Path([]))
-    assert_allclose(p, log(1.0))
-
-    p = hmm.likelihood("A", Path([]))
-    assert_allclose(p, LOG0)
+    with pytest.raises(ValueError):
+        hmm.likelihood("A", Path([]))
 
 
 def test_hmm_lik_3():
@@ -226,8 +226,8 @@ def test_hmm_lik_3():
     hmm.set_trans(E, E, log(1.0))
     hmm.normalize()
 
-    p = hmm.likelihood("A", Path([(S, 1), (E, 0)]))
-    assert_allclose(p, LOG0)
+    with pytest.raises(RuntimeError):
+        Path([(S, 1), (E, 0)])
 
     p = hmm.likelihood("A", Path([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.8))
@@ -235,8 +235,8 @@ def test_hmm_lik_3():
     p = hmm.likelihood("C", Path([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.2))
 
-    with pytest.raises(ValueError):
-        p = hmm.likelihood("C", Path([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    with pytest.raises(RuntimeError):
+        Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
 
     hmm.set_trans(M1, E, log(1.0))
     hmm.normalize()
