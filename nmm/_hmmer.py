@@ -12,16 +12,10 @@ from ._state import MuteState, NormalState
 from ._path import Path
 
 
-_States = NamedTuple(
-    "States",
-    [("M", Union[NormalState, MuteState]), ("I", NormalState), ("D", MuteState)],
-)
-
-
 _Node = NamedTuple("Node", [("M", NormalState), ("I", NormalState), ("D", MuteState)])
 
 
-class BackgroundModel:
+class _BackgroundModel:
     def __init__(self, state: NormalState):
         self._state = state
         self._hmm = HMM(state.alphabet)
@@ -45,7 +39,7 @@ class BackgroundModel:
 
 
 class HMMERProfile:
-    def __init__(self, bg_model: BackgroundModel):
+    def __init__(self, bg_model: _BackgroundModel):
         self._alphabet = bg_model.state.alphabet
         self._bg_model = bg_model
         emission_table = bg_model.state.emission_table()
@@ -126,12 +120,6 @@ class HMMERProfile:
         score1 = self.viterbi(seq)
         return score1 - score0
 
-    def gumbel(self, seq: str, loc: float, lamb: float) -> float:
-        import scipy.stats as st
-
-        lr = self.lr(seq)
-        return 1 - st.gumbel_r(loc=loc, scale=1 / lamb).cdf(lr)
-
 
 class _HMMERCoreModel:
     def __init__(self, hmmer: HMMERProfile, core_nodes: List[_Node], finalize):
@@ -177,7 +165,7 @@ class _HMMERCoreModel:
         del traceback
 
 
-def read_file2(file: Union[str, pathlib.Path, TextIOBase]) -> HMMERProfile:
+def read_hmmer(file: Union[str, pathlib.Path, TextIOBase]) -> HMMERProfile:
     if isinstance(file, str):
         file = pathlib.Path(file)
 
@@ -192,7 +180,7 @@ def read_file2(file: Union[str, pathlib.Path, TextIOBase]) -> HMMERProfile:
     alphabet = Alphabet(hmmfile.alphabet)
     R = NormalState("R", alphabet, hmmfile.insert(0, True))
     R.normalize()
-    bg = BackgroundModel(R)
+    bg = _BackgroundModel(R)
     hmmer = HMMERProfile(bg)
 
     with hmmer.core_model() as core:

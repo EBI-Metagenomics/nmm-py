@@ -5,7 +5,7 @@ from ._alphabet import Alphabet
 from ._codon import Codon
 from ._base import Base
 from ._path import Path
-from . import hmmer
+from ._hmmer import read_hmmer
 
 
 try:
@@ -33,6 +33,6 @@ __all__ = [
     "Codon",
     "Base",
     "Path",
-    "hmmer",
     "LOG0",
+    "read_hmmer",
 ]
