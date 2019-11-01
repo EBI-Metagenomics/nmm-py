@@ -1,12 +1,15 @@
 import pytest
 import importlib_resources as pkg_resources
-from numpy.testing import assert_equal, assert_allclose
+from numpy.testing import assert_allclose
 
 from nmm import read_hmmer
 
 
 def test_read_hmmer(PF03373_path):
     hmmer = read_hmmer(PF03373_path)
+    most_likely_seq = "PGKEDNNK"
+    score = hmmer.lr(most_likely_seq)
+    assert_allclose(score, 14.300392905370323)
 
 
 @pytest.fixture
