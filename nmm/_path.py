@@ -24,3 +24,16 @@ class Path:
     def __del__(self):
         if self._path != ffi.NULL:
             lib.imm_path_destroy(self._path)
+
+    def __repr__(self):
+        step = lib.imm_path_first(self._path)
+        steps = []
+        while step != ffi.NULL:
+            name = lib.imm_state_get_name(lib.imm_step_state(step))
+            state_name = ffi.string(name).decode()
+            seq_len = lib.imm_step_seq_len(step)
+            steps += [f"<{state_name}:{seq_len}>"]
+            step = lib.imm_path_next(self._path, step)
+
+        step_msg = "".join(steps)
+        return f"<{self.__class__.__name__}:{step_msg}>"

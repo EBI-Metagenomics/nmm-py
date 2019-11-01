@@ -4,9 +4,12 @@ from ._log import LOG0
 from ._state import State
 from ._alphabet import Alphabet
 from bidict import bidict
-from typing import Dict, Optional
+from typing import Dict, Optional, NamedTuple
+
 
 from ._ffi import ffi, lib
+
+PathScore = NamedTuple("PathScore", [("score", float), ("path", Path)])
 
 
 class HMM:
@@ -119,10 +122,10 @@ class HMM:
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
-    def viterbi(self, seq: str, end_state: State):
-        lprob: float = lib.imm_hmm_viterbi(
-            self._hmm, seq.encode(), end_state.cdata, ffi.NULL
-        )
+    def viterbi(self, seq: str, end_state: State) -> PathScore:
+        eseq: bytes = seq.encode()
+        path = Path([])
+        lprob: float = lib.imm_hmm_viterbi(self._hmm, eseq, end_state.cdata, path.cdata)
         if isnan(lprob):
             raise ValueError("Could not calculate the viterbi score.")
-        return lprob
+        return PathScore(score=lprob, path=path)

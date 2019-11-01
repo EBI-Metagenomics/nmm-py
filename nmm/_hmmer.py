@@ -1,7 +1,7 @@
 import pathlib
 from io import TextIOBase
 from math import log
-from typing import List, NamedTuple, Union, Dict
+from typing import List, NamedTuple, Union
 from dataclasses import dataclass
 
 import hmmer_reader
@@ -11,6 +11,7 @@ from ._hmm import HMM
 from ._log import LOG0
 from ._state import MuteState, NormalState
 from ._path import Path
+from ._hmm import PathScore
 
 
 Node = NamedTuple("Node", [("M", NormalState), ("I", NormalState), ("D", MuteState)])
@@ -201,15 +202,15 @@ class HMMERProfile:
     def hmm(self) -> HMM:
         return self._hmm
 
-    def viterbi(self, seq: str) -> float:
+    def _viterbi(self, seq: str) -> PathScore:
         self._set_target_length(seq)
         return self._hmm.viterbi(seq, self._special_node.T)
 
-    def lr(self, seq: str) -> float:
+    def lr(self, seq: str) -> PathScore:
         self._set_target_length(seq)
         score0 = self._bg_model.likelihood(seq)
-        score1 = self.viterbi(seq)
-        return score1 - score0
+        result = self._viterbi(seq)
+        return PathScore(score=result.score - score0, path=result.path)
 
 
 class HMMERCoreModel:

@@ -1,25 +1,23 @@
-import pytest
 import importlib_resources as pkg_resources
 from numpy.testing import assert_allclose
 
 from nmm import read_hmmer
 
 
-def test_read_hmmer(PF03373_path):
-    hmmer = read_hmmer(PF03373_path)
+def test_read_hmmer(tmp_path):
+    filepath = write_file(tmp_path, "PF03373.hmm")
+    hmmer = read_hmmer(filepath)
     most_likely_seq = "PGKEDNNK"
-    score = hmmer.lr(most_likely_seq)
-    assert_allclose(score, 14.300392905370323)
+    lr = hmmer.lr(most_likely_seq)
+    assert_allclose(lr.score, 11.867796719423442)
 
 
-@pytest.fixture
-def PF03373_path(tmp_path):
+def write_file(path, filename):
     import nmm
 
-    filename = "PF03373.hmm"
     text = pkg_resources.read_text(nmm.test, filename)
 
-    with open(tmp_path / filename, "w") as f:
+    with open(path / filename, "w") as f:
         f.write(text)
 
-    return tmp_path / filename
+    return path / filename
