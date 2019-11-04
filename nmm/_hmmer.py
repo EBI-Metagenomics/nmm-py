@@ -12,6 +12,7 @@ from ._log import LOG0
 from ._state import MuteState, NormalState
 from ._path import Path
 from ._hmm import PathScore
+from ._hmmer_path import HMMERResult
 
 
 Node = NamedTuple("Node", [("M", NormalState), ("I", NormalState), ("D", MuteState)])
@@ -206,11 +207,12 @@ class HMMERProfile:
         self._set_target_length(seq)
         return self._hmm.viterbi(seq, self._special_node.T)
 
-    def lr(self, seq: str) -> PathScore:
+    def lr(self, seq: str) -> HMMERResult:
         self._set_target_length(seq)
         score0 = self._bg_model.likelihood(seq)
         result = self._viterbi(seq)
-        return PathScore(score=result.score - score0, path=result.path)
+        score = result.score - score0
+        return HMMERResult(score, seq.encode(), result.path)
 
 
 class HMMERCoreModel:
