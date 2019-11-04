@@ -1,14 +1,17 @@
 import pathlib
 from io import TextIOBase
 from math import log
-from typing import List, NamedTuple, Union
+from typing import List, NamedTuple, Union, Dict
 
 from hmmer_reader import HMMEReader
 
+from .._base import Base
 from .._alphabet import Alphabet
 from .._hmm import HMM, PathScore
 from .._log import LOG0
 from .._state import FrameState, MuteState
+from .._gencode import GeneticCode
+from .._codon import Codon
 from .background import BackgroundModel
 from .core import HMMERCoreModel, SpecialTrans, Trans
 from .path import HMMERResult
@@ -148,24 +151,65 @@ class HMMERFrameProfile:
         return self._hmm.viterbi(seq, self._special_node.T)
 
 
+def _infer_codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
+    from numpy import logaddexp
+
+    codon_lprobs = []
+    lprob_norm = LOG0
+    for aa, lprob in aa_lprobs.items():
+
+        codons = gencode.codons(aa)
+        if len(codons) == 0:
+            continue
+
+        norm = log(len(codons))
+        for codon in codons:
+            codon_lprobs.append((codon, lprob - norm))
+            lprob_norm = logaddexp(lprob_norm, codon_lprobs[-1][1])
+
+    codon_lprobs = [(i[0], i[1] - lprob_norm) for i in codon_lprobs]
+    return dict(codon_lprobs)
+
+
+def _infer_base_lprobs(codon_lprobs, alphabet: Alphabet):
+    from scipy.special import logsumexp
+
+    lprobs: Dict[str, list] = {base: [] for base in alphabet.symbols}
+    lprob_norm = log(3)
+    for codon, lprob in codon_lprobs.items():
+        lprobs[codon[0]] += [lprob - lprob_norm]
+        lprobs[codon[1]] += [lprob - lprob_norm]
+        lprobs[codon[2]] += [lprob - lprob_norm]
+
+    return {b: logsumexp(lp) for b, lp in lprobs.items()}
+
+
 def create_frame_profile(reader: HMMEReader) -> HMMERFrameProfile:
+    gcode = GeneticCode()
+    codon_lprobs = _infer_codon_lprobs(reader.compo, gcode)
+    # codon_abc = Alphabet(reader.alphabet)
 
-    alphabet = Alphabet(reader.alphabet)
-    R = NormalState("R", alphabet, reader.insert(0))
-    R.normalize()
-    hmmer = HMMERProfile(BackgroundModel(R))
+    bases_abc = Alphabet("ACGU")
+    base_lprobs = _infer_base_lprobs(codon_lprobs, bases_abc)
+    base = Base(bases_abc, base_lprobs)
+    codon = Codon(bases_abc, codon_lprobs)
 
-    with hmmer.core_model() as core:
-        for m in range(1, reader.M + 1):
-            node = Node(
-                M=NormalState(f"M{m}", alphabet, reader.match(m)),
-                I=NormalState(f"I{m}", alphabet, reader.insert(m)),
-                D=MuteState(f"D{m}", alphabet),
-            )
-            node.M.normalize()
-            node.I.normalize()
-            trans = Trans(**reader.trans(m - 1))
-            trans.normalize()
-            core.add_node(node, trans)
+    epsilon = 0.1
+    R = FrameState("R", base, codon, epsilon)
+    # # M3 = FrameState("M3", base_emission, codon_emission, epsilon)
+    # hmmer = HMMERProfile(BackgroundModel(R))
 
-    return hmmer
+    # with hmmer.core_model() as core:
+    #     for m in range(1, reader.M + 1):
+    #         node = Node(
+    #             M=NormalState(f"M{m}", alphabet, reader.match(m)),
+    #             I=NormalState(f"I{m}", alphabet, reader.insert(m)),
+    #             D=MuteState(f"D{m}", alphabet),
+    #         )
+    #         node.M.normalize()
+    #         node.I.normalize()
+    #         trans = Trans(**reader.trans(m - 1))
+    #         trans.normalize()
+    #         core.add_node(node, trans)
+
+    # return hmmer
