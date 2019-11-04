@@ -1,12 +1,13 @@
 import importlib_resources as pkg_resources
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import read_hmmer
+from nmm import read_hmmer, create_hmmer_profile
 
 
 def test_read_hmmer_unihit_homologous_1(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
-    hmmer = read_hmmer(filepath)
+    reader = read_hmmer(filepath)
+    hmmer = create_hmmer_profile(reader)
     most_likely_seq = "PGKEDNNK"
     r = hmmer.lr(most_likely_seq)
     assert_allclose(r.score, 11.867796719423442)
@@ -19,7 +20,8 @@ def test_read_hmmer_unihit_homologous_1(tmp_path):
 
 def test_read_hmmer_unihit_homologous_2(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
-    hmmer = read_hmmer(filepath)
+    reader = read_hmmer(filepath)
+    hmmer = create_hmmer_profile(reader)
     seq = "PGKENNK"
     r = hmmer.lr(seq)
     assert_allclose(r.score, 3.299501501364073)
@@ -32,7 +34,8 @@ def test_read_hmmer_unihit_homologous_2(tmp_path):
 
 def test_read_hmmer_unihit_homologous_3(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
-    hmmer = read_hmmer(filepath)
+    reader = read_hmmer(filepath)
+    hmmer = create_hmmer_profile(reader)
     seq = "PGKEPNNK"
     r = hmmer.lr(seq)
     assert_allclose(r.score, 6.883636719423446)
@@ -45,7 +48,8 @@ def test_read_hmmer_unihit_homologous_3(tmp_path):
 
 def test_read_hmmer_nonhomo_and_homologous(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
-    hmmer = read_hmmer(filepath)
+    reader = read_hmmer(filepath)
+    hmmer = create_hmmer_profile(reader)
     seq = "KKKPGKEDNNK"
     r = hmmer.lr(seq)
     assert_allclose(r.score, 10.707618955640605)
@@ -59,7 +63,8 @@ def test_read_hmmer_nonhomo_and_homologous(tmp_path):
 
 def test_read_hmmer_multihit_homologous(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
-    hmmer = read_hmmer(filepath)
+    reader = read_hmmer(filepath)
+    hmmer = create_hmmer_profile(reader)
     seq = "PPPPGKEDNNKDDDPGKEDNNKEEEE"
     r = hmmer.lr(seq)
     assert_allclose(r.score, 20.329227532144742)

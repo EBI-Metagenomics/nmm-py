@@ -1,12 +1,11 @@
-from ._hmm import HMM
-from ._log import LOG0
-from ._state import NormalState, MuteState, TableState, FrameState
 from ._alphabet import Alphabet
-from ._codon import Codon
 from ._base import Base
+from ._codon import Codon
+from ._hmm import HMM
+from ._hmmer import create_frame_profile, create_hmmer_profile, read_hmmer
+from ._log import LOG0
 from ._path import Path
-from ._hmmer import read_hmmer
-
+from ._state import FrameState, MuteState, NormalState, TableState
 
 try:
     from ._ffi import ffi as _
@@ -35,4 +34,6 @@ __all__ = [
     "Path",
     "LOG0",
     "read_hmmer",
+    "create_frame_profile",
+    "create_hmmer_profile",
 ]

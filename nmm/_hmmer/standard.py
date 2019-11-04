@@ -1,20 +1,15 @@
-import pathlib
-from io import TextIOBase
 from math import log
-from typing import List, NamedTuple, Union
+from typing import List, NamedTuple
 
-import hmmer_reader
+from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
-from .._hmm import HMM
+from .._hmm import HMM, PathScore
 from .._log import LOG0
 from .._state import MuteState, NormalState
 from .background import BackgroundModel
-from .core import HMMERCoreModel
-from .._hmm import PathScore
+from .core import HMMERCoreModel, SpecialTrans, Trans
 from .path import HMMERResult
-from .core import SpecialTrans, Trans
-
 
 Node = NamedTuple("Node", [("M", NormalState), ("I", NormalState), ("D", MuteState)])
 
@@ -151,33 +146,23 @@ class HMMERProfile:
         return self._hmm.viterbi(seq, self._special_node.T)
 
 
-def read_hmmer(file: Union[str, pathlib.Path, TextIOBase]) -> HMMERProfile:
-    if isinstance(file, str):
-        file = pathlib.Path(file)
+def create_hmmer_profile(reader: HMMEReader) -> HMMERProfile:
 
-    if isinstance(file, pathlib.Path):
-        if not file.exists():
-            raise ValueError(f"`{file}` does not exist.")
-
-        if not file.is_file():
-            raise ValueError(f"`{file}` is not a file.")
-
-    hmmfile = hmmer_reader.read(file)
-    alphabet = Alphabet(hmmfile.alphabet)
-    R = NormalState("R", alphabet, hmmfile.insert(0))
+    alphabet = Alphabet(reader.alphabet)
+    R = NormalState("R", alphabet, reader.insert(0))
     R.normalize()
     hmmer = HMMERProfile(BackgroundModel(R))
 
     with hmmer.core_model() as core:
-        for m in range(1, hmmfile.M + 1):
+        for m in range(1, reader.M + 1):
             node = Node(
-                M=NormalState(f"M{m}", alphabet, hmmfile.match(m)),
-                I=NormalState(f"I{m}", alphabet, hmmfile.insert(m)),
+                M=NormalState(f"M{m}", alphabet, reader.match(m)),
+                I=NormalState(f"I{m}", alphabet, reader.insert(m)),
                 D=MuteState(f"D{m}", alphabet),
             )
             node.M.normalize()
             node.I.normalize()
-            trans = Trans(**hmmfile.trans(m - 1))
+            trans = Trans(**reader.trans(m - 1))
             trans.normalize()
             core.add_node(node, trans)
 
