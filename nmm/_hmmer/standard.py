@@ -6,13 +6,13 @@ from dataclasses import dataclass
 
 import hmmer_reader
 
-from ._alphabet import Alphabet
-from ._hmm import HMM
-from ._log import LOG0
-from ._state import MuteState, NormalState
-from ._path import Path
-from ._hmm import PathScore
-from ._hmmer_path import HMMERResult
+from .._alphabet import Alphabet
+from .._hmm import HMM
+from .._log import LOG0
+from .._state import MuteState, NormalState
+from .._path import Path
+from .._hmm import PathScore
+from .path import HMMERResult
 
 
 Node = NamedTuple("Node", [("M", NormalState), ("I", NormalState), ("D", MuteState)])

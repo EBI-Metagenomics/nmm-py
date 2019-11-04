@@ -1,7 +1,7 @@
 from typing import Union, List
-from ._path import Path
+from .._path import Path
 
-from ._ffi import ffi, lib
+from .._ffi import ffi, lib
 
 
 class Fragment:
