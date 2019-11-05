@@ -27,7 +27,7 @@ class CState:
         return lib.imm_state_max_seq(self.__cdata)
 
     @property
-    def cdata(self) -> ffi.CData:
+    def imm_state(self) -> ffi.CData:
         return self.__cdata
 
     def lprob(self, seq: str) -> float:

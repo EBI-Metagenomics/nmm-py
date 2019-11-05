@@ -28,7 +28,7 @@ class HMM:
         return self._states
 
     def set_start_lprob(self, state: State, lprob: float):
-        err: int = lib.imm_hmm_set_start(self._hmm, state.cdata, lprob)
+        err: int = lib.imm_hmm_set_start(self._hmm, state.imm_state, lprob)
         if err != 0:
             raise RuntimeError("Could not set start probability.")
 
@@ -41,7 +41,7 @@ class HMM:
         b : State
             Destination state.
         """
-        lprob: float = lib.imm_hmm_get_trans(self._hmm, a.cdata, b.cdata)
+        lprob: float = lib.imm_hmm_get_trans(self._hmm, a.imm_state, b.imm_state)
         if isnan(lprob):
             raise RuntimeError("Could not retrieve transition probability.")
         return lprob
@@ -57,13 +57,13 @@ class HMM:
         lprob : float
             Transition probability in log-space.
         """
-        if a.cdata not in self._states:
+        if a.imm_state not in self._states:
             raise ValueError(f"State {a} not found.")
 
-        if b.cdata not in self._states:
+        if b.imm_state not in self._states:
             raise ValueError(f"State {b} not found.")
 
-        err: int = lib.imm_hmm_set_trans(self._hmm, a.cdata, b.cdata, lprob)
+        err: int = lib.imm_hmm_set_trans(self._hmm, a.imm_state, b.imm_state, lprob)
         if err != 0:
             raise RuntimeError("Could not set transition probability.")
 
@@ -85,24 +85,24 @@ class HMM:
         start_lprob : bool
             Log-space probability of being the initial state.
         """
-        err: int = lib.imm_hmm_add_state(self._hmm, state.cdata, start_lprob)
+        err: int = lib.imm_hmm_add_state(self._hmm, state.imm_state, start_lprob)
         if err != 0:
             raise ValueError("Could not add state %s.", state)
-        self._states[state.cdata] = state
+        self._states[state.imm_state] = state
         if name is not None:
-            self._state_names[state.cdata] = name
+            self._state_names[state.imm_state] = name
 
     def del_state(self, state: State):
-        if state.cdata not in self._states:
+        if state.imm_state not in self._states:
             raise ValueError(f"State {state} not found.")
 
-        err: int = lib.imm_hmm_del_state(self._hmm, state.cdata)
+        err: int = lib.imm_hmm_del_state(self._hmm, state.imm_state)
         if err != 0:
             raise RuntimeError(f"Could not delete state {state}.")
 
-        del self._states[state.cdata]
+        del self._states[state.imm_state]
         try:
-            self._state_names.pop(state.cdata)
+            self._state_names.pop(state.imm_state)
         except KeyError:
             pass
 
@@ -112,7 +112,7 @@ class HMM:
             raise ValueError("Normalization error.")
 
     def normalize_trans(self, state: State):
-        err: int = lib.imm_hmm_normalize_trans(self._hmm, state.cdata)
+        err: int = lib.imm_hmm_normalize_trans(self._hmm, state.imm_state)
         if err != 0:
             raise ValueError("Normalization error.")
 
@@ -127,7 +127,9 @@ class HMM:
         if cpath == ffi.NULL:
             raise RuntimeError("Could not create `cpath`.")
         try:
-            lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, end_state.cdata, cpath)
+            lprob: float = lib.imm_hmm_viterbi(
+                self._hmm, seq, end_state.imm_state, cpath
+            )
         except Exception as e:
             lib.imm_path_destroy(cpath)
             raise e

@@ -57,7 +57,7 @@ class Path(CPath):
         for step in steps:
             if step.seq_len < 0:
                 raise ValueError("Sequence length cannot be negative.")
-            self._append(step.state.cdata, step.seq_len)
+            self._append(step.state.imm_state, step.seq_len)
             self._steps.append(step)
 
     # def steps(self):
