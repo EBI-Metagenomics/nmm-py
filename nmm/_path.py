@@ -10,6 +10,15 @@ class Path:
         for step in path:
             self._append(step[0].cdata, step[1])
 
+    # def steps(self):
+    #     step = lib.imm_path_first(self._path)
+    #     while step != ffi.NULL:
+    #         cname = lib.imm_state_get_name(lib.imm_step_state(step))
+    #         name = ffi.string(cname).decode()
+    #         seq_len = lib.imm_step_seq_len(step)
+
+    #         step = lib.imm_path_next(self._path, step)
+
     @property
     def cdata(self):
         return self._path
@@ -37,3 +46,4 @@ class Path:
 
         step_msg = "".join(steps)
         return f"<{self.__class__.__name__}:{step_msg}>"
+
