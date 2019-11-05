@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+from typing import Callable, List, NamedTuple
+
 from .._hmm import HMM
-from .._log import LOG0
+from .._log import LOG0, LOG1
+from .._path import Path
 from .._state import State
-from typing import List, NamedTuple
 
 Node = NamedTuple("Node", [("M", State), ("I", State), ("D", State)])
 
@@ -49,8 +51,8 @@ class SpecialTrans:
     ME: float = 0.0
 
 
-class HMMERCoreModel:
-    def __init__(self, hmm: HMM, core_nodes: List[Node], finalize):
+class CoreModel:
+    def __init__(self, hmm: HMM, core_nodes: List[Node], finalize: Callable[[], None]):
         self._hmm = hmm
         self._core_nodes = core_nodes
         self._finalize = finalize
@@ -85,3 +87,20 @@ class HMMERCoreModel:
         del type
         del value
         del traceback
+
+
+class NullModel:
+    def __init__(self, state: State):
+        self._state = state
+        self._hmm = HMM(state.alphabet)
+        self._hmm.add_state(state, LOG1)
+
+    @property
+    def hmm(self) -> HMM:
+        return self._hmm
+
+    def set_trans(self, lprob: float):
+        self._hmm.set_trans(self._state, self._state, lprob)
+
+    def likelihood(self, seq: bytes):
+        return self._hmm.likelihood(seq, Path([(self._state, 1)] * len(seq)))

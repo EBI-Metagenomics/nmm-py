@@ -1,19 +1,17 @@
-import pathlib
 from io import TextIOBase
 from math import log
-from typing import List, NamedTuple, Union, Dict
+from typing import Dict, List, NamedTuple, Union
 
 from hmmer_reader import HMMEReader
 
-from .._base import Base
 from .._alphabet import Alphabet
-from .._hmm import HMM, PathScore
-from .._log import LOG0
-from .._state import FrameState, MuteState
-from .._gencode import GeneticCode
+from .._base import Base
 from .._codon import Codon
-from .background import BackgroundModel
-from .core import HMMERCoreModel, SpecialTrans, Trans
+from .._gencode import GeneticCode
+from .._hmm import HMM, PathScore
+from .._log import LOG0, LOG1
+from .._state import FrameState, MuteState
+from .core import CoreModel, NullModel, SpecialTrans, Trans
 from .path import HMMERResult
 
 Node = NamedTuple("Node", [("M", FrameState), ("I", FrameState), ("D", MuteState)])
@@ -32,37 +30,71 @@ SpecialNode = NamedTuple(
 )
 
 
-class HMMERFrameProfile:
-    def __init__(self, bg_model: BackgroundModel):
+class FrameNullModel(NullModel):
+    def __init__(self, state: FrameState):
+        super().__init__(state)
+        self._frame_state = state
+
+    @property
+    def state(self) -> FrameState:
+        return self._frame_state
+
+
+class FrameCoreModel(CoreModel):
+    pass
+
+
+class FrameProfile:
+    def __init__(self, bg: FrameNullModel):
         self._multiple_hits: bool = True
-        self._alphabet = bg_model.state.alphabet
-        self._bg_model = bg_model
-        emission_table = bg_model.state.emission_table()
-        self._hmm = HMM(self._alphabet)
+        self._bg = bg
 
-        self._special_node = SpecialNode(
-            S=MuteState("S", self._alphabet),
-            N=FrameState("N", self._alphabet, emission_table),
-            B=MuteState("B", self._alphabet),
-            E=MuteState("E", self._alphabet),
-            J=FrameState("J", self._alphabet, emission_table),
-            C=FrameState("C", self._alphabet, emission_table),
-            T=MuteState("T", self._alphabet),
+        alphabet = bg.state.alphabet
+        base = bg.state.base
+        codon = bg.state.codon
+        epsilon = bg.state.epsilon
+        special_node = SpecialNode(
+            S=MuteState("S", alphabet),
+            N=FrameState("N", base, codon, epsilon),
+            B=MuteState("B", alphabet),
+            E=MuteState("E", alphabet),
+            J=FrameState("J", base, codon, epsilon),
+            C=FrameState("C", base, codon, epsilon),
+            T=MuteState("T", alphabet),
         )
-        self._hmm.add_state(self._special_node.S, 0.0)
-        self._hmm.add_state(self._special_node.N)
-        self._hmm.add_state(self._special_node.B)
-        self._hmm.add_state(self._special_node.E)
-        self._hmm.add_state(self._special_node.J)
-        self._hmm.add_state(self._special_node.C)
-        self._hmm.add_state(self._special_node.T)
+        hmm = HMM(alphabet)
+        hmm.add_state(special_node.S, LOG1)
+        hmm.add_state(special_node.N)
+        hmm.add_state(special_node.B)
+        hmm.add_state(special_node.E)
+        hmm.add_state(special_node.J)
+        hmm.add_state(special_node.C)
+        hmm.add_state(special_node.T)
 
+        self._hmm = hmm
+        self._special_node = special_node
         self._special_trans = SpecialTrans()
 
         self._core_nodes: List[Node] = []
 
+    @property
+    def alphabet(self):
+        return self._bg.state.alphabet
+
+    @property
+    def epsilon(self):
+        return self._bg.state.epsilon
+
+    @property
+    def base(self):
+        return self._bg.state.base
+
+    @property
+    def codon(self):
+        return self._bg.state.codon
+
     def core_model(self):
-        return HMMERCoreModel(self._hmm, self._core_nodes, self._finalize)
+        return FrameCoreModel(self._hmm, self._core_nodes, self._finalize)
 
     @property
     def length(self):
@@ -77,7 +109,7 @@ class HMMERFrameProfile:
 
     def lr(self, seq: str) -> HMMERResult:
         self._set_target_length(seq)
-        score0 = self._bg_model.likelihood(seq)
+        score0 = self._bg.likelihood(seq)
         result = self._viterbi(seq)
         score = result.score - score0
         return HMMERResult(score, seq.encode(), result.path)
@@ -144,7 +176,7 @@ class HMMERFrameProfile:
         self._hmm.set_trans(node.J, node.J, t.JJ)
         self._hmm.set_trans(node.J, node.B, t.JB)
 
-        self._bg_model.set_trans(t.RR)
+        self._bg.set_trans(t.RR)
 
     def _viterbi(self, seq: str) -> PathScore:
         self._set_target_length(seq)
@@ -184,7 +216,7 @@ def _infer_base_lprobs(codon_lprobs, alphabet: Alphabet):
     return {b: logsumexp(lp) for b, lp in lprobs.items()}
 
 
-def create_frame_profile(reader: HMMEReader) -> HMMERFrameProfile:
+def create_frame_profile(reader: HMMEReader) -> FrameProfile:
     gcode = GeneticCode()
     codon_lprobs = _infer_codon_lprobs(reader.compo, gcode)
     # codon_abc = Alphabet(reader.alphabet)
@@ -196,8 +228,7 @@ def create_frame_profile(reader: HMMEReader) -> HMMERFrameProfile:
 
     epsilon = 0.1
     R = FrameState("R", base, codon, epsilon)
-    # # M3 = FrameState("M3", base_emission, codon_emission, epsilon)
-    # hmmer = HMMERProfile(BackgroundModel(R))
+    hmmer = FrameProfile(FrameNullModel(R))
 
     # with hmmer.core_model() as core:
     #     for m in range(1, reader.M + 1):

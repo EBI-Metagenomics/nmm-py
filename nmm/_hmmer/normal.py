@@ -5,10 +5,9 @@ from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
 from .._hmm import HMM, PathScore
-from .._log import LOG0
+from .._log import LOG0, LOG1
 from .._state import MuteState, NormalState
-from .background import BackgroundModel
-from .core import HMMERCoreModel, SpecialTrans, Trans
+from .core import CoreModel, NullModel, SpecialTrans, Trans
 from .path import HMMERResult
 
 Node = NamedTuple("Node", [("M", NormalState), ("I", NormalState), ("D", MuteState)])
@@ -27,37 +26,53 @@ SpecialNode = NamedTuple(
 )
 
 
-class HMMERProfile:
-    def __init__(self, bg_model: BackgroundModel):
+class NormalNullModel(NullModel):
+    def __init__(self, state: NormalState):
+        super().__init__(state)
+        self._normal_state = state
+
+    @property
+    def state(self) -> NormalState:
+        return self._normal_state
+
+
+class NormalCoreModel(CoreModel):
+    pass
+
+
+class NormalProfile:
+    def __init__(self, bg: NormalNullModel):
         self._multiple_hits: bool = True
-        self._alphabet = bg_model.state.alphabet
-        self._bg_model = bg_model
-        emission_table = bg_model.state.emission_table()
-        self._hmm = HMM(self._alphabet)
+        self._bg = bg
 
-        self._special_node = SpecialNode(
-            S=MuteState("S", self._alphabet),
-            N=NormalState("N", self._alphabet, emission_table),
-            B=MuteState("B", self._alphabet),
-            E=MuteState("E", self._alphabet),
-            J=NormalState("J", self._alphabet, emission_table),
-            C=NormalState("C", self._alphabet, emission_table),
-            T=MuteState("T", self._alphabet),
+        alphabet = bg.state.alphabet
+        emission_table = bg.state.emission_table()
+        special_node = SpecialNode(
+            S=MuteState("S", alphabet),
+            N=NormalState("N", alphabet, emission_table),
+            B=MuteState("B", alphabet),
+            E=MuteState("E", alphabet),
+            J=NormalState("J", alphabet, emission_table),
+            C=NormalState("C", alphabet, emission_table),
+            T=MuteState("T", alphabet),
         )
-        self._hmm.add_state(self._special_node.S, 0.0)
-        self._hmm.add_state(self._special_node.N)
-        self._hmm.add_state(self._special_node.B)
-        self._hmm.add_state(self._special_node.E)
-        self._hmm.add_state(self._special_node.J)
-        self._hmm.add_state(self._special_node.C)
-        self._hmm.add_state(self._special_node.T)
+        hmm = HMM(alphabet)
+        hmm.add_state(special_node.S, LOG1)
+        hmm.add_state(special_node.N)
+        hmm.add_state(special_node.B)
+        hmm.add_state(special_node.E)
+        hmm.add_state(special_node.J)
+        hmm.add_state(special_node.C)
+        hmm.add_state(special_node.T)
 
+        self._hmm = hmm
+        self._special_node = special_node
         self._special_trans = SpecialTrans()
 
         self._core_nodes: List[Node] = []
 
     def core_model(self):
-        return HMMERCoreModel(self._hmm, self._core_nodes, self._finalize)
+        return NormalCoreModel(self._hmm, self._core_nodes, self._finalize)
 
     @property
     def length(self):
@@ -70,12 +85,12 @@ class HMMERProfile:
     def hmm(self) -> HMM:
         return self._hmm
 
-    def lr(self, seq: str) -> HMMERResult:
+    def lr(self, seq: bytes) -> HMMERResult:
         self._set_target_length(seq)
-        score0 = self._bg_model.likelihood(seq)
+        score0 = self._bg.likelihood(seq)
         result = self._viterbi(seq)
         score = result.score - score0
-        return HMMERResult(score, seq.encode(), result.path)
+        return HMMERResult(score, seq, result.path)
 
     def _finalize(self):
         self._set_fragment_length()
@@ -98,10 +113,10 @@ class HMMERProfile:
         for node in self._core_nodes[1:]:
             self._hmm.set_trans(node.D, E, 0.0)
 
-    def _set_target_length(self, seq: str):
+    def _set_target_length(self, seq: bytes):
         from math import exp
 
-        L = len(seq.encode())
+        L = len(seq)
         if L == 0:
             return
 
@@ -139,19 +154,19 @@ class HMMERProfile:
         self._hmm.set_trans(node.J, node.J, t.JJ)
         self._hmm.set_trans(node.J, node.B, t.JB)
 
-        self._bg_model.set_trans(t.RR)
+        self._bg.set_trans(t.RR)
 
-    def _viterbi(self, seq: str) -> PathScore:
+    def _viterbi(self, seq: bytes) -> PathScore:
         self._set_target_length(seq)
         return self._hmm.viterbi(seq, self._special_node.T)
 
 
-def create_hmmer_profile(reader: HMMEReader) -> HMMERProfile:
+def create_hmmer_profile(reader: HMMEReader) -> NormalProfile:
 
     alphabet = Alphabet(reader.alphabet)
     R = NormalState("R", alphabet, reader.insert(0))
     R.normalize()
-    hmmer = HMMERProfile(BackgroundModel(R))
+    hmmer = NormalProfile(NormalNullModel(R))
 
     with hmmer.core_model() as core:
         for m in range(1, reader.M + 1):

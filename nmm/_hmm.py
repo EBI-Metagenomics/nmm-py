@@ -116,16 +116,15 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def likelihood(self, seq: str, path: Path):
-        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq.encode(), path.cdata)
+    def likelihood(self, seq: bytes, path: Path):
+        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq, path.cdata)
         if isnan(lprob):
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
-    def viterbi(self, seq: str, end_state: State) -> PathScore:
-        eseq: bytes = seq.encode()
+    def viterbi(self, seq: bytes, end_state: State) -> PathScore:
         path = Path([])
-        lprob: float = lib.imm_hmm_viterbi(self._hmm, eseq, end_state.cdata, path.cdata)
+        lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, end_state.cdata, path.cdata)
         if isnan(lprob):
             raise ValueError("Could not calculate the viterbi score.")
         return PathScore(score=lprob, path=path)

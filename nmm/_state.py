@@ -169,13 +169,28 @@ class FrameState(State):
             Epsilon.
         """
         super(FrameState, self).__init__(codon.alphabet)
+        if set(base.alphabet.symbols) != set(codon.alphabet.symbols):
+            raise ValueError("Alphabet symbols of `base` and `codon` are not equal.")
         self._base = base
         self._codon = codon
+        self._epsilon = epsilon
 
         n = name.encode()
         self._state = lib.nmm_frame_state_create(n, base.cdata, codon.cdata, epsilon)
         if self._state == ffi.NULL:
             raise RuntimeError("Could not create state.")
+
+    @property
+    def base(self) -> Base:
+        return self._base
+
+    @property
+    def codon(self) -> Codon:
+        return self._codon
+
+    @property
+    def epsilon(self):
+        return self._epsilon
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name}>"

@@ -11,8 +11,8 @@ class Fragment:
         self._end = end
 
     @property
-    def sequence(self) -> str:
-        return self._seq[self._start : self._end].decode()
+    def sequence(self) -> bytes:
+        return self._seq[self._start : self._end]
 
 
 class HomoFragment(Fragment):
@@ -24,7 +24,8 @@ class HomoFragment(Fragment):
         return True
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}:{self.sequence}>"
+        seq = self.sequence.encode()
+        return f"<{self.__class__.__name__}:{seq}>"
 
 
 class NonHomoFragment(Fragment):
@@ -36,7 +37,8 @@ class NonHomoFragment(Fragment):
         return False
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}:{self.sequence}>"
+        seq = self.sequence.encode()
+        return f"<{self.__class__.__name__}:{seq}>"
 
 
 class HMMERResult:
