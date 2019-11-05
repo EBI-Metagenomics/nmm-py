@@ -18,7 +18,7 @@ class HomoFragment(Fragment):
         return True
 
     def __repr__(self):
-        seq = self.sequence.encode()
+        seq = self.sequence.decode()
         return f"<{self.__class__.__name__}:{seq}>"
 
 
@@ -31,5 +31,5 @@ class NonHomoFragment(Fragment):
         return False
 
     def __repr__(self):
-        seq = self.sequence.encode()
+        seq = self.sequence.decode()
         return f"<{self.__class__.__name__}:{seq}>"
