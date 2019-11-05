@@ -167,7 +167,7 @@ class FrameProfile:
         return self._hmm.viterbi(seq, self._special_node.T)
 
 
-def _codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
+def _infer_codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
     from numpy import logaddexp
 
     codon_lprobs = []
@@ -187,7 +187,7 @@ def _codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
     return dict(codon_lprobs)
 
 
-def _base_lprobs(codon_lprobs, alphabet: Alphabet):
+def _infer_base_lprobs(codon_lprobs, alphabet: Alphabet):
     from scipy.special import logsumexp
 
     lprobs: Dict[str, list] = {base: [] for base in alphabet.symbols}
@@ -200,30 +200,35 @@ def _base_lprobs(codon_lprobs, alphabet: Alphabet):
     return {b: logsumexp(lp) for b, lp in lprobs.items()}
 
 
-def create_frame_profile(reader: HMMEReader) -> FrameProfile:
-    gcode = GeneticCode()
+class _FrameStateFactory:
+    def __init__(self, bases: Alphabet, gcode: GeneticCode, epsilon: float):
+        self._bases = bases
+        self._gcode = gcode
+        self._epsilon = epsilon
 
-    codon_lprobs = _codon_lprobs(reader.compo, gcode)
+    def create(self, name: str, aa_lprobs: Dict[str, float]) -> FrameState:
+        codon_lprobs = _infer_codon_lprobs(aa_lprobs, self._gcode)
+        base_lprobs = _infer_base_lprobs(codon_lprobs, self._bases)
+        base = Base(self._bases, base_lprobs)
+        codon = Codon(self._bases, codon_lprobs)
+        return FrameState(name, base, codon, self._epsilon)
 
-    bases_abc = Alphabet("ACGU")
 
-    base_lprobs = _base_lprobs(codon_lprobs, bases_abc)
-    base = Base(bases_abc, base_lprobs)
-    codon = Codon(bases_abc, codon_lprobs)
+def create_frame_profile(reader: HMMEReader, epsilon: float = 0.1) -> FrameProfile:
+    bases = Alphabet("ACGU")
+    ffact = _FrameStateFactory(bases, GeneticCode(), epsilon)
+    R = ffact.create("R", reader.insert(0))
 
-    epsilon = 0.1
-    R = FrameState("R", base, codon, epsilon)
+    # TODO: the null model is not property set.
+    # It is supposed to be temporary.
     hmmer = FrameProfile(FrameNullModel(R))
 
     with hmmer.core_model() as core:
         for m in range(1, reader.M + 1):
-            Mcodon = Codon(bases_abc, _codon_lprobs(reader.match(m), gcode))
-            Icodon = Codon(bases_abc, _codon_lprobs(reader.insert(m), gcode))
-
             node = Node(
-                M=FrameState(f"M{m}", base, Mcodon, epsilon),
-                I=FrameState(f"I{m}", base, Icodon, epsilon),
-                D=MuteState(f"D{m}", bases_abc),
+                M=ffact.create(f"M{m}", reader.match(m)),
+                I=ffact.create(f"I{m}", reader.insert(m)),
+                D=MuteState(f"D{m}", bases),
             )
             trans = Trans(**reader.trans(m - 1))
             trans.normalize()

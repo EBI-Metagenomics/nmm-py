@@ -164,6 +164,8 @@ class NormalProfile:
 def create_hmmer_profile(reader: HMMEReader) -> NormalProfile:
 
     alphabet = Alphabet(reader.alphabet)
+    # TODO: the null model is not property set.
+    # It is supposed to be temporary.
     R = NormalState("R", alphabet, reader.insert(0))
     R.normalize()
     hmmer = NormalProfile(NormalNullModel(R))
