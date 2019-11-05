@@ -1,14 +1,42 @@
-from typing import Sequence, Tuple
+from typing import Sequence, Tuple, Union
 from ._state import State
 
 from ._ffi import ffi, lib
 
 
+class CPath:
+    def __init__(self):
+        self._own = True
+        self._cdata = ffi.NULL
+        self._cdata = lib.imm_path_create()
+        if self._cdata == ffi.NULL:
+            raise RuntimeError("Could not create CPath.")
+
+    @property
+    def cdata(self) -> ffi.CData:
+        if not self._own:
+            raise RuntimeError("I do not own this data anymore.")
+        return self._cdata
+
+    def borrow_cdata(self) -> ffi.CData:
+        cdata = self.cdata
+        self._own = False
+        return cdata
+
+    def __del__(self):
+        if self._own and self._cdata != ffi.NULL:
+            lib.imm_path_destroy(self._cdata)
+
+
 class Path:
-    def __init__(self, path: Sequence[Tuple[State, int]]):
-        self._path = lib.imm_path_create()
-        for step in path:
-            self._append(step[0].cdata, step[1])
+    def __init__(self, steps: Union[Sequence[Tuple[State, int]], CPath]):
+        self._path = ffi.NULL
+        if isinstance(steps, CPath):
+            self._path = steps.borrow_cdata()
+        else:
+            self._path = lib.imm_path_create()
+            for step in steps:
+                self._append(step[0].cdata, step[1])
 
     # def steps(self):
     #     step = lib.imm_path_first(self._path)
