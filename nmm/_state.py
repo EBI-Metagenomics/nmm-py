@@ -171,6 +171,7 @@ class FrameState(State):
         super(FrameState, self).__init__(codon.alphabet)
         if set(base.alphabet.symbols) != set(codon.alphabet.symbols):
             raise ValueError("Alphabet symbols of `base` and `codon` are not equal.")
+
         self._base = base
         self._codon = codon
         self._epsilon = epsilon

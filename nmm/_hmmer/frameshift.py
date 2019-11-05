@@ -77,22 +77,6 @@ class FrameProfile:
 
         self._core_nodes: List[Node] = []
 
-    @property
-    def alphabet(self):
-        return self._bg.state.alphabet
-
-    @property
-    def epsilon(self):
-        return self._bg.state.epsilon
-
-    @property
-    def base(self):
-        return self._bg.state.base
-
-    @property
-    def codon(self):
-        return self._bg.state.codon
-
     def core_model(self):
         return FrameCoreModel(self._hmm, self._core_nodes, self._finalize)
 
@@ -107,12 +91,12 @@ class FrameProfile:
     def hmm(self) -> HMM:
         return self._hmm
 
-    def lr(self, seq: str) -> Result:
+    def lr(self, seq: bytes) -> Result:
         self._set_target_length(seq)
         score0 = self._bg.likelihood(seq)
         result = self._viterbi(seq)
         score = result.score - score0
-        return Result(score, seq.encode(), result.path)
+        return Result(score, seq, result.path)
 
     def _finalize(self):
         self._set_fragment_length()
@@ -183,7 +167,7 @@ class FrameProfile:
         return self._hmm.viterbi(seq, self._special_node.T)
 
 
-def _infer_codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
+def _codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
     from numpy import logaddexp
 
     codon_lprobs = []
@@ -203,7 +187,7 @@ def _infer_codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
     return dict(codon_lprobs)
 
 
-def _infer_base_lprobs(codon_lprobs, alphabet: Alphabet):
+def _base_lprobs(codon_lprobs, alphabet: Alphabet):
     from scipy.special import logsumexp
 
     lprobs: Dict[str, list] = {base: [] for base in alphabet.symbols}
@@ -218,11 +202,12 @@ def _infer_base_lprobs(codon_lprobs, alphabet: Alphabet):
 
 def create_frame_profile(reader: HMMEReader) -> FrameProfile:
     gcode = GeneticCode()
-    codon_lprobs = _infer_codon_lprobs(reader.compo, gcode)
-    # codon_abc = Alphabet(reader.alphabet)
+
+    codon_lprobs = _codon_lprobs(reader.compo, gcode)
 
     bases_abc = Alphabet("ACGU")
-    base_lprobs = _infer_base_lprobs(codon_lprobs, bases_abc)
+
+    base_lprobs = _base_lprobs(codon_lprobs, bases_abc)
     base = Base(bases_abc, base_lprobs)
     codon = Codon(bases_abc, codon_lprobs)
 
@@ -230,17 +215,18 @@ def create_frame_profile(reader: HMMEReader) -> FrameProfile:
     R = FrameState("R", base, codon, epsilon)
     hmmer = FrameProfile(FrameNullModel(R))
 
-    # with hmmer.core_model() as core:
-    #     for m in range(1, reader.M + 1):
-    #         node = Node(
-    #             M=NormalState(f"M{m}", alphabet, reader.match(m)),
-    #             I=NormalState(f"I{m}", alphabet, reader.insert(m)),
-    #             D=MuteState(f"D{m}", alphabet),
-    #         )
-    #         node.M.normalize()
-    #         node.I.normalize()
-    #         trans = Trans(**reader.trans(m - 1))
-    #         trans.normalize()
-    #         core.add_node(node, trans)
+    with hmmer.core_model() as core:
+        for m in range(1, reader.M + 1):
+            Mcodon = Codon(bases_abc, _codon_lprobs(reader.match(m), gcode))
+            Icodon = Codon(bases_abc, _codon_lprobs(reader.insert(m), gcode))
 
-    # return hmmer
+            node = Node(
+                M=FrameState(f"M{m}", base, Mcodon, epsilon),
+                I=FrameState(f"I{m}", base, Icodon, epsilon),
+                D=MuteState(f"D{m}", bases_abc),
+            )
+            trans = Trans(**reader.trans(m - 1))
+            trans.normalize()
+            core.add_node(node, trans)
+
+    return hmmer
