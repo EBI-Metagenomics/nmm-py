@@ -1,4 +1,5 @@
 from typing import Sequence, Tuple, Union
+from ._step import Step
 from ._state import State
 
 from ._ffi import ffi, lib
