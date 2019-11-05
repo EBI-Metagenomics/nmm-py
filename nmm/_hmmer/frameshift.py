@@ -12,7 +12,7 @@ from .._hmm import HMM, PathScore
 from .._log import LOG0, LOG1
 from .._state import FrameState, MuteState
 from .core import CoreModel, NullModel, SpecialTrans, Trans
-from .path import HMMERResult
+from .result import Result
 
 Node = NamedTuple("Node", [("M", FrameState), ("I", FrameState), ("D", MuteState)])
 
@@ -107,12 +107,12 @@ class FrameProfile:
     def hmm(self) -> HMM:
         return self._hmm
 
-    def lr(self, seq: str) -> HMMERResult:
+    def lr(self, seq: str) -> Result:
         self._set_target_length(seq)
         score0 = self._bg.likelihood(seq)
         result = self._viterbi(seq)
         score = result.score - score0
-        return HMMERResult(score, seq.encode(), result.path)
+        return Result(score, seq.encode(), result.path)
 
     def _finalize(self):
         self._set_fragment_length()
@@ -135,10 +135,10 @@ class FrameProfile:
         for node in self._core_nodes[1:]:
             self._hmm.set_trans(node.D, E, 0.0)
 
-    def _set_target_length(self, seq: str):
+    def _set_target_length(self, seq: bytes):
         from math import exp
 
-        L = len(seq.encode())
+        L = len(seq)
         if L == 0:
             return
 
@@ -178,7 +178,7 @@ class FrameProfile:
 
         self._bg.set_trans(t.RR)
 
-    def _viterbi(self, seq: str) -> PathScore:
+    def _viterbi(self, seq: bytes) -> PathScore:
         self._set_target_length(seq)
         return self._hmm.viterbi(seq, self._special_node.T)
 

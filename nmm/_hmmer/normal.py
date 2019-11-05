@@ -8,7 +8,7 @@ from .._hmm import HMM, PathScore
 from .._log import LOG0, LOG1
 from .._state import MuteState, NormalState
 from .core import CoreModel, NullModel, SpecialTrans, Trans
-from .path import HMMERResult
+from .result import Result
 
 Node = NamedTuple("Node", [("M", NormalState), ("I", NormalState), ("D", MuteState)])
 
@@ -85,12 +85,12 @@ class NormalProfile:
     def hmm(self) -> HMM:
         return self._hmm
 
-    def lr(self, seq: bytes) -> HMMERResult:
+    def lr(self, seq: bytes) -> Result:
         self._set_target_length(seq)
         score0 = self._bg.likelihood(seq)
         result = self._viterbi(seq)
         score = result.score - score0
-        return HMMERResult(score, seq, result.path)
+        return Result(score, seq, result.path)
 
     def _finalize(self):
         self._set_fragment_length()

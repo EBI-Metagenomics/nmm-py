@@ -1,47 +1,11 @@
-from typing import Union, List
-from .._path import Path
+from typing import List, Union
 
 from .._ffi import ffi, lib
+from .._path import Path
+from .fragment import HomoFragment, NonHomoFragment
 
 
-class Fragment:
-    def __init__(self, seq: bytes, start: int, end: int):
-        self._seq = seq
-        self._start = start
-        self._end = end
-
-    @property
-    def sequence(self) -> bytes:
-        return self._seq[self._start : self._end]
-
-
-class HomoFragment(Fragment):
-    def __init__(self, seq: bytes, start: int, end: int):
-        super().__init__(seq, start, end)
-
-    @property
-    def homologous(self):
-        return True
-
-    def __repr__(self):
-        seq = self.sequence.encode()
-        return f"<{self.__class__.__name__}:{seq}>"
-
-
-class NonHomoFragment(Fragment):
-    def __init__(self, seq: bytes, start: int, end: int):
-        super().__init__(seq, start, end)
-
-    @property
-    def homologous(self):
-        return False
-
-    def __repr__(self):
-        seq = self.sequence.encode()
-        return f"<{self.__class__.__name__}:{seq}>"
-
-
-class HMMERResult:
+class Result:
     def __init__(self, score: float, seq: bytes, path: Path):
         self._score = score
 
