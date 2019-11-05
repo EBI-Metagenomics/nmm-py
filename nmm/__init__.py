@@ -6,6 +6,7 @@ from ._hmmer import create_frame_profile, create_hmmer_profile, read_hmmer
 from ._log import LOG0
 from ._path import Path
 from ._state import FrameState, MuteState, NormalState, TableState
+from ._step import Step
 
 try:
     from ._ffi import ffi as _
@@ -22,18 +23,19 @@ and reinstall the package again."""
 __version__ = "0.0.1"
 
 __all__ = [
-    "__version__",
+    "Alphabet",
+    "Base",
+    "Codon",
+    "FrameState",
     "HMM",
+    "LOG0",
     "MuteState",
     "NormalState",
-    "TableState",
-    "FrameState",
-    "Alphabet",
-    "Codon",
-    "Base",
     "Path",
-    "LOG0",
-    "read_hmmer",
+    "Step",
+    "TableState",
+    "__version__",
     "create_frame_profile",
     "create_hmmer_profile",
+    "read_hmmer",
 ]

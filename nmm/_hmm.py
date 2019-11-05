@@ -123,7 +123,14 @@ class HMM:
         return lprob
 
     def viterbi(self, seq: bytes, end_state: State) -> PathScore:
-        cpath = CPath()
-        lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, end_state.cdata, cpath.cdata)
-        path = Path(cpath)
+        cpath = lib.imm_path_create()
+        if cpath == ffi.NULL:
+            raise RuntimeError("Could not create `cpath`.")
+        try:
+            lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, end_state.cdata, cpath)
+        except Exception as e:
+            lib.imm_path_destroy(cpath)
+            raise e
+
+        path = CPath(cpath)
         return PathScore(score=lprob, path=path)

@@ -2,7 +2,7 @@ from math import log
 
 import pytest
 
-from nmm import Alphabet, MuteState, NormalState, Path
+from nmm import Alphabet, MuteState, NormalState, Path, Step
 
 
 def test_path():
@@ -12,4 +12,4 @@ def test_path():
     M = NormalState("M1", alphabet, {"A": log(0.8), "C": log(0.2)})
 
     with pytest.raises(ValueError):
-        Path([(S, 0), (E, 0), (M, -1)])
+        Path([Step(S, 0), Step(E, 0), Step(M, -1)])

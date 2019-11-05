@@ -4,6 +4,7 @@ from typing import Callable, List, NamedTuple
 from .._hmm import HMM
 from .._log import LOG0, LOG1
 from .._path import Path
+from .._step import Step
 from .._state import State
 
 Node = NamedTuple("Node", [("M", State), ("I", State), ("D", State)])
@@ -103,4 +104,5 @@ class NullModel:
         self._hmm.set_trans(self._state, self._state, lprob)
 
     def likelihood(self, seq: bytes):
-        return self._hmm.likelihood(seq, Path([(self._state, 1)] * len(seq)))
+        path = Path([Step(self._state, 1) for i in range(len(seq))])
+        return self._hmm.likelihood(seq, path)
