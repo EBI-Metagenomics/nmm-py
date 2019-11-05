@@ -34,7 +34,6 @@ def test_hmm_trans_prob():
     hmm.add_state(S)
 
     E = MuteState("E", alphabet)
-    E.normalize()
     with pytest.raises(RuntimeError):
         hmm.trans(S, E)
 
