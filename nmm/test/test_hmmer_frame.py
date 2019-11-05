@@ -21,10 +21,10 @@ def test_read_hmmer_frame_1(tmp_path):
     assert_equal(frag.sequence, most_likely_rna_seq)
 
 
-def test_read_hmmer_frame_4(tmp_path):
+def test_read_hmmer_frame_2(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
     reader = read_hmmer(filepath)
-    hmmer = create_frame_profile(reader)
+    hmmer = create_frame_profile(reader, epsilon=0.1)
 
     # seq = b"KKKPGKEDNNK"
     rna_seq = b"AAA AAA AAA CCU GGU AAA GAA GAU AAU AAC AAA"
@@ -37,6 +37,52 @@ def test_read_hmmer_frame_4(tmp_path):
     assert_equal(frags[0].sequence, b"AAAAAAAAA")
     assert_equal(frags[1].homologous, True)
     assert_equal(frags[1].sequence, b"CCUGGUAAAGAAGAUAAUAACAAA")
+
+
+def test_read_hmmer_frame_3(tmp_path):
+    filepath = write_file(tmp_path, "PF03373.hmm")
+    reader = read_hmmer(filepath)
+    hmmer = create_frame_profile(reader, epsilon=0.0)
+
+    # seq = b"PGKEDNNK"
+    rna_seq = b"CCU GGU AAA GAA GAU AAU AAC AAA"
+    rna_seq = rna_seq.replace(b" ", b"")
+
+    r = hmmer.lr(rna_seq)
+    frags = r.fragments
+    assert_equal(len(frags), 1)
+    assert_equal(frags[0].homologous, True)
+    assert_equal(frags[0].sequence, b"CCUGGUAAAGAAGAUAAUAACAAA")
+
+
+def test_read_hmmer_frame_4(tmp_path):
+    filepath = write_file(tmp_path, "PF03373.hmm")
+    reader = read_hmmer(filepath)
+    hmmer = create_frame_profile(reader, epsilon=0.0)
+
+    # seq = b"PGKEDNNK"
+    rna_seq = b"CCUU GGU AAA GAA GAU AAU AAC AAA"
+    rna_seq = rna_seq.replace(b" ", b"")
+
+    r = hmmer.lr(rna_seq)
+    frags = r.fragments
+    assert_equal(len(frags), 0)
+
+
+def test_read_hmmer_frame_5(tmp_path):
+    filepath = write_file(tmp_path, "PF03373.hmm")
+    reader = read_hmmer(filepath)
+    hmmer = create_frame_profile(reader, epsilon=0.00001)
+
+    # seq = b"PGKEDNNK"
+    rna_seq = b"CCUU GGU AAA GAA GAU AAU AAC AAA"
+    rna_seq = rna_seq.replace(b" ", b"")
+
+    r = hmmer.lr(rna_seq)
+    frags = r.fragments
+    assert_equal(len(frags), 1)
+    assert_equal(frags[0].homologous, True)
+    assert_equal(frags[0].sequence, b"CCUUGGUAAAGAAGAUAAUAACAAA")
 
 
 def write_file(path, filename):

@@ -278,8 +278,8 @@ def test_hmm_viterbi_1():
     hmm.set_trans(E, E, log(1.0))
     hmm.normalize()
 
-    with pytest.raises(ValueError):
-        hmm.viterbi(b"AC", E)
+    # with pytest.raises(ValueError):
+    #     hmm.viterbi(b"AC", E)
 
     hmm.set_trans(E, E, LOG0)
     assert_allclose(hmm.trans(E, E), LOG0)

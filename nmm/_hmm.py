@@ -125,6 +125,6 @@ class HMM:
     def viterbi(self, seq: bytes, end_state: State) -> PathScore:
         path = Path([])
         lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, end_state.cdata, path.cdata)
-        if isnan(lprob):
-            raise ValueError("Could not calculate the viterbi score.")
+        # if isnan(lprob):
+        #     raise ValueError("Could not calculate the viterbi score.")
         return PathScore(score=lprob, path=path)
