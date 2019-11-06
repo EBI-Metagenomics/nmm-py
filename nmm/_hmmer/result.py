@@ -17,16 +17,16 @@ class Result:
         step = lib.imm_path_first(path.imm_path)
         while step != ffi.NULL:
             cname = lib.imm_state_get_name(lib.imm_step_state(step))
-            name = ffi.string(cname).decode()
+            name = ffi.string(cname)
             seq_len = lib.imm_step_seq_len(step)
 
-            if not homologous and name.startswith("M"):
+            if not homologous and name.startswith(b"M"):
                 if frag_start < frag_end:
                     self._fragments.append(NonHomoFragment(seq, frag_start, frag_end))
                 homologous = True
                 frag_start = frag_end
 
-            elif homologous and name.startswith("E"):
+            elif homologous and name.startswith(b"E"):
                 if frag_start < frag_end:
                     self._fragments.append(HomoFragment(seq, frag_start, frag_end))
                 homologous = False

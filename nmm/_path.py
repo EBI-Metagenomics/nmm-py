@@ -1,7 +1,7 @@
-from typing import Sequence, Union, List
-from ._step import Step, CStep
+from typing import List, Sequence
 
 from ._ffi import ffi, lib
+from ._step import CStep, Step
 
 
 class CPath:
@@ -11,6 +11,12 @@ class CPath:
     @property
     def imm_path(self) -> ffi.CData:
         return self.__cdata
+
+    def steps(self):
+        step = lib.imm_path_first(self._path)
+        while step != ffi.NULL:
+            yield CStep(step)
+            step = lib.imm_path_next(self._path, step)
 
     def _append(self, state: ffi.CData, seq_len: int) -> ffi.CData:
         err: int = lib.imm_path_append(self.__cdata, state, seq_len)
@@ -49,23 +55,3 @@ class Path(CPath):
             imm_step = self._append(step.state.imm_state, step.seq_len)
             step.set_imm_step(imm_step)
             self._steps.append(step)
-
-
-# class Path(CPath):
-#     def __init__(self, steps: Sequence[Step]):
-#         super().__init__(None)
-#         self._steps: List[Step] = []
-#         for step in steps:
-#             if step.seq_len < 0:
-#                 raise ValueError("Sequence length cannot be negative.")
-#             self._append(step.state.imm_state, step.seq_len)
-#             self._steps.append(step)
-
-# def steps(self):
-#     step = lib.imm_path_first(self._path)
-#     while step != ffi.NULL:
-#         cname = lib.imm_state_get_name(lib.imm_step_state(step))
-#         name = ffi.string(cname).decode()
-#         seq_len = lib.imm_step_seq_len(step)
-
-#         step = lib.imm_path_next(self._path, step)
