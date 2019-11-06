@@ -26,6 +26,14 @@ class CStep:
             raise RuntimeError("`imm_step` is not NULL.")
         self.__cdata = imm_step
 
+    def __str__(self) -> str:
+        name = self.state.name.decode()
+        return f"<{name},{self.seq_len}>"
+
+    def __repr__(self) -> str:
+        name = self.state.name.decode()
+        return f"<{self.__class__.__name__}:{name},{self.seq_len}>"
+
 
 class Step(CStep):
     def __init__(self, state: State, seq_len: int):

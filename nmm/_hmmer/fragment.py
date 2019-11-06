@@ -1,17 +1,20 @@
+from typing import List
+from .._step import CStep
+
+
 class Fragment:
-    def __init__(self, seq: bytes, start: int, end: int):
+    def __init__(self, seq: bytes, steps: List[CStep] = []):
         self._seq = seq
-        self._start = start
-        self._end = end
+        self._steps = steps
 
     @property
     def sequence(self) -> bytes:
-        return self._seq[self._start : self._end]
+        return self._seq
 
 
 class HomoFragment(Fragment):
-    def __init__(self, seq: bytes, start: int, end: int):
-        super().__init__(seq, start, end)
+    def __init__(self, seq: bytes, steps: List[CStep] = []):
+        super().__init__(seq, steps)
 
     @property
     def homologous(self):
@@ -23,8 +26,8 @@ class HomoFragment(Fragment):
 
 
 class NonHomoFragment(Fragment):
-    def __init__(self, seq: bytes, start: int, end: int):
-        super().__init__(seq, start, end)
+    def __init__(self, seq: bytes, steps: List[CStep] = []):
+        super().__init__(seq, steps)
 
     @property
     def homologous(self):
