@@ -8,7 +8,7 @@ class Codon:
     def __init__(self, alphabet: Alphabet, lprobs: Dict[bytes, float] = {}):
         self._alphabet = alphabet
         self._codon = ffi.NULL
-        self._codon = lib.nmm_codon_create(self._alphabet.cdata)
+        self._codon = lib.nmm_codon_create(self._alphabet.imm_abc)
         for seq, lprob in lprobs.items():
             self.set_lprob(seq, lprob)
 

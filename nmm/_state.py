@@ -71,11 +71,11 @@ class MuteState(State):
         alphabet : Alphabet
             Alphabet.
         """
-        cdata = lib.imm_mute_state_create(name, alphabet.cdata)
+        cdata = lib.imm_mute_state_create(name, alphabet.imm_abc)
         if cdata == ffi.NULL:
             raise RuntimeError("`imm_mute_state_create` failed.")
         self._cdata = cdata
-        super(MuteState, self).__init__(lib.imm_state_cast_c(cdata), alphabet)
+        super().__init__(lib.imm_state_cast_c(cdata), alphabet)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name.decode()}>"
@@ -102,12 +102,12 @@ class NormalState(State):
             raise ValueError("Unrecognized alphabet symbol.")
 
         arr = [lprobs.get(bytes([symb]), LOG0) for symb in alphabet.symbols]
-        cdata = lib.imm_normal_state_create(name, alphabet.cdata, arr)
+        cdata = lib.imm_normal_state_create(name, alphabet.imm_abc, arr)
         if cdata == ffi.NULL:
             raise RuntimeError("`imm_normal_state_create` failed.")
 
         self._cdata = cdata
-        super(NormalState, self).__init__(lib.imm_state_cast_c(cdata), alphabet)
+        super().__init__(lib.imm_state_cast_c(cdata), alphabet)
 
     def emission_table(self) -> Dict[bytes, float]:
         return {bytes([s]): self.lprob(bytes([s])) for s in self.alphabet.symbols}
@@ -137,7 +137,7 @@ class TableState(State):
         emission : dict
             Emission probabilities in log-space.
         """
-        cdata = lib.imm_table_state_create(name, alphabet.cdata)
+        cdata = lib.imm_table_state_create(name, alphabet.imm_abc)
         if cdata == ffi.NULL:
             raise RuntimeError("`imm_table_state_create` failed.")
 
@@ -145,7 +145,7 @@ class TableState(State):
             lib.imm_table_state_add(cdata, seq, lprob)
 
         self._cdata = cdata
-        super(TableState, self).__init__(lib.imm_state_cast_c(cdata), alphabet)
+        super().__init__(lib.imm_state_cast_c(cdata), alphabet)
 
     def normalize(self) -> None:
         err = lib.imm_table_state_normalize(self._cdata)
@@ -186,7 +186,7 @@ class FrameState(State):
             raise RuntimeError("Could not create state.")
 
         self._cdata = cdata
-        super(FrameState, self).__init__(lib.imm_state_cast_c(cdata), codon.alphabet)
+        super().__init__(lib.imm_state_cast_c(cdata), codon.alphabet)
 
     @property
     def base(self) -> Base:

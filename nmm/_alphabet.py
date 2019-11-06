@@ -1,30 +1,40 @@
 from ._ffi import ffi, lib
 
 
-class Alphabet:
-    def __init__(self, symbols: bytes):
-        self._abc = ffi.NULL
-        self._symbols = symbols
-        self._abc = lib.imm_abc_create(self._symbols)
-        if self._abc == ffi.NULL:
-            raise RuntimeError("Could not create alphabet.")
+class CAlphabet:
+    def __init__(self, cdata: ffi.CData):
+        self.__cdata = cdata
 
     @property
-    def cdata(self):
-        return self._abc
+    def imm_abc(self) -> ffi.CData:
+        return self.__cdata
 
     @property
     def length(self) -> int:
-        return lib.imm_abc_length(self._abc)
+        return lib.imm_abc_length(self.__cdata)
 
     def has_symbol(self, symbol_id: bytes) -> bool:
-        return lib.imm_abc_has_symbol(self._abc, symbol_id) == 1
+        return lib.imm_abc_has_symbol(self.__cdata, symbol_id) == 1
 
     def symbol_idx(self, symbol_id: bytes) -> int:
-        return lib.imm_abc_symbol_idx(self._abc, symbol_id)
+        return lib.imm_abc_symbol_idx(self.__cdata, symbol_id)
 
     def symbol_id(self, symbol_idx: int) -> bytes:
-        return lib.imm_abc_symbol_id(self._abc, symbol_idx)
+        return lib.imm_abc_symbol_id(self.__cdata, symbol_idx)
+
+    def __del__(self):
+        if self.__cdata != ffi.NULL:
+            lib.imm_abc_destroy(self.__cdata)
+
+
+class Alphabet(CAlphabet):
+    def __init__(self, symbols: bytes):
+        self._symbols = symbols
+        cdata = ffi.NULL
+        cdata = lib.imm_abc_create(self._symbols)
+        if cdata == ffi.NULL:
+            raise RuntimeError("`imm_abc_create` failed.")
+        super().__init__(cdata)
 
     @property
     def symbols(self) -> bytes:
@@ -37,7 +47,3 @@ class Alphabet:
     def __repr__(self) -> str:
         symbols = self.symbols.decode()
         return f"{{{self.__class__.__name__}:{symbols}}}"
-
-    def __del__(self):
-        if self._abc != ffi.NULL:
-            lib.imm_abc_destroy(self._abc)

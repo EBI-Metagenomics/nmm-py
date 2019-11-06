@@ -41,7 +41,7 @@ def test_normal_state():
     assert_equal(state.lprob(b"T"), log(0.3) - log(0.9))
 
     assert_equal(state.alphabet.length, alphabet.length)
-    assert_equal(state.alphabet.cdata, alphabet.cdata)
+    assert_equal(state.alphabet.imm_abc, alphabet.imm_abc)
 
     assert_equal(str(state), "<M0>")
     assert_equal(repr(state), "<NormalState:M0>")

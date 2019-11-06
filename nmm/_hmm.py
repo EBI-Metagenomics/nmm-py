@@ -17,7 +17,7 @@ class HMM:
         self._alphabet = alphabet
         self._states: Dict[ffi.CData, State] = {}
         self._state_names = bidict()
-        self._hmm = lib.imm_hmm_create(self._alphabet.cdata)
+        self._hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
 
     def __del__(self):
         if self._hmm != ffi.NULL:

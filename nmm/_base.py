@@ -8,7 +8,7 @@ class Base:
     def __init__(self, alphabet: Alphabet, lprobs: Dict[bytes, float] = {}):
         self._alphabet = alphabet
         self._base = ffi.NULL
-        self._base = lib.nmm_base_create(self._alphabet.cdata)
+        self._base = lib.nmm_base_create(self._alphabet.imm_abc)
         for letter, lprob in lprobs.items():
             self.set_lprob(letter, lprob)
 
