@@ -4,26 +4,26 @@ from typing import Dict
 from ._ffi import ffi, lib
 
 
-class Codon:
-    def __init__(self, alphabet: Alphabet, lprobs: Dict[bytes, float] = {}):
-        self._alphabet = alphabet
-        self._codon = ffi.NULL
-        self._codon = lib.nmm_codon_create(self._alphabet.imm_abc)
-        for seq, lprob in lprobs.items():
-            self.set_lprob(seq, lprob)
+class CCodon:
+    def __init__(self, cdata: ffi.CData):
+        self.__cdata = cdata
 
     @property
-    def cdata(self) -> ffi.CData:
-        return self._codon
+    def nmm_codon(self) -> ffi.CData:
+        return self.__cdata
 
     @property
-    def alphabet(self) -> Alphabet:
-        return self._alphabet
+    def imm_abc(self) -> ffi.CData:
+        return lib.nmm_codon_get_abc(self.__cdata)
 
     def set_lprob(self, seq: bytes, lprob: float) -> None:
         if len(seq) != 3:
             raise ValueError("Codon must have three letters.")
-        err = lib.nmm_codon_set_lprob(self._codon, seq[0:1], seq[1:2], seq[2:3], lprob)
+
+        a = seq[0:1]
+        b = seq[1:2]
+        c = seq[2:3]
+        err: int = lib.nmm_codon_set_lprob(self.__cdata, a, b, c, lprob)
         if err != 0:
             s = seq.decode()
             raise ValueError(f"Could not set a probability for `{s}`.")
@@ -31,13 +31,27 @@ class Codon:
     def get_lprob(self, seq: bytes) -> float:
         if len(seq) != 3:
             raise ValueError("Codon must have three letters.")
-        return lib.nmm_codon_get_lprob(self._codon, seq[0:1], seq[1:2], seq[2:3])
+
+        return lib.nmm_codon_get_lprob(self.__cdata, seq[0:1], seq[1:2], seq[2:3])
 
     def normalize(self) -> None:
-        err = lib.nmm_codon_normalize(self._codon)
+        err: int = lib.nmm_codon_normalize(self.__cdata)
         if err != 0:
             raise RuntimeError("Normalization error.")
 
     def __del__(self):
-        if self._codon != ffi.NULL:
-            lib.nmm_codon_destroy(self._codon)
+        if self.__cdata != ffi.NULL:
+            lib.nmm_codon_destroy(self.__cdata)
+
+
+class Codon(CCodon):
+    def __init__(self, alphabet: Alphabet, lprobs: Dict[bytes, float] = {}):
+        self._alphabet = alphabet
+        cdata = lib.nmm_codon_create(self._alphabet.imm_abc)
+        super().__init__(cdata)
+        for seq, lprob in lprobs.items():
+            self.set_lprob(seq, lprob)
+
+    @property
+    def alphabet(self) -> Alphabet:
+        return self._alphabet

@@ -181,7 +181,9 @@ class FrameState(State):
         self._codon = codon
         self._epsilon = epsilon
 
-        cdata = lib.nmm_frame_state_create(name, base.cdata, codon.cdata, epsilon)
+        cdata = lib.nmm_frame_state_create(
+            name, base.nmm_base, codon.nmm_codon, epsilon
+        )
         if cdata == ffi.NULL:
             raise RuntimeError("Could not create state.")
 
