@@ -11,5 +11,5 @@ def test_path():
     E = MuteState(b"E", alphabet)
     M = NormalState(b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2)})
 
-    with pytest.raises(ValueError):
+    with pytest.raises(RuntimeError):
         Path([Step(S, 0), Step(E, 0), Step(M, -1)])

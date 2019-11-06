@@ -60,6 +60,7 @@ void             imm_path_destroy(struct imm_path *path);
 int              imm_path_append(struct imm_path *path, struct imm_state const *state, int seq_len);
 int              imm_path_prepend(struct imm_path *path, struct imm_state const *state, int seq_len);
 struct imm_step const *imm_path_first(struct imm_path const *path);
+struct imm_step const *imm_path_last(struct imm_path const *path);
 struct imm_step const *imm_path_next(struct imm_path const *path, struct imm_step const *step);
 
 /* Step */

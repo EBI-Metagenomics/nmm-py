@@ -9,7 +9,7 @@ from typing import Dict, Optional, NamedTuple
 
 from ._ffi import ffi, lib
 
-PathScore = NamedTuple("PathScore", [("score", float), ("path", Path)])
+PathScore = NamedTuple("PathScore", [("score", float), ("path", CPath)])
 
 
 class HMM:
@@ -117,7 +117,7 @@ class HMM:
             raise ValueError("Normalization error.")
 
     def likelihood(self, seq: bytes, path: Path):
-        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq, path.cdata)
+        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq, path.imm_path)
         if isnan(lprob):
             raise ValueError("Could not calculate the likelihood.")
         return lprob

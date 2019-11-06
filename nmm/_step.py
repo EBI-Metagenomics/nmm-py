@@ -21,6 +21,11 @@ class CStep:
     def seq_len(self) -> int:
         return lib.imm_step_seq_len(self.imm_step)
 
+    def _set_imm_step(self, imm_step: ffi.CData):
+        if self.__cdata != ffi.NULL:
+            raise RuntimeError("`imm_step` is not NULL.")
+        self.__cdata = imm_step
+
 
 class Step(CStep):
     def __init__(self, state: State, seq_len: int):
@@ -35,3 +40,6 @@ class Step(CStep):
     @property
     def seq_len(self) -> int:
         return self._seq_len
+
+    def set_imm_step(self, imm_step: ffi.CData):
+        self._set_imm_step(imm_step)

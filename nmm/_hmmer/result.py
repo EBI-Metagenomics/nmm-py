@@ -1,12 +1,12 @@
 from typing import List, Union
 
 from .._ffi import ffi, lib
-from .._path import Path
+from .._path import CPath
 from .fragment import HomoFragment, NonHomoFragment
 
 
 class Result:
-    def __init__(self, score: float, seq: bytes, path: Path):
+    def __init__(self, score: float, seq: bytes, path: CPath):
         self._score = score
 
         self._fragments: List[Union[HomoFragment, NonHomoFragment]] = []
@@ -14,7 +14,7 @@ class Result:
         frag_start = frag_end = 0
         homologous = False
 
-        step = lib.imm_path_first(path.cdata)
+        step = lib.imm_path_first(path.imm_path)
         while step != ffi.NULL:
             cname = lib.imm_state_get_name(lib.imm_step_state(step))
             name = ffi.string(cname).decode()
@@ -33,7 +33,7 @@ class Result:
                 frag_start = frag_end
 
             frag_end += seq_len
-            step = lib.imm_path_next(path.cdata, step)
+            step = lib.imm_path_next(path.imm_path, step)
 
     @property
     def fragments(self):
