@@ -1,6 +1,6 @@
 from io import TextIOBase
 from math import log
-from typing import Dict, List, NamedTuple, Union
+from typing import Dict, List, NamedTuple, Union, Any
 
 from hmmer_reader import HMMEReader
 
@@ -54,13 +54,13 @@ class FrameProfile:
         codon = bg.state.codon
         epsilon = bg.state.epsilon
         special_node = SpecialNode(
-            S=MuteState("S", alphabet),
-            N=FrameState("N", base, codon, epsilon),
-            B=MuteState("B", alphabet),
-            E=MuteState("E", alphabet),
-            J=FrameState("J", base, codon, epsilon),
-            C=FrameState("C", base, codon, epsilon),
-            T=MuteState("T", alphabet),
+            S=MuteState(b"S", alphabet),
+            N=FrameState(b"N", base, codon, epsilon),
+            B=MuteState(b"B", alphabet),
+            E=MuteState(b"E", alphabet),
+            J=FrameState(b"J", base, codon, epsilon),
+            C=FrameState(b"C", base, codon, epsilon),
+            T=MuteState(b"T", alphabet),
         )
         hmm = HMM(alphabet)
         hmm.add_state(special_node.S, LOG1)
@@ -167,7 +167,7 @@ class FrameProfile:
         return self._hmm.viterbi(seq, self._special_node.T)
 
 
-def _infer_codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
+def _infer_codon_lprobs(aa_lprobs: Dict[bytes, float], gencode: GeneticCode):
     from numpy import logaddexp
 
     codon_lprobs = []
@@ -190,12 +190,12 @@ def _infer_codon_lprobs(aa_lprobs: Dict[str, float], gencode: GeneticCode):
 def _infer_base_lprobs(codon_lprobs, alphabet: Alphabet):
     from scipy.special import logsumexp
 
-    lprobs: Dict[str, list] = {base: [] for base in alphabet.symbols}
+    lprobs: Dict[bytes, list] = {bytes([base]): [] for base in alphabet.symbols}
     lprob_norm = log(3)
     for codon, lprob in codon_lprobs.items():
-        lprobs[codon[0]] += [lprob - lprob_norm]
-        lprobs[codon[1]] += [lprob - lprob_norm]
-        lprobs[codon[2]] += [lprob - lprob_norm]
+        lprobs[codon[0:1]] += [lprob - lprob_norm]
+        lprobs[codon[1:2]] += [lprob - lprob_norm]
+        lprobs[codon[2:3]] += [lprob - lprob_norm]
 
     return {b: logsumexp(lp) for b, lp in lprobs.items()}
 
@@ -206,7 +206,7 @@ class _FrameStateFactory:
         self._gcode = gcode
         self._epsilon = epsilon
 
-    def create(self, name: str, aa_lprobs: Dict[str, float]) -> FrameState:
+    def create(self, name: bytes, aa_lprobs: Dict[bytes, float]) -> FrameState:
         codon_lprobs = _infer_codon_lprobs(aa_lprobs, self._gcode)
         base_lprobs = _infer_base_lprobs(codon_lprobs, self._bases)
         base = Base(self._bases, base_lprobs)
@@ -215,9 +215,9 @@ class _FrameStateFactory:
 
 
 def create_frame_profile(reader: HMMEReader, epsilon: float = 0.1) -> FrameProfile:
-    bases = Alphabet("ACGU")
+    bases = Alphabet(b"ACGU")
     ffact = _FrameStateFactory(bases, GeneticCode(), epsilon)
-    R = ffact.create("R", reader.insert(0))
+    R = ffact.create(b"R", _bytes_dict(reader.insert(0)))
 
     # TODO: the null model is not property set.
     # It is supposed to be temporary.
@@ -226,12 +226,16 @@ def create_frame_profile(reader: HMMEReader, epsilon: float = 0.1) -> FrameProfi
     with hmmer.core_model() as core:
         for m in range(1, reader.M + 1):
             node = Node(
-                M=ffact.create(f"M{m}", reader.match(m)),
-                I=ffact.create(f"I{m}", reader.insert(m)),
-                D=MuteState(f"D{m}", bases),
+                M=ffact.create(f"M{m}".encode(), _bytes_dict(reader.match(m))),
+                I=ffact.create(f"I{m}".encode(), _bytes_dict(reader.insert(m))),
+                D=MuteState(f"D{m}".encode(), bases),
             )
             trans = Trans(**reader.trans(m - 1))
             trans.normalize()
             core.add_node(node, trans)
 
     return hmmer
+
+
+def _bytes_dict(d: Dict[str, Any]):
+    return {k.encode(): v for k, v in d.items()}

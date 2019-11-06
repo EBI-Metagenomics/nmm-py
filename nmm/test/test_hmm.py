@@ -7,12 +7,12 @@ from nmm import HMM, LOG0, Alphabet, MuteState, NormalState, Path, TableState, S
 
 
 def test_hmm_states():
-    alphabet = Alphabet("ACGU")
+    alphabet = Alphabet(b"ACGU")
     hmm = HMM(alphabet)
 
-    S = MuteState("S", alphabet)
+    S = MuteState(b"S", alphabet)
     hmm.add_state(S)
-    M = TableState("M", alphabet, {"AGU": log(0.8), "AGG": log(0.2)})
+    M = TableState(b"M", alphabet, {b"AGU": log(0.8), b"AGG": log(0.2)})
     hmm.add_state(M, LOG0)
 
     with pytest.raises(ValueError):
@@ -25,15 +25,15 @@ def test_hmm_states():
 
 
 def test_hmm_trans_prob():
-    alphabet = Alphabet("ACGU")
+    alphabet = Alphabet(b"ACGU")
     hmm = HMM(alphabet)
 
-    S = MuteState("S", alphabet)
+    S = MuteState(b"S", alphabet)
     with pytest.raises(RuntimeError):
         hmm.set_start_lprob(S, log(0.4))
     hmm.add_state(S)
 
-    E = MuteState("E", alphabet)
+    E = MuteState(b"E", alphabet)
     with pytest.raises(RuntimeError):
         hmm.trans(S, E)
 
@@ -79,22 +79,22 @@ def test_hmm_trans_prob():
 
 
 def test_hmm_lik_1():
-    alphabet = Alphabet("ACGU")
+    alphabet = Alphabet(b"ACGU")
     hmm = HMM(alphabet)
 
-    S = MuteState("S", alphabet)
+    S = MuteState(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    E = MuteState("E", alphabet)
+    E = MuteState(b"E", alphabet)
     hmm.add_state(E, LOG0)
 
     M1 = NormalState(
-        "M1", alphabet, {"A": log(0.8), "C": log(0.2), "G": LOG0, "U": LOG0}
+        b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2), b"G": LOG0, b"U": LOG0}
     )
     hmm.add_state(M1, LOG0)
 
     M2 = NormalState(
-        "M2", alphabet, {"A": log(0.4), "C": log(0.6), "G": LOG0, "U": log(0.6)}
+        b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6), b"G": LOG0, b"U": log(0.6)}
     )
     M2.normalize()
     hmm.add_state(M2, LOG0)
@@ -157,20 +157,22 @@ def test_hmm_lik_1():
     assert_allclose(p, LOG0)
 
     M3 = NormalState(
-        "M2", alphabet, {"A": log(0.4), "C": log(0.6), "G": LOG0, "U": log(0.6)}
+        b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6), b"G": LOG0, b"U": log(0.6)}
     )
     with pytest.raises(ValueError):
         hmm.likelihood(b"UU", Path([Step(S, 0), Step(M1, 1), Step(M3, 1), Step(E, 0)]))
 
 
 def test_hmm_lik_2():
-    alphabet = Alphabet("ACGU")
+    alphabet = Alphabet(b"ACGU")
     hmm = HMM(alphabet)
 
-    S = NormalState("S", alphabet, {"A": log(0.8), "C": log(0.2), "G": LOG0, "U": LOG0})
+    S = NormalState(
+        b"S", alphabet, {b"A": log(0.8), b"C": log(0.2), b"G": LOG0, b"U": LOG0}
+    )
     hmm.add_state(S, log(1.0))
 
-    E = MuteState("E", alphabet)
+    E = MuteState(b"E", alphabet)
     hmm.add_state(E, LOG0)
 
     hmm.set_trans(S, E, log(1.0))
@@ -204,19 +206,19 @@ def test_hmm_lik_2():
 
 
 def test_hmm_lik_3():
-    alphabet = Alphabet("AC")
+    alphabet = Alphabet(b"AC")
     hmm = HMM(alphabet)
 
-    S = MuteState("S", alphabet)
+    S = MuteState(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    M1 = MuteState("M1", alphabet)
+    M1 = MuteState(b"M1", alphabet)
     hmm.add_state(M1, LOG0)
 
-    M2 = NormalState("M2", alphabet, {"A": log(0.8), "C": log(0.2)})
+    M2 = NormalState(b"M2", alphabet, {b"A": log(0.8), b"C": log(0.2)})
     hmm.add_state(M2, LOG0)
 
-    E = MuteState("E", alphabet)
+    E = MuteState(b"E", alphabet)
     hmm.add_state(E, LOG0)
 
     hmm.set_trans(S, M1, log(1.0))
@@ -251,22 +253,22 @@ def test_hmm_lik_3():
 
 
 def test_hmm_viterbi_1():
-    alphabet = Alphabet("ACGU")
+    alphabet = Alphabet(b"ACGU")
     hmm = HMM(alphabet)
 
-    S = MuteState("S", alphabet)
+    S = MuteState(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    E = MuteState("E", alphabet)
+    E = MuteState(b"E", alphabet)
     hmm.add_state(E, LOG0)
 
     M1 = NormalState(
-        "M1", alphabet, {"A": log(0.8), "C": log(0.2), "G": LOG0, "U": LOG0}
+        b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2), b"G": LOG0, b"U": LOG0}
     )
     hmm.add_state(M1, LOG0)
 
     M2 = NormalState(
-        "M2", alphabet, {"A": log(0.4), "C": log(0.6), "G": LOG0, "U": log(0.6)}
+        b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6), b"G": LOG0, b"U": log(0.6)}
     )
     M2.normalize()
     hmm.add_state(M2, LOG0)
@@ -291,19 +293,19 @@ def test_hmm_viterbi_1():
 
 
 def test_hmm_viterbi_2():
-    alphabet = Alphabet("AC")
+    alphabet = Alphabet(b"AC")
 
     hmm = HMM(alphabet)
-    S = MuteState("S", alphabet)
+    S = MuteState(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    E = MuteState("E", alphabet)
+    E = MuteState(b"E", alphabet)
     hmm.add_state(E, LOG0)
 
-    M1 = NormalState("M1", alphabet, {"A": log(0.8), "C": log(0.2)})
+    M1 = NormalState(b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2)})
     hmm.add_state(M1, LOG0)
 
-    M2 = NormalState("M2", alphabet, {"A": log(0.4), "C": log(0.6)})
+    M2 = NormalState(b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6)})
     hmm.add_state(M2, LOG0)
 
     hmm.set_trans(S, M1, log(1.0))
@@ -335,25 +337,25 @@ def test_hmm_viterbi_2():
 
 
 def test_hmm_viterbi_3():
-    alphabet = Alphabet("AC")
+    alphabet = Alphabet(b"AC")
 
     hmm = HMM(alphabet)
-    S = MuteState("S", alphabet)
+    S = MuteState(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    E = MuteState("E", alphabet)
+    E = MuteState(b"E", alphabet)
     hmm.add_state(E, LOG0)
 
-    M1 = NormalState("M1", alphabet, {"A": log(0.8), "C": log(0.2)})
+    M1 = NormalState(b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2)})
     hmm.add_state(M1, LOG0)
 
-    D1 = MuteState("D1", alphabet)
+    D1 = MuteState(b"D1", alphabet)
     hmm.add_state(D1, LOG0)
 
-    M2 = NormalState("M2", alphabet, {"A": log(0.4), "C": log(0.6)})
+    M2 = NormalState(b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6)})
     hmm.add_state(M2, LOG0)
 
-    D2 = MuteState("D2", alphabet)
+    D2 = MuteState(b"D2", alphabet)
     hmm.add_state(D2, LOG0)
 
     hmm.set_trans(S, M1, log(0.8))

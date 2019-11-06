@@ -5,7 +5,7 @@ from ._ffi import ffi, lib
 
 
 class Base:
-    def __init__(self, alphabet: Alphabet, lprobs: Dict[str, float] = {}):
+    def __init__(self, alphabet: Alphabet, lprobs: Dict[bytes, float] = {}):
         self._alphabet = alphabet
         self._base = ffi.NULL
         self._base = lib.nmm_base_create(self._alphabet.cdata)
@@ -20,16 +20,17 @@ class Base:
     def alphabet(self) -> Alphabet:
         return self._alphabet
 
-    def set_lprob(self, nucleotide: str, lprob: float) -> None:
-        letter = nucleotide.encode()
+    def set_lprob(self, nucleotide: bytes, lprob: float) -> None:
+        letter = nucleotide
         if len(letter) != 1:
             raise ValueError("Nucleotide must be a single letter.")
         err: int = lib.nmm_base_set_lprob(self._base, letter, lprob)
         if err != 0:
-            raise ValueError(f"Could not set a probability for `{nucleotide}`.")
+            nucl = nucleotide.decode()
+            raise ValueError(f"Could not set a probability for `{nucl}`.")
 
-    def get_lprob(self, nucleotide: str) -> float:
-        letter = nucleotide.encode()
+    def get_lprob(self, nucleotide: bytes) -> float:
+        letter = nucleotide
         if len(letter) != 1:
             raise ValueError("Nucleotide must be a single letter.")
         return lib.nmm_base_get_lprob(self._base, letter)

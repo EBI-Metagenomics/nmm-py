@@ -5,28 +5,28 @@ from nmm import Alphabet
 
 
 def test_alphabet():
-    abc = Alphabet("ACGT")
+    abc = Alphabet(b"ACGT")
     assert_equal(abc.length, 4)
 
-    assert_equal(abc.has_symbol("A"), True)
-    assert_equal(abc.has_symbol("C"), True)
-    assert_equal(abc.has_symbol("G"), True)
-    assert_equal(abc.has_symbol("T"), True)
+    assert_equal(abc.has_symbol(b"A"), True)
+    assert_equal(abc.has_symbol(b"C"), True)
+    assert_equal(abc.has_symbol(b"G"), True)
+    assert_equal(abc.has_symbol(b"T"), True)
 
-    assert_equal(abc.symbol_idx("A"), 0)
-    assert_equal(abc.symbol_idx("C"), 1)
-    assert_equal(abc.symbol_idx("G"), 2)
-    assert_equal(abc.symbol_idx("T"), 3)
+    assert_equal(abc.symbol_idx(b"A"), 0)
+    assert_equal(abc.symbol_idx(b"C"), 1)
+    assert_equal(abc.symbol_idx(b"G"), 2)
+    assert_equal(abc.symbol_idx(b"T"), 3)
 
-    assert_equal(abc.symbol_id(0), "A")
-    assert_equal(abc.symbol_id(1), "C")
-    assert_equal(abc.symbol_id(2), "G")
-    assert_equal(abc.symbol_id(3), "T")
+    assert_equal(abc.symbol_id(0), b"A")
+    assert_equal(abc.symbol_id(1), b"C")
+    assert_equal(abc.symbol_id(2), b"G")
+    assert_equal(abc.symbol_id(3), b"T")
 
-    assert_equal(abc.symbols, "ACGT")
+    assert_equal(abc.symbols, b"ACGT")
 
     assert_equal(str(abc), "{ACGT}")
     assert_equal(repr(abc), "{Alphabet:ACGT}")
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(TypeError):
         Alphabet("ACGTç")

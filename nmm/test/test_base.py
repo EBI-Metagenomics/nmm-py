@@ -7,44 +7,44 @@ from nmm import LOG0, Alphabet, Base
 
 
 def test_base():
-    alphabet = Alphabet("ACGT")
+    alphabet = Alphabet(b"ACGT")
     base = Base(alphabet)
-    base.set_lprob("A", log(0.3))
-    base.set_lprob("T", log(0.3))
+    base.set_lprob(b"A", log(0.3))
+    base.set_lprob(b"T", log(0.3))
 
-    assert_allclose(base.get_lprob("A"), log(0.3))
-    assert_allclose(base.get_lprob("T"), log(0.3))
+    assert_allclose(base.get_lprob(b"A"), log(0.3))
+    assert_allclose(base.get_lprob(b"T"), log(0.3))
 
-    assert_equal(base.get_lprob("C"), LOG0)
-    assert_equal(base.get_lprob("G"), LOG0)
+    assert_equal(base.get_lprob(b"C"), LOG0)
+    assert_equal(base.get_lprob(b"G"), LOG0)
 
-    assert_equal(base.get_lprob("X"), nan)
-
-    with pytest.raises(ValueError):
-        base.set_lprob("X", 0.0)
+    assert_equal(base.get_lprob(b"X"), nan)
 
     with pytest.raises(ValueError):
-        base.set_lprob("XX", 0.0)
+        base.set_lprob(b"X", 0.0)
 
     with pytest.raises(ValueError):
-        base.get_lprob("XX")
+        base.set_lprob(b"XX", 0.0)
+
+    with pytest.raises(ValueError):
+        base.get_lprob(b"XX")
 
     base.normalize()
 
-    assert_allclose(base.get_lprob("A"), log(0.3) - log(0.6))
-    assert_allclose(base.get_lprob("T"), log(0.3) - log(0.6))
+    assert_allclose(base.get_lprob(b"A"), log(0.3) - log(0.6))
+    assert_allclose(base.get_lprob(b"T"), log(0.3) - log(0.6))
 
-    assert_equal(base.get_lprob("C"), LOG0)
-    assert_equal(base.get_lprob("G"), LOG0)
+    assert_equal(base.get_lprob(b"C"), LOG0)
+    assert_equal(base.get_lprob(b"G"), LOG0)
 
-    assert_equal(base.get_lprob("X"), nan)
+    assert_equal(base.get_lprob(b"X"), nan)
 
-    assert_equal(set(base.alphabet.symbols), set("ACGT"))
+    assert_equal(set(base.alphabet.symbols), set(b"ACGT"))
 
-    base.set_lprob("A", LOG0)
-    base.set_lprob("C", LOG0)
-    base.set_lprob("G", LOG0)
-    base.set_lprob("T", LOG0)
+    base.set_lprob(b"A", LOG0)
+    base.set_lprob(b"C", LOG0)
+    base.set_lprob(b"G", LOG0)
+    base.set_lprob(b"T", LOG0)
 
     with pytest.raises(RuntimeError):
         base.normalize()

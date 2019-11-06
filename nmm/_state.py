@@ -30,7 +30,7 @@ class CState:
     def imm_state(self) -> ffi.CData:
         return self.__cdata
 
-    def lprob(self, seq: str) -> float:
+    def lprob(self, seq: bytes) -> float:
         """
         Log-space probability of sequence emission.
 
@@ -39,7 +39,7 @@ class CState:
         seq : str
             Sequence.
         """
-        return lib.imm_state_lprob(self.__cdata, seq.encode(), len(seq))
+        return lib.imm_state_lprob(self.__cdata, seq, len(seq))
 
 
 class State(CState):
@@ -62,16 +62,16 @@ class State(CState):
 
 
 class MuteState(State):
-    def __init__(self, name: str, alphabet: Alphabet):
+    def __init__(self, name: bytes, alphabet: Alphabet):
         """
         Parameters
         ----------
-        name : str
+        name : bytes
             Name.
         alphabet : Alphabet
             Alphabet.
         """
-        cdata = lib.imm_mute_state_create(name.encode(), alphabet.cdata)
+        cdata = lib.imm_mute_state_create(name, alphabet.cdata)
         if cdata == ffi.NULL:
             raise RuntimeError("`imm_mute_state_create` failed.")
         self._cdata = cdata
@@ -86,11 +86,11 @@ class MuteState(State):
 
 
 class NormalState(State):
-    def __init__(self, name: str, alphabet: Alphabet, lprobs: Dict[str, float]):
+    def __init__(self, name: bytes, alphabet: Alphabet, lprobs: Dict[bytes, float]):
         """
         Parameters
         ----------
-        name : str
+        name : bytes
             Name.
         alphabet : Alphabet
             Alphabet.
@@ -98,19 +98,19 @@ class NormalState(State):
             List of probabilities in log-space.
         """
 
-        if len(set(lprobs.keys() - set(alphabet.symbols))) > 0:
+        if len(set(b"".join(lprobs.keys())) - set(alphabet.symbols)) > 0:
             raise ValueError("Unrecognized alphabet symbol.")
 
-        arr = [lprobs.get(symb, LOG0) for symb in alphabet.symbols]
-        cdata = lib.imm_normal_state_create(name.encode(), alphabet.cdata, arr)
+        arr = [lprobs.get(bytes([symb]), LOG0) for symb in alphabet.symbols]
+        cdata = lib.imm_normal_state_create(name, alphabet.cdata, arr)
         if cdata == ffi.NULL:
             raise RuntimeError("`imm_normal_state_create` failed.")
 
         self._cdata = cdata
         super(NormalState, self).__init__(lib.imm_state_cast_c(cdata), alphabet)
 
-    def emission_table(self) -> Dict[str, float]:
-        return {s: self.lprob(s) for s in self.alphabet.symbols}
+    def emission_table(self) -> Dict[bytes, float]:
+        return {bytes([s]): self.lprob(bytes([s])) for s in self.alphabet.symbols}
 
     def normalize(self) -> None:
         err = lib.imm_normal_state_normalize(self._cdata)
@@ -126,23 +126,23 @@ class NormalState(State):
 
 
 class TableState(State):
-    def __init__(self, name: str, alphabet: Alphabet, emission: Dict[str, float]):
+    def __init__(self, name: bytes, alphabet: Alphabet, emission: Dict[bytes, float]):
         """
         Parameters
         ----------
-        name : str
+        name : bytes
             Name.
         alphabet : Alphabet
             Alphabet.
         emission : dict
             Emission probabilities in log-space.
         """
-        cdata = lib.imm_table_state_create(name.encode(), alphabet.cdata)
+        cdata = lib.imm_table_state_create(name, alphabet.cdata)
         if cdata == ffi.NULL:
             raise RuntimeError("`imm_table_state_create` failed.")
 
         for seq, lprob in emission.items():
-            lib.imm_table_state_add(cdata, seq.encode(), lprob)
+            lib.imm_table_state_add(cdata, seq, lprob)
 
         self._cdata = cdata
         super(TableState, self).__init__(lib.imm_state_cast_c(cdata), alphabet)
@@ -161,11 +161,11 @@ class TableState(State):
 
 
 class FrameState(State):
-    def __init__(self, name: str, base: Base, codon: Codon, epsilon: float):
+    def __init__(self, name: bytes, base: Base, codon: Codon, epsilon: float):
         """
         Parameters
         ----------
-        name : str
+        name : bytes
             Name.
         base : Base
             Base.
@@ -181,8 +181,7 @@ class FrameState(State):
         self._codon = codon
         self._epsilon = epsilon
 
-        n = name.encode()
-        cdata = lib.nmm_frame_state_create(n, base.cdata, codon.cdata, epsilon)
+        cdata = lib.nmm_frame_state_create(name, base.cdata, codon.cdata, epsilon)
         if cdata == ffi.NULL:
             raise RuntimeError("Could not create state.")
 

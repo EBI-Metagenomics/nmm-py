@@ -1,5 +1,5 @@
 from math import log
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Dict, Any
 
 from hmmer_reader import HMMEReader
 
@@ -48,13 +48,13 @@ class NormalProfile:
         alphabet = bg.state.alphabet
         emission_table = bg.state.emission_table()
         special_node = SpecialNode(
-            S=MuteState("S", alphabet),
-            N=NormalState("N", alphabet, emission_table),
-            B=MuteState("B", alphabet),
-            E=MuteState("E", alphabet),
-            J=NormalState("J", alphabet, emission_table),
-            C=NormalState("C", alphabet, emission_table),
-            T=MuteState("T", alphabet),
+            S=MuteState(b"S", alphabet),
+            N=NormalState(b"N", alphabet, emission_table),
+            B=MuteState(b"B", alphabet),
+            E=MuteState(b"E", alphabet),
+            J=NormalState(b"J", alphabet, emission_table),
+            C=NormalState(b"C", alphabet, emission_table),
+            T=MuteState(b"T", alphabet),
         )
         hmm = HMM(alphabet)
         hmm.add_state(special_node.S, LOG1)
@@ -163,19 +163,21 @@ class NormalProfile:
 
 def create_hmmer_profile(reader: HMMEReader) -> NormalProfile:
 
-    alphabet = Alphabet(reader.alphabet)
+    alphabet = Alphabet(reader.alphabet.encode())
     # TODO: the null model is not property set.
     # It is supposed to be temporary.
-    R = NormalState("R", alphabet, reader.insert(0))
+    R = NormalState(b"R", alphabet, _bytes_dict(reader.insert(0)))
     R.normalize()
     hmmer = NormalProfile(NormalNullModel(R))
 
     with hmmer.core_model() as core:
         for m in range(1, reader.M + 1):
             node = Node(
-                M=NormalState(f"M{m}", alphabet, reader.match(m)),
-                I=NormalState(f"I{m}", alphabet, reader.insert(m)),
-                D=MuteState(f"D{m}", alphabet),
+                M=NormalState(f"M{m}".encode(), alphabet, _bytes_dict(reader.match(m))),
+                I=NormalState(
+                    f"I{m}".encode(), alphabet, _bytes_dict(reader.insert(m))
+                ),
+                D=MuteState(f"D{m}".encode(), alphabet),
             )
             node.M.normalize()
             node.I.normalize()
@@ -184,3 +186,7 @@ def create_hmmer_profile(reader: HMMEReader) -> NormalProfile:
             core.add_node(node, trans)
 
     return hmmer
+
+
+def _bytes_dict(d: Dict[str, Any]):
+    return {k.encode(): v for k, v in d.items()}
