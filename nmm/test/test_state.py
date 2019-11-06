@@ -25,7 +25,7 @@ def test_normal_state():
         alphabet,
         {b"A": log(0.1), b"C": log(0.2), b"G": log(0.3), b"T": log(0.3)},
     )
-    assert_equal(state.name, "M0")
+    assert_equal(state.name, b"M0")
     assert_equal(state.lprob(b"A"), log(0.1))
     assert_equal(state.lprob(b"C"), log(0.2))
     assert_equal(state.lprob(b"G"), log(0.3))
@@ -54,7 +54,7 @@ def test_normal_state():
 def test_mute_state():
     alphabet = Alphabet(b"ACGU")
     state = MuteState(b"S", alphabet)
-    assert_equal(state.name, "S")
+    assert_equal(state.name, b"S")
     assert_equal(state.alphabet.symbols, b"ACGU")
     assert_equal(state.lprob(b""), log(1.0))
     assert_equal(state.lprob(b"A"), LOG0)
@@ -65,7 +65,7 @@ def test_mute_state():
 def test_table_state():
     alphabet = Alphabet(b"ACGU")
     state = TableState(b"M2", alphabet, {b"AUG": log(0.8), b"AUU": log(0.4)})
-    assert_equal(state.name, "M2")
+    assert_equal(state.name, b"M2")
     assert_equal(set(state.alphabet.symbols), set(b"ACGU"))
     assert_allclose(state.lprob(b"AUG"), log(0.8))
     assert_allclose(state.lprob(b"AUU"), log(0.4))

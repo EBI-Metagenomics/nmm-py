@@ -12,11 +12,11 @@ class CState:
         self.__cdata = cdata
 
     @property
-    def name(self) -> str:
+    def name(self) -> bytes:
         # Refer to https://github.com/pytest-dev/pytest/issues/4659
         if self.__cdata == ffi.NULL:
             raise RuntimeError("State has failed to initialize.")
-        return ffi.string(lib.imm_state_get_name(self.__cdata)).decode()
+        return ffi.string(lib.imm_state_get_name(self.__cdata))
 
     @property
     def min_seq(self) -> int:
@@ -58,7 +58,7 @@ class State(CState):
         return self._alphabet
 
     def __str__(self) -> str:
-        return f"<{self.name}>"
+        return f"<{self.name.decode()}>"
 
 
 class MuteState(State):
@@ -78,7 +78,7 @@ class MuteState(State):
         super(MuteState, self).__init__(lib.imm_state_cast_c(cdata), alphabet)
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}:{self.name}>"
+        return f"<{self.__class__.__name__}:{self.name.decode()}>"
 
     def __del__(self):
         if self._cdata != ffi.NULL:
@@ -118,7 +118,7 @@ class NormalState(State):
             raise RuntimeError("Normalization error.")
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}:{self.name}>"
+        return f"<{self.__class__.__name__}:{self.name.decode()}>"
 
     def __del__(self):
         if self._cdata != ffi.NULL:
@@ -153,7 +153,7 @@ class TableState(State):
             raise RuntimeError("Normalization error.")
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}:{self.name}>"
+        return f"<{self.__class__.__name__}:{self.name.decode()}>"
 
     def __del__(self):
         if self._cdata != ffi.NULL:
@@ -201,7 +201,7 @@ class FrameState(State):
         return self._epsilon
 
     def __repr__(self):
-        return f"<{self.__class__.__name__}:{self.name}>"
+        return f"<{self.__class__.__name__}:{self.name.decode()}>"
 
     def __del__(self):
         if self._cdata != ffi.NULL:
