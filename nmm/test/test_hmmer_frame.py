@@ -85,6 +85,45 @@ def test_read_hmmer_frame_5(tmp_path):
     assert_equal(frags[0].sequence, b"CCUUGGUAAAGAAGAUAAUAACAAA")
 
 
+def test_read_hmmer_frame_6(tmp_path):
+    filepath = write_file(tmp_path, "PF03373.hmm")
+    reader = read_hmmer(filepath)
+    hmmer = create_frame_profile(reader, epsilon=0.1)
+
+    # seq = b"KKKPGKEDNNK"
+    rna_seq = b"AAGA AAA AAA CCU GGU AAA GAA GAU AAU AAC AAA"
+    rna_seq = rna_seq.replace(b" ", b"")
+
+    r = hmmer.lr(rna_seq)
+    assert_allclose(r.score, 171.5602273844319)
+    frags = r.fragments
+
+    assert_equal(len(frags), 2)
+    assert_equal(frags[0].homologous, False)
+    assert_equal(frags[0].sequence, b"AAGAAAAAAA")
+
+    items = list(frags[0].items())
+    assert_equal(items[0][0], b"")
+    assert_equal(str(items[0][1]), "<S,0>")
+    assert_equal(items[1][0], b"AAG")
+    assert_equal(str(items[1][1]), "<N,3>")
+    assert_equal(items[2][0], b"AAAA")
+    assert_equal(str(items[2][1]), "<N,4>")
+    assert_equal(items[3][0], b"AAA")
+    assert_equal(str(items[3][1]), "<N,3>")
+    assert_equal(items[4][0], b"")
+    assert_equal(str(items[4][1]), "<B,0>")
+
+    assert_equal(frags[1].homologous, True)
+    assert_equal(frags[1].sequence, b"CCUGGUAAAGAAGAUAAUAACAAA")
+
+    items = list(frags[1].items())
+    assert_equal(items[0][0], b"CCU")
+    assert_equal(str(items[0][1]), "<M1,3>")
+    assert_equal(items[7][0], b"AAA")
+    assert_equal(str(items[7][1]), "<M8,3>")
+
+
 def write_file(path, filename):
     import nmm
 

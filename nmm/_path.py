@@ -31,7 +31,7 @@ class CPath:
         return lib.imm_path_last(self.__cdata)
 
     def __del__(self):
-        if self._cdata != ffi.NULL:
+        if self.__cdata != ffi.NULL:
             lib.imm_path_destroy(self.__cdata)
 
     def __repr__(self):

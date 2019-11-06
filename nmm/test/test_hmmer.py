@@ -79,6 +79,38 @@ def test_read_hmmer_multihit_homologous(tmp_path):
     assert_equal(frags[3].homologous, True)
     assert_equal(frags[3].sequence, b"PGKEDNNK")
 
+    items = list(frags[0].items())
+
+    assert_equal(items[0][0], b"")
+    assert_equal(str(items[0][1]), "<S,0>")
+    assert_equal(items[1][0], b"P")
+    assert_equal(str(items[1][1]), "<N,1>")
+    assert_equal(items[2][0], b"P")
+    assert_equal(str(items[2][1]), "<N,1>")
+    assert_equal(items[3][0], b"P")
+    assert_equal(str(items[3][1]), "<N,1>")
+    assert_equal(items[4][0], b"")
+    assert_equal(str(items[4][1]), "<B,0>")
+
+    items = list(frags[1].items())
+
+    assert_equal(items[0][0], b"P")
+    assert_equal(str(items[0][1]), "<M1,1>")
+    assert_equal(items[1][0], b"G")
+    assert_equal(str(items[1][1]), "<M2,1>")
+    assert_equal(items[2][0], b"K")
+    assert_equal(str(items[2][1]), "<M3,1>")
+    assert_equal(items[3][0], b"E")
+    assert_equal(str(items[3][1]), "<M4,1>")
+    assert_equal(items[4][0], b"D")
+    assert_equal(str(items[4][1]), "<M5,1>")
+    assert_equal(items[5][0], b"N")
+    assert_equal(str(items[5][1]), "<M6,1>")
+    assert_equal(items[6][0], b"N")
+    assert_equal(str(items[6][1]), "<M7,1>")
+    assert_equal(items[7][0], b"K")
+    assert_equal(str(items[7][1]), "<M8,1>")
+
 
 def write_file(path, filename):
     import nmm
