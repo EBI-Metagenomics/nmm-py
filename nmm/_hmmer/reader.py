@@ -12,7 +12,7 @@ def read_hmmer(file: Union[str, pathlib.Path, TextIOBase]) -> hmmer_reader.HMMER
 
     if isinstance(file, pathlib.Path):
         if not file.exists():
-            raise ValueError(f"`{file}` does not exist.")
+            raise FileNotFoundError(f"`{file}` does not exist.")
 
         if not file.is_file():
             raise ValueError(f"`{file}` is not a file.")

@@ -8,7 +8,6 @@ from ._log import LOG0
 from ._path import Path
 from ._state import FrameState, MuteState, NormalState, TableState
 from ._step import Step
-from ._fasta import FASTAReader, FASTAParserError
 
 try:
     from ._ffi import ffi as _
@@ -25,8 +24,6 @@ and reinstall the package again."""
 __version__ = "0.0.1"
 
 __all__ = [
-    "FASTAReader",
-    "FASTAParserError",
     "Alphabet",
     "Base",
     "Codon",

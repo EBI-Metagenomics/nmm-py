@@ -14,20 +14,18 @@ def match(profile, target, epsilon: float):
     """
     Match nucleotide sequences against a HMMER3 Protein profile.
     """
-    from nmm import create_frame_profile, read_hmmer, FASTAReader
+    from nmm import create_frame_profile, read_hmmer
+    from fasta_reader import open_fasta
 
     prof = create_frame_profile(read_hmmer(profile), epsilon=epsilon)
 
-    with FASTAReader(target) as fasta:
-        for item in fasta.items():
-            defline = item[0]
-            seq = item[1]
-
-            r = prof.lr(seq.encode())
+    with open_fasta(target) as fasta:
+        for item in fasta:
+            r = prof.lr(item.sequence.encode())
             frags = r.fragments
 
-            print(defline)
-            print(seq)
+            print(item.defline)
+            print(item.sequence)
             print(f"Fragments: {frags}")
 
             for n, frag in enumerate(frags):
