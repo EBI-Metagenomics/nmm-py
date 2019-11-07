@@ -1,14 +1,24 @@
-from typing import List, Tuple, Iterator
+from typing import List, Tuple, Iterator, NamedTuple
 from .._step import CStep
 from .._path import CPath
 
+Interval = NamedTuple("Interval", [("start", int), ("end", int)])
+
 
 class Fragment:
-    def __init__(self, seq: bytes, steps: List[CStep] = []):
+    def __init__(
+        self, seq: bytes, steps: List[CStep], homologous: bool, interval: Interval
+    ):
         self._seq = seq
+        self._homologous = homologous
         self._path = CPath(None)
         for step in steps:
             self._path.append(step.state.imm_state, step.seq_len)
+        self._interval = interval
+
+    @property
+    def interval(self):
+        return self._interval
 
     @property
     def sequence(self) -> bytes:
@@ -21,27 +31,9 @@ class Fragment:
             yield (self._seq[start:end], step)
             start = end
 
-
-class HomoFragment(Fragment):
-    def __init__(self, seq: bytes, steps: List[CStep] = []):
-        super().__init__(seq, steps)
-
     @property
     def homologous(self):
-        return True
-
-    def __repr__(self):
-        seq = self.sequence.decode()
-        return f"<{self.__class__.__name__}:{seq}>"
-
-
-class NonHomoFragment(Fragment):
-    def __init__(self, seq: bytes, steps: List[CStep] = []):
-        super().__init__(seq, steps)
-
-    @property
-    def homologous(self):
-        return False
+        return self._homologous
 
     def __repr__(self):
         seq = self.sequence.decode()

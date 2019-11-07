@@ -1,14 +1,14 @@
 from typing import List, Union
 
 from .._path import CPath
-from .fragment import HomoFragment, NonHomoFragment
+from .fragment import Fragment, Interval
 
 
 class Result:
     def __init__(self, score: float, seq: bytes, path: CPath):
         self._score = score
 
-        self._fragments: List[Union[HomoFragment, NonHomoFragment]] = []
+        self._fragments: List[Union[Fragment]] = []
 
         frag_start = frag_end = 0
         idx_start = idx_end = 0
@@ -22,7 +22,9 @@ class Result:
             if not homologous and name.startswith(b"M"):
                 if frag_start < frag_end:
                     s = seq[frag_start:frag_end]
-                    self._fragments.append(NonHomoFragment(s, steps[idx_start:idx_end]))
+                    i = Interval(frag_start + 1, frag_end)
+                    frag = Fragment(s, steps[idx_start:idx_end], False, i)
+                    self._fragments.append(frag)
                 homologous = True
                 frag_start = frag_end
                 idx_start = idx_end
@@ -30,7 +32,9 @@ class Result:
             elif homologous and name.startswith(b"E"):
                 if frag_start < frag_end:
                     s = seq[frag_start:frag_end]
-                    self._fragments.append(HomoFragment(s, steps[idx_start:idx_end]))
+                    i = Interval(frag_start + 1, frag_end)
+                    frag = Fragment(s, steps[idx_start:idx_end], True, i)
+                    self._fragments.append(frag)
                 homologous = False
                 frag_start = frag_end
                 idx_start = idx_end

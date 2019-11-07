@@ -10,7 +10,10 @@ def cli():
 @click.argument("profile", type=click.File("r"))
 @click.argument("target", type=click.File("r"))
 @click.option("--epsilon", type=float, default=1e-2)
-def match(profile, target, epsilon: float):
+@click.option(
+    "--output", type=click.Path(file_okay=True, dir_okay=False, writable=True)
+)
+def match(profile, target, epsilon: float, output):
     """
     Match nucleotide sequences against a HMMER3 Protein profile.
     """
@@ -20,16 +23,22 @@ def match(profile, target, epsilon: float):
     prof = create_frame_profile(read_hmmer(profile), epsilon=epsilon)
 
     with open_fasta(target) as fasta:
-        for item in fasta:
-            r = prof.lr(item.sequence.encode())
+        for ti, target in enumerate(fasta):
+            print(f"Target: {ti}")
+            print(">" + target.defline)
+            print(target.sequence)
+
+            r = prof.lr(target.sequence.encode())
             frags = r.fragments
 
-            print(item.defline)
-            print(item.sequence)
-            print(f"Fragments: {frags}")
+            hfrags = [frag for frag in r.fragments if frag.homologous]
 
-            for n, frag in enumerate(frags):
-                print(f"Fragment {n}")
+            print(f"Found {len(hfrags)} homologous fragments ({len(frags)} in total).")
+
+            for fi, frag in enumerate(hfrags):
+                start = frag.interval.start
+                end = frag.interval.end
+                print(f"Homologous fragment={fi}; Position=[{start}, {end}]")
                 states = []
                 matches = []
                 for i in frag.items():
@@ -38,6 +47,8 @@ def match(profile, target, epsilon: float):
 
                 print("\t".join(states))
                 print("\t".join(matches))
+
+            print()
 
 
 cli.add_command(match)

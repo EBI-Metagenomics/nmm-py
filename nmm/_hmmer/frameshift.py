@@ -1,6 +1,5 @@
-from io import TextIOBase
 from math import log
-from typing import Dict, List, NamedTuple, Union, Any
+from typing import Any, Dict, List, NamedTuple
 
 from hmmer_reader import HMMEReader
 
