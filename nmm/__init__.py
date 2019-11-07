@@ -1,3 +1,4 @@
+from ._cli import cli
 from ._alphabet import Alphabet
 from ._base import Base
 from ._codon import Codon
@@ -7,6 +8,7 @@ from ._log import LOG0
 from ._path import Path
 from ._state import FrameState, MuteState, NormalState, TableState
 from ._step import Step
+from ._fasta import FASTAReader, FASTAParserError
 
 try:
     from ._ffi import ffi as _
@@ -23,6 +25,8 @@ and reinstall the package again."""
 __version__ = "0.0.1"
 
 __all__ = [
+    "FASTAReader",
+    "FASTAParserError",
     "Alphabet",
     "Base",
     "Codon",
@@ -38,4 +42,5 @@ __all__ = [
     "create_frame_profile",
     "create_hmmer_profile",
     "read_hmmer",
+    "cli",
 ]

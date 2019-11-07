@@ -1,4 +1,8 @@
 from setuptools import setup
 
 if __name__ == "__main__":
-    setup(cffi_modules="build_ext.py:ffibuilder")
+    console_scripts = ["nmm = nmm:cli"]
+    setup(
+        cffi_modules="build_ext.py:ffibuilder",
+        entry_points={"console_scripts": console_scripts},
+    )
