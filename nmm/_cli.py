@@ -18,10 +18,12 @@ def match(profile, target, epsilon: float, output):
     Match nucleotide sequences against a HMMER3 Protein profile.
     """
     from nmm import create_frame_profile, read_hmmer
+    from nmm._gff import GFFWriter, Item as GFFItem
     from fasta_reader import open_fasta
 
     prof = create_frame_profile(read_hmmer(profile), epsilon=epsilon)
 
+    gff = GFFWriter()
     with open_fasta(target) as fasta:
         for ti, target in enumerate(fasta):
             print(f"Target: {ti}")
@@ -47,6 +49,8 @@ def match(profile, target, epsilon: float, output):
 
                 print("\t".join(states))
                 print("\t".join(matches))
+
+                gff.append(GFFItem(seqid=f"{target.defline}"))
 
             print()
 
