@@ -10,14 +10,10 @@ def cli():
 @click.argument("profile", type=click.File("r"))
 @click.argument("target", type=click.File("r"))
 @click.option("--epsilon", type=float, default=1e-2)
-@click.option(
-    # "--output", type=click.Path(file_okay=True, dir_okay=False, writable=True)
-    "--output",
-    type=click.File("w"),
-)
-def match(profile, target, epsilon: float, output):
+@click.option("--output", type=click.File("w"))
+def search(profile, target, epsilon: float, output):
     """
-    Match nucleotide sequences against a HMMER3 Protein profile.
+    Search nucleotide sequences against a HMMER3 Protein profile.
     """
     from nmm import create_frame_profile, read_hmmer
     from nmm._gff import GFFWriter, Item as GFFItem
@@ -48,7 +44,8 @@ def match(profile, target, epsilon: float, output):
             print(">" + target.defline)
             print(target.sequence)
 
-            r = prof.lr(target.sequence.encode())
+            seq = target.sequence.encode().replace(b"T", b"U")
+            r = prof.lr(seq)
             frags = r.fragments
 
             hfrags = [frag for frag in r.fragments if frag.homologous]
@@ -71,7 +68,7 @@ def match(profile, target, epsilon: float, output):
 
                 gff.append(
                     GFFItem(
-                        seqid=f"{target.defline}",
+                        seqid=f"{target.defline.split()[0]}",
                         source=f"nmm:{prof_acc}",
                         type=".",
                         start=start,
@@ -79,10 +76,10 @@ def match(profile, target, epsilon: float, output):
                         score=0.0,
                         strand="+",
                         phase=".",
-                        attributes=".",
+                        attributes=f"Epsilon={epsilon}",
                     )
                 )
     gff.dump(output)
 
 
-cli.add_command(match)
+cli.add_command(search)
