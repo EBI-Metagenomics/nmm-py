@@ -11,6 +11,7 @@ struct imm_table_state;
 struct imm_abc *imm_abc_create(char const *symbols);
 void            imm_abc_destroy(struct imm_abc *abc);
 int             imm_abc_length(struct imm_abc const *abc);
+char const *    imm_abc_symbols(struct imm_abc const *abc);
 int             imm_abc_has_symbol(struct imm_abc const *abc, char symbol_id);
 int             imm_abc_symbol_idx(struct imm_abc const *abc, char symbol_id);
 char            imm_abc_symbol_id(struct imm_abc const *abc, int symbol_idx);

@@ -20,10 +20,7 @@ class CCodon:
         if len(seq) != 3:
             raise ValueError("Codon must have three letters.")
 
-        a = seq[0:1]
-        b = seq[1:2]
-        c = seq[2:3]
-        err: int = lib.nmm_codon_set_lprob(self.__cdata, a, b, c, lprob)
+        err: int = lib.nmm_codon_set_lprob(self.__cdata, _create_ccode(seq), lprob)
         if err != 0:
             s = seq.decode()
             raise ValueError(f"Could not set a probability for `{s}`.")
@@ -32,7 +29,7 @@ class CCodon:
         if len(seq) != 3:
             raise ValueError("Codon must have three letters.")
 
-        return lib.nmm_codon_get_lprob(self.__cdata, seq[0:1], seq[1:2], seq[2:3])
+        return lib.nmm_codon_get_lprob(self.__cdata, _create_ccode(seq))
 
     def normalize(self) -> None:
         err: int = lib.nmm_codon_normalize(self.__cdata)
@@ -55,3 +52,11 @@ class Codon(CCodon):
     @property
     def alphabet(self) -> Alphabet:
         return self._alphabet
+
+
+def _create_ccode(seq: bytes):
+    ccode = ffi.new("struct nmm_ccode *")
+    ccode.a = seq[0:1]
+    ccode.b = seq[1:2]
+    ccode.c = seq[2:3]
+    return ccode
