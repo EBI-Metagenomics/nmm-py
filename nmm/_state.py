@@ -1,10 +1,12 @@
-from typing import Dict
+from typing import Dict, NamedTuple
 
 from ._alphabet import Alphabet
 from ._base import Base
 from ._codon import Codon
 from ._ffi import ffi, lib
 from ._log import LOG0
+
+DecodedCodon = NamedTuple("DecodedCodon", [("lprob", float), ("codon", bytes)])
 
 
 class CState:
@@ -201,6 +203,11 @@ class FrameState(State):
     @property
     def epsilon(self):
         return self._epsilon
+
+    def decode(self, seq: bytes) -> DecodedCodon:
+        ccode = ffi.new("struct nmm_ccode *")
+        lprob: float = lib.nmm_frame_state_decode(self._cdata, seq, len(seq), ccode)
+        return DecodedCodon(lprob, ccode.a + ccode.b + ccode.c)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name.decode()}>"

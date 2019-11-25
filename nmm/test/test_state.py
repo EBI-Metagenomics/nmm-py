@@ -137,3 +137,22 @@ def test_frame_state():
     assert_equal(str(frame_state), "<M2>")
     assert_equal(repr(frame_state), "<FrameState:M2>")
 
+    decoded_codon = frame_state.decode(b"ATG")
+    assert_allclose(decoded_codon.lprob, -0.9025667061364364)
+    assert_equal(decoded_codon.codon, b"ATG")
+
+    decoded_codon = frame_state.decode(b"ATGGG")
+    assert_allclose(decoded_codon.lprob, -8.913317446063251)
+    assert_equal(decoded_codon.codon, b"ATG")
+
+    decoded_codon = frame_state.decode(b"T")
+    assert_allclose(decoded_codon.lprob, -6.400011321753555)
+    assert_equal(decoded_codon.codon, b"ATG")
+
+    decoded_codon = frame_state.decode(b"TT")
+    assert_allclose(decoded_codon.lprob, -5.579253016600963)
+    assert_equal(decoded_codon.codon, b"ATT")
+
+    decoded_codon = frame_state.decode(b"GC")
+    assert_allclose(decoded_codon.lprob, -4.199705077879926)
+    assert_equal(decoded_codon.codon, b"GTC")
