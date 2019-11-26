@@ -107,11 +107,11 @@ class NormalProfile:
         t.BM = log(2) - log(self.length) - log(self.length + 1)
         t.ME = 0.0
         for node in self._core_nodes:
-            self._hmm.set_trans(B, node.M, t.BM)
-            self._hmm.set_trans(node.M, E, t.ME)
+            self._hmm.set_transition(B, node.M, t.BM)
+            self._hmm.set_transition(node.M, E, t.ME)
 
         for node in self._core_nodes[1:]:
-            self._hmm.set_trans(node.D, E, 0.0)
+            self._hmm.set_transition(node.D, E, 0.0)
 
     def _set_target_length(self, seq: bytes):
         from math import exp
@@ -139,22 +139,22 @@ class NormalProfile:
 
         node = self._special_node
 
-        self._hmm.set_trans(node.S, node.B, t.NB)
-        self._hmm.set_trans(node.S, node.N, t.NN)
-        self._hmm.set_trans(node.N, node.N, t.NN)
-        self._hmm.set_trans(node.N, node.B, t.NB)
+        self._hmm.set_transition(node.S, node.B, t.NB)
+        self._hmm.set_transition(node.S, node.N, t.NN)
+        self._hmm.set_transition(node.N, node.N, t.NN)
+        self._hmm.set_transition(node.N, node.B, t.NB)
 
-        self._hmm.set_trans(node.E, node.T, t.EC + t.CT)
-        self._hmm.set_trans(node.E, node.C, t.EC + t.CC)
-        self._hmm.set_trans(node.C, node.C, t.CC)
-        self._hmm.set_trans(node.C, node.T, t.CT)
+        self._hmm.set_transition(node.E, node.T, t.EC + t.CT)
+        self._hmm.set_transition(node.E, node.C, t.EC + t.CC)
+        self._hmm.set_transition(node.C, node.C, t.CC)
+        self._hmm.set_transition(node.C, node.T, t.CT)
 
-        self._hmm.set_trans(node.E, node.B, t.EJ + t.JB)
-        self._hmm.set_trans(node.E, node.J, t.EJ + t.JJ)
-        self._hmm.set_trans(node.J, node.J, t.JJ)
-        self._hmm.set_trans(node.J, node.B, t.JB)
+        self._hmm.set_transition(node.E, node.B, t.EJ + t.JB)
+        self._hmm.set_transition(node.E, node.J, t.EJ + t.JJ)
+        self._hmm.set_transition(node.J, node.J, t.JJ)
+        self._hmm.set_transition(node.J, node.B, t.JB)
 
-        self._bg.set_trans(t.RR)
+        self._bg.set_transition(t.RR)
 
     def _viterbi(self, seq: bytes) -> PathScore:
         self._set_target_length(seq)

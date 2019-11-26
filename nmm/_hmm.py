@@ -38,7 +38,7 @@ class HMM:
         if err != 0:
             raise RuntimeError("Could not set start probability.")
 
-    def trans(self, a: State, b: State):
+    def transition(self, a: State, b: State):
         """
         Parameters
         ----------
@@ -52,7 +52,7 @@ class HMM:
             raise RuntimeError("Could not retrieve transition probability.")
         return lprob
 
-    def set_trans(self, a: State, b: State, lprob: float):
+    def set_transition(self, a: State, b: State, lprob: float):
         """
         Parameters
         ----------
@@ -117,7 +117,7 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def normalize_trans(self, state: State):
+    def normalize_transitions(self, state: State):
         err: int = lib.imm_hmm_normalize_trans(self._hmm, state.imm_state)
         if err != 0:
             raise ValueError("Normalization error.")

@@ -4,7 +4,6 @@ from typing import Callable, List, NamedTuple
 from .._hmm import HMM
 from .._log import LOG0, LOG1
 from .._path import Path
-from .._step import Step
 from .._state import State
 
 Node = NamedTuple("Node", [("M", State), ("I", State), ("D", State)])
@@ -69,13 +68,13 @@ class CoreModel:
             return
 
         prev = self._core_nodes[-2]
-        self._hmm.set_trans(prev.M, node.M, trans.MM)
-        self._hmm.set_trans(prev.M, prev.I, trans.MI)
-        self._hmm.set_trans(prev.M, node.D, trans.MD)
-        self._hmm.set_trans(prev.I, node.M, trans.IM)
-        self._hmm.set_trans(prev.I, prev.I, trans.II)
-        self._hmm.set_trans(prev.D, node.M, trans.DM)
-        self._hmm.set_trans(prev.D, node.D, trans.DD)
+        self._hmm.set_transition(prev.M, node.M, trans.MM)
+        self._hmm.set_transition(prev.M, prev.I, trans.MI)
+        self._hmm.set_transition(prev.M, node.D, trans.MD)
+        self._hmm.set_transition(prev.I, node.M, trans.IM)
+        self._hmm.set_transition(prev.I, prev.I, trans.II)
+        self._hmm.set_transition(prev.D, node.M, trans.DM)
+        self._hmm.set_transition(prev.D, node.D, trans.DD)
 
     def __enter__(self):
         return self
@@ -100,8 +99,8 @@ class NullModel:
     def hmm(self) -> HMM:
         return self._hmm
 
-    def set_trans(self, lprob: float):
-        self._hmm.set_trans(self._state, self._state, lprob)
+    def set_transition(self, lprob: float):
+        self._hmm.set_transition(self._state, self._state, lprob)
 
     def likelihood(self, seq: bytes):
         path = Path.create([(self._state, 1) for i in range(len(seq))])

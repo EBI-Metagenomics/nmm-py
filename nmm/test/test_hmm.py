@@ -35,13 +35,13 @@ def test_hmm_trans_prob():
 
     E = MuteState(b"E", alphabet)
     with pytest.raises(RuntimeError):
-        hmm.trans(S, E)
+        hmm.transition(S, E)
 
     with pytest.raises(ValueError):
-        hmm.set_trans(S, E, LOG0)
+        hmm.set_transition(S, E, LOG0)
 
     with pytest.raises(ValueError):
-        hmm.set_trans(E, S, LOG0)
+        hmm.set_transition(E, S, LOG0)
 
     with pytest.raises(ValueError):
         hmm.del_state(E)
@@ -49,17 +49,17 @@ def test_hmm_trans_prob():
     hmm.add_state(E)
 
     with pytest.raises(RuntimeError):
-        hmm.set_trans(E, S, nan)
+        hmm.set_transition(E, S, nan)
 
     with pytest.raises(ValueError):
         hmm.normalize()
 
-    hmm.set_trans(S, E, log(0.5))
+    hmm.set_transition(S, E, log(0.5))
 
-    assert_allclose(hmm.trans(S, S), LOG0)
-    assert_allclose(hmm.trans(S, E), log(0.5))
-    assert_allclose(hmm.trans(E, S), LOG0)
-    assert_allclose(hmm.trans(E, E), LOG0)
+    assert_allclose(hmm.transition(S, S), LOG0)
+    assert_allclose(hmm.transition(S, E), log(0.5))
+    assert_allclose(hmm.transition(E, S), LOG0)
+    assert_allclose(hmm.transition(E, E), LOG0)
 
     with pytest.raises(ValueError):
         hmm.normalize()
@@ -68,14 +68,14 @@ def test_hmm_trans_prob():
         hmm.normalize()
 
     hmm.set_start_lprob(S, log(0.4))
-    hmm.set_trans(E, E, log(0.1))
+    hmm.set_transition(E, E, log(0.1))
 
     hmm.normalize()
 
-    assert_allclose(hmm.trans(S, E), log(1.0))
-    assert_allclose(hmm.trans(E, S), LOG0)
-    assert_allclose(hmm.trans(S, S), LOG0)
-    assert_allclose(hmm.trans(E, E), log(1.0))
+    assert_allclose(hmm.transition(S, E), log(1.0))
+    assert_allclose(hmm.transition(E, S), LOG0)
+    assert_allclose(hmm.transition(S, S), LOG0)
+    assert_allclose(hmm.transition(E, E), log(1.0))
 
 
 def test_hmm_lik_1():
@@ -99,10 +99,10 @@ def test_hmm_lik_1():
     M2.normalize()
     hmm.add_state(M2, LOG0)
 
-    hmm.set_trans(S, M1, log(1.0))
-    hmm.set_trans(M1, M2, log(1.0))
-    hmm.set_trans(M2, E, log(1.0))
-    hmm.set_trans(E, E, log(1.0))
+    hmm.set_transition(S, M1, log(1.0))
+    hmm.set_transition(M1, M2, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
 
     p = hmm.likelihood(b"AC", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
@@ -175,7 +175,7 @@ def test_hmm_lik_2():
     E = MuteState(b"E", alphabet)
     hmm.add_state(E, LOG0)
 
-    hmm.set_trans(S, E, log(1.0))
+    hmm.set_transition(S, E, log(1.0))
 
     p = hmm.likelihood(b"A", Path.create([(S, 1), (E, 0)]))
     assert_allclose(p, log(0.8))
@@ -221,10 +221,10 @@ def test_hmm_lik_3():
     E = MuteState(b"E", alphabet)
     hmm.add_state(E, LOG0)
 
-    hmm.set_trans(S, M1, log(1.0))
-    hmm.set_trans(M1, M2, log(1.0))
-    hmm.set_trans(M2, E, log(1.0))
-    hmm.set_trans(E, E, log(1.0))
+    hmm.set_transition(S, M1, log(1.0))
+    hmm.set_transition(M1, M2, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
 
     with pytest.raises(RuntimeError):
@@ -239,7 +239,7 @@ def test_hmm_lik_3():
     with pytest.raises(RuntimeError):
         Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)])
 
-    hmm.set_trans(M1, E, log(1.0))
+    hmm.set_transition(M1, E, log(1.0))
     hmm.normalize()
 
     p = hmm.likelihood(b"A", Path.create([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
@@ -273,17 +273,17 @@ def test_hmm_viterbi_1():
     M2.normalize()
     hmm.add_state(M2, LOG0)
 
-    hmm.set_trans(S, M1, log(1.0))
-    hmm.set_trans(M1, M2, log(1.0))
-    hmm.set_trans(M2, E, log(1.0))
-    hmm.set_trans(E, E, log(1.0))
+    hmm.set_transition(S, M1, log(1.0))
+    hmm.set_transition(M1, M2, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
 
-    hmm.set_trans(E, E, LOG0)
-    assert_allclose(hmm.trans(E, E), LOG0)
-    assert_allclose(hmm.trans(S, S), LOG0)
-    assert_allclose(hmm.trans(S, E), LOG0)
-    assert_allclose(hmm.trans(E, S), LOG0)
+    hmm.set_transition(E, E, LOG0)
+    assert_allclose(hmm.transition(E, E), LOG0)
+    assert_allclose(hmm.transition(S, S), LOG0)
+    assert_allclose(hmm.transition(S, E), LOG0)
+    assert_allclose(hmm.transition(E, S), LOG0)
 
     lik = hmm.viterbi(b"AC", E)
     assert_allclose(lik.score, log(0.3))
@@ -305,12 +305,12 @@ def test_hmm_viterbi_2():
     M2 = NormalState(b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6)})
     hmm.add_state(M2, LOG0)
 
-    hmm.set_trans(S, M1, log(1.0))
-    hmm.set_trans(M1, M2, log(1.0))
-    hmm.set_trans(M2, E, log(1.0))
-    hmm.set_trans(E, E, log(1.0))
+    hmm.set_transition(S, M1, log(1.0))
+    hmm.set_transition(M1, M2, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
-    hmm.set_trans(E, E, LOG0)
+    hmm.set_transition(E, E, LOG0)
 
     lik = hmm.viterbi(b"AC", E)
     assert_allclose(lik.score, log(0.48))
@@ -324,7 +324,7 @@ def test_hmm_viterbi_2():
     lik = hmm.viterbi(b"CC", E)
     assert_allclose(lik.score, log(0.12))
 
-    hmm.set_trans(M1, E, log(1.0))
+    hmm.set_transition(M1, E, log(1.0))
 
     lik = hmm.viterbi(b"AC", E)
     assert_allclose(lik.score, log(0.48))
@@ -355,20 +355,20 @@ def test_hmm_viterbi_3():
     D2 = MuteState(b"D2", alphabet)
     hmm.add_state(D2, LOG0)
 
-    hmm.set_trans(S, M1, log(0.8))
-    hmm.set_trans(S, D1, log(0.2))
+    hmm.set_transition(S, M1, log(0.8))
+    hmm.set_transition(S, D1, log(0.2))
 
-    hmm.set_trans(M1, M2, log(0.8))
-    hmm.set_trans(M1, D2, log(0.2))
+    hmm.set_transition(M1, M2, log(0.8))
+    hmm.set_transition(M1, D2, log(0.2))
 
-    hmm.set_trans(D1, D2, log(0.2))
-    hmm.set_trans(D1, M2, log(0.8))
+    hmm.set_transition(D1, D2, log(0.2))
+    hmm.set_transition(D1, M2, log(0.8))
 
-    hmm.set_trans(D2, E, log(1.0))
-    hmm.set_trans(M2, E, log(1.0))
-    hmm.set_trans(E, E, log(1.0))
+    hmm.set_transition(D2, E, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
-    hmm.set_trans(E, E, LOG0)
+    hmm.set_transition(E, E, LOG0)
 
     lik = hmm.viterbi(b"AC", E)
     assert_allclose(lik.score, log(0.3072))
