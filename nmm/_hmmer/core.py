@@ -104,5 +104,5 @@ class NullModel:
         self._hmm.set_trans(self._state, self._state, lprob)
 
     def likelihood(self, seq: bytes):
-        path = Path([Step(self._state, 1) for i in range(len(seq))])
+        path = Path.create([(self._state, 1) for i in range(len(seq))])
         return self._hmm.likelihood(seq, path)
