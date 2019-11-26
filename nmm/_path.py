@@ -1,4 +1,4 @@
-from typing import List, Sequence, Union
+from typing import List, Union
 
 from ._ffi import ffi, lib
 from ._step import CStep, Step
@@ -11,18 +11,19 @@ class CPath:
 
     Parameters
     ----------
-    cdata : `<cdata 'struct imm_path *'>` or `None`. Passing `None` will create a new path at the
-    underlying library level.
+    cdata : Union[ffi.CData, None]
+        `<cdata 'struct imm_path *'>` or `None`. Passing `None` will create a new path at the
+        underlying library level.
     """
 
-    def __init__(self, cdata: Union[ffi.CData, None]):
-        if cdata is None:
-            cdata = lib.imm_path_create()
-            if cdata == ffi.NULL:
+    def __init__(self, imm_path: Union[ffi.CData, None]):
+        if imm_path is None:
+            imm_path = lib.imm_path_create()
+            if imm_path == ffi.NULL:
                 raise RuntimeError("`imm_path_create` failed.")
-        elif cdata == ffi.NULL:
+        elif imm_path == ffi.NULL:
             raise RuntimeError("`cdata` cannot be NULL.")
-        self.__cdata = cdata
+        self.__cdata = imm_path
 
     @property
     def imm_path(self) -> ffi.CData:
@@ -58,14 +59,15 @@ class CPath:
 
 
 class Path(CPath):
+    """
+    Path of steps through a Markov model.
+
+    Each step represents a state and an emitted sequence length.
+    """
+
     def __init__(self):
         super().__init__(None)
-
         self._steps: List[Step] = []
-        # for step in steps:
-        #     imm_step = self.append(step.state.imm_state, step.seq_len)
-        #     step.set_imm_step(imm_step)
-        #     self._steps.append(step)
 
     def append(self, state: State, seq_len: int) -> ffi.CData:
         imm_step = super().append(state.imm_state, seq_len)

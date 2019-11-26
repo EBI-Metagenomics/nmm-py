@@ -1,7 +1,7 @@
 from ._cli import cli
 from ._alphabet import Alphabet
 from ._base import Base
-from ._codon import Codon
+from ._codon import CodonTable
 from ._hmm import HMM
 from ._hmmer import create_frame_profile, create_hmmer_profile, read_hmmer
 from ._log import LOG0
@@ -26,7 +26,7 @@ __version__ = "0.0.1"
 __all__ = [
     "Alphabet",
     "Base",
-    "Codon",
+    "CodonTable",
     "FrameState",
     "HMM",
     "LOG0",

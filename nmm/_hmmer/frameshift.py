@@ -5,7 +5,7 @@ from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
 from .._base import Base
-from .._codon import Codon
+from .._codon import CodonTable
 from .._gencode import GeneticCode
 from .._hmm import HMM, PathScore
 from .._log import LOG0, LOG1
@@ -232,7 +232,7 @@ class _FrameStateFactory:
         codon_lprobs = _infer_codon_lprobs(aa_lprobs, self._gcode)
         base_lprobs = _infer_base_lprobs(codon_lprobs, self._bases)
         base = Base(self._bases, base_lprobs)
-        codon = Codon(self._bases, codon_lprobs)
+        codon = CodonTable(self._bases, codon_lprobs)
         return FrameState(name, base, codon, self._epsilon)
 
 

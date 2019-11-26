@@ -2,7 +2,7 @@ from typing import Dict, NamedTuple
 
 from ._alphabet import Alphabet
 from ._base import Base
-from ._codon import Codon
+from ._codon import CodonTable
 from ._ffi import ffi, lib
 from ._log import LOG0
 
@@ -154,7 +154,7 @@ class TableState(State):
 
 
 class FrameState(State):
-    def __init__(self, name: bytes, base: Base, codon: Codon, epsilon: float):
+    def __init__(self, name: bytes, base: Base, codon: CodonTable, epsilon: float):
         """
         Parameters
         ----------
@@ -184,7 +184,7 @@ class FrameState(State):
         return self._base
 
     @property
-    def codon(self) -> Codon:
+    def codon(self) -> CodonTable:
         return self._codon
 
     @property

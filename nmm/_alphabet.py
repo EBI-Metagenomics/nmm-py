@@ -7,11 +7,11 @@ class CAlphabet:
 
     Parameters
     ----------
-    cdata : `<cdata 'struct imm_abc *'>`.
+    imm_abc : `<cdata 'struct imm_abc *'>`.
     """
 
-    def __init__(self, cdata: ffi.CData):
-        self.__cdata = cdata
+    def __init__(self, imm_abc: ffi.CData):
+        self.__cdata = imm_abc
 
     @property
     def imm_abc(self) -> ffi.CData:
@@ -41,7 +41,8 @@ class Alphabet(CAlphabet):
 
     Parameters
     ----------
-    symbols : set of symbols as an array of bytes.
+    symbols : bytes
+        Set of symbols as an array of bytes.
     """
 
     def __init__(self, symbols: bytes):

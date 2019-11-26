@@ -9,7 +9,8 @@ class CStep:
 
     Parameters
     ----------
-    imm_step : `<cdata 'struct imm_step *'>`.
+    imm_step : ffi.CData
+        A non-null `<cdata 'struct imm_step *'>`.
     """
 
     def __init__(self, imm_step: ffi.CData):
@@ -29,11 +30,6 @@ class CStep:
     def seq_len(self) -> int:
         return lib.imm_step_seq_len(self.imm_step)
 
-    # def _set_imm_step(self, imm_step: ffi.CData):
-    #     if self.__cdata != ffi.NULL:
-    #         raise RuntimeError("`imm_step` is not NULL.")
-    #     self.__cdata = imm_step
-
     def __str__(self) -> str:
         name = self.state.name.decode()
         return f"<{name},{self.seq_len}>"
@@ -47,8 +43,13 @@ class Step(CStep):
     """
     Path step.
 
+    A step is composed of a state and an emitted sequence length. The user should not need to
+    directly call the constructor of this class but instead use the methods from the `Path` class.
+
     Parameters
     ----------
+    imm_step : ffi.CData
+        A non-null `<cdata 'struct imm_step *'>`.
     state : State.
     seq_len : Sequence length.
     """
