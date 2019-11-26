@@ -3,8 +3,7 @@ from ._path import Path, CPath
 from ._log import LOG0
 from ._state import State
 from ._alphabet import Alphabet
-from bidict import bidict
-from typing import Dict, Optional, NamedTuple
+from typing import Dict, NamedTuple
 
 
 from ._ffi import ffi, lib
@@ -25,7 +24,6 @@ class HMM:
     def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
         self._states: Dict[ffi.CData, State] = {}
-        self._state_names = bidict()
         self._hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
         if self._hmm == ffi.NULL:
             raise RuntimeError("`imm_hmm_create` failed.")
@@ -73,16 +71,11 @@ class HMM:
         if err != 0:
             raise RuntimeError("Could not set transition probability.")
 
-    def find_state(self, state_name: bytes):
-        return self._states[self._state_names.inverse[state_name]]
-
     @property
     def alphabet(self):
         return self._alphabet
 
-    def add_state(
-        self, state: State, start_lprob: float = LOG0, name: Optional[bytes] = None
-    ):
+    def add_state(self, state: State, start_lprob: float = LOG0):
         """
         Parameters
         ----------
@@ -95,8 +88,6 @@ class HMM:
         if err != 0:
             raise ValueError("Could not add state %s.", state)
         self._states[state.imm_state] = state
-        if name is not None:
-            self._state_names[state.imm_state] = name
 
     def del_state(self, state: State):
         if state.imm_state not in self._states:
@@ -107,10 +98,6 @@ class HMM:
             raise RuntimeError(f"Could not delete state {state}.")
 
         del self._states[state.imm_state]
-        try:
-            self._state_names.pop(state.imm_state)
-        except KeyError:
-            pass
 
     def normalize(self):
         err: int = lib.imm_hmm_normalize(self._hmm)
