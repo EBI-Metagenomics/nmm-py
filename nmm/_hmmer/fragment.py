@@ -11,7 +11,7 @@ class Fragment:
     ):
         self._seq = seq
         self._homologous = homologous
-        self._path = CPath(None)
+        self._path = CPath()
         for step in steps:
             self._path.append(step.state.imm_state, step.seq_len)
         self._interval = interval

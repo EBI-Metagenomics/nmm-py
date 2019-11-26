@@ -1,5 +1,5 @@
 from ._alphabet import Alphabet, CAlphabet
-from typing import Dict, Union
+from typing import Dict, Optional
 
 from ._ffi import ffi, lib
 
@@ -10,15 +10,15 @@ class CBase:
 
     Parameters
     ----------
-    nmm_base : Union[ffi.CData, None]
+    nmm_base : Optional[ffi.CData]
         Passing `None` will create a new base at the underlying library level using the `alphabet`
         argument.
-    alphabet : Union[CAlphabet, None]
+    alphabet : Optional[CAlphabet]
         Passing a `CAlphabet` will create a new base at the underlying library level.
     """
 
     def __init__(
-        self, nmm_base: Union[ffi.CData, None], alphabet: Union[CAlphabet, None]
+        self, nmm_base: Optional[ffi.CData] = None, alphabet: Optional[CAlphabet] = None
     ):
         if nmm_base is None:
             if alphabet is None:
@@ -80,7 +80,7 @@ class Base(CBase):
     """
 
     def __init__(self, alphabet: Alphabet, lprobs: Dict[bytes, float] = {}):
-        super().__init__(None, alphabet)
+        super().__init__(alphabet=alphabet)
         self._alphabet = alphabet
         for letter, lprob in lprobs.items():
             self.set_lprob(letter, lprob)

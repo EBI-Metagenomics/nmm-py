@@ -66,6 +66,3 @@ class Step(CStep):
     @property
     def seq_len(self) -> int:
         return self._seq_len
-
-    # def set_imm_step(self, imm_step: ffi.CData):
-    #     self._set_imm_step(imm_step)

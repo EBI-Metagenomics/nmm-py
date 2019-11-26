@@ -1,5 +1,5 @@
 from ._alphabet import Alphabet, CAlphabet
-from typing import Dict, Union
+from typing import Dict, Optional
 
 from ._ffi import ffi, lib
 
@@ -10,15 +10,17 @@ class CCodonTable:
 
     Parameters
     ----------
-    imm_codont : ffi.CData
+    imm_codont : Optional[ffi.CData]
         Passing `None` will create a new codon table at the underlying library level using the
         `alphabet` argument.
-    alphabet : Union[CAlphabet, None]
+    alphabet : Optional[CAlphabet]
         Passing a `CAlphabet` will create a new codon table at the underlying library level.
     """
 
     def __init__(
-        self, imm_codont: Union[ffi.CData, None], alphabet: Union[CAlphabet, None]
+        self,
+        imm_codont: Optional[ffi.CData] = None,
+        alphabet: Optional[CAlphabet] = None,
     ):
         if imm_codont is None:
             if alphabet is None:
@@ -80,7 +82,7 @@ class CodonTable(CCodonTable):
     """
 
     def __init__(self, alphabet: Alphabet, lprobs: Dict[bytes, float] = {}):
-        super().__init__(None, alphabet)
+        super().__init__(alphabet=alphabet)
         self._alphabet = alphabet
         for seq, lprob in lprobs.items():
             self.set_lprob(seq, lprob)

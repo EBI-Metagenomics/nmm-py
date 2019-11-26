@@ -108,7 +108,7 @@ class FrameProfile:
         npath = Path()
         start: int = 0
         for step in path_result.path.steps():
-            state = self._hmm.states[step.state.imm_state]
+            state = self._hmm.states()[step.state.imm_state]
             if step.seq_len == 0:
                 npath.append(state, 0)
             else:

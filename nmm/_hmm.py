@@ -13,18 +13,24 @@ PathScore = NamedTuple("PathScore", [("score", float), ("path", CPath)])
 
 
 class HMM:
+    """
+    Hidden Markov model.
+
+    Parameters
+    ----------
+    alphabet : Alphabet
+        Alphabet.
+    """
+
     def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
         self._states: Dict[ffi.CData, State] = {}
         self._state_names = bidict()
         self._hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
+        if self._hmm == ffi.NULL:
+            raise RuntimeError("`imm_hmm_create` failed.")
 
-    def __del__(self):
-        if self._hmm != ffi.NULL:
-            lib.imm_hmm_destroy(self._hmm)
-
-    @property
-    def states(self):
+    def states(self) -> Dict[ffi.CData, State]:
         return self._states
 
     def set_start_lprob(self, state: State, lprob: float):
@@ -136,3 +142,7 @@ class HMM:
 
         path = CPath(cpath)
         return PathScore(score=lprob, path=path)
+
+    def __del__(self):
+        if self._hmm != ffi.NULL:
+            lib.imm_hmm_destroy(self._hmm)

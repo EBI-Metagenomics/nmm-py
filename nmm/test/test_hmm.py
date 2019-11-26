@@ -21,7 +21,7 @@ def test_hmm_states():
     with pytest.raises(ValueError):
         hmm.add_state(M)
 
-    assert_equal(len(hmm.states), 2)
+    assert_equal(len(hmm.states()), 2)
 
 
 def test_hmm_trans_prob():

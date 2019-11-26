@@ -1,4 +1,4 @@
-from typing import List, Union, Sequence, Tuple, Type, TypeVar
+from typing import List, Sequence, Tuple, Type, TypeVar, Optional
 
 from ._ffi import ffi, lib
 from ._step import CStep, Step
@@ -11,12 +11,12 @@ class CPath:
 
     Parameters
     ----------
-    cdata : Union[ffi.CData, None]
+    imm_path : Optional[ffi.CData]
         `<cdata 'struct imm_path *'>` or `None`. Passing `None` will create a new path at the
         underlying library level.
     """
 
-    def __init__(self, imm_path: Union[ffi.CData, None]):
+    def __init__(self, imm_path: Optional[ffi.CData] = None):
         if imm_path is None:
             imm_path = lib.imm_path_create()
             if imm_path == ffi.NULL:
@@ -69,7 +69,7 @@ class Path(CPath):
     """
 
     def __init__(self):
-        super().__init__(None)
+        super().__init__()
         self._steps: List[Step] = []
 
     @classmethod
