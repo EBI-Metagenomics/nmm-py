@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Sequence, Tuple, Type, TypeVar
 
 from ._ffi import ffi, lib
 from ._step import CStep, Step
@@ -58,6 +58,9 @@ class CPath:
         return f"<{self.__class__.__name__}:{msg}>"
 
 
+T = TypeVar("T", bound="Path")
+
+
 class Path(CPath):
     """
     Path of steps through a Markov model.
@@ -68,6 +71,13 @@ class Path(CPath):
     def __init__(self):
         super().__init__(None)
         self._steps: List[Step] = []
+
+    @classmethod
+    def create(cls: Type[T], steps: Sequence[Tuple[State, int]]) -> T:
+        path = cls()
+        for state, seq_len in steps:
+            path.append(state, seq_len)
+        return path
 
     def append(self, state: State, seq_len: int) -> ffi.CData:
         imm_step = super().append(state.imm_state, seq_len)
