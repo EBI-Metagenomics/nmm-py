@@ -192,7 +192,7 @@ class FrameState(State):
         return self._epsilon
 
     def decode(self, seq: bytes) -> DecodedCodon:
-        ccode = ffi.new("struct nmm_ccode *")
+        ccode = ffi.new("struct nmm_codon *")
         lprob: float = lib.nmm_frame_state_decode(self._cdata, seq, len(seq), ccode)
         return DecodedCodon(lprob, ccode.a + ccode.b + ccode.c)
 

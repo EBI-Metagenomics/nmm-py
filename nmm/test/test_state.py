@@ -7,7 +7,7 @@ from nmm import (
     LOG0,
     Alphabet,
     Base,
-    Codon,
+    CodonTable,
     FrameState,
     MuteState,
     NormalState,
@@ -87,7 +87,7 @@ def test_frame_state():
     base = Base(
         alphabet, {b"A": log(0.25), b"C": log(0.25), b"G": log(0.25), b"U": log(0.25)}
     )
-    codon = Codon(alphabet, {b"AUG": log(0.8), b"AUU": log(0.1)})
+    codon = CodonTable(alphabet, {b"AUG": log(0.8), b"AUU": log(0.1)})
 
     frame_state = FrameState(b"M1", base, codon, epsilon=0.0)
     assert_allclose(frame_state.lprob(b"AUA"), LOG0)
@@ -113,7 +113,7 @@ def test_frame_state():
     base = Base(
         alphabet, {b"A": log(0.1), b"C": log(0.2), b"G": log(0.3), b"T": log(0.4)}
     )
-    codon = Codon(alphabet, {b"ATG": log(0.8), b"ATT": log(0.1), b"GTC": log(0.4)})
+    codon = CodonTable(alphabet, {b"ATG": log(0.8), b"ATT": log(0.1), b"GTC": log(0.4)})
     codon.normalize()
     frame_state = FrameState(b"M2", base, codon, 0.1)
     assert_allclose(frame_state.lprob(b"A"), -6.282228286097171)
