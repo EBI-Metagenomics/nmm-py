@@ -54,6 +54,24 @@ class Codon(CCodon):
         return self._alphabet
 
 
+# class CCodonCode:
+#     """
+#     Wrapper around the C implementation of codon code.
+
+#     Parameters
+#     ----------
+#     cdata : `struct imm_abc *`.
+#     """
+
+#     def __init__(self, cdata: ffi.CData):
+#         self.__cdata = cdata
+
+# def decode(self, seq: bytes) -> DecodedCodon:
+#     ccode = ffi.new("struct nmm_ccode *")
+#     lprob: float = lib.nmm_frame_state_decode(self._cdata, seq, len(seq), ccode)
+#     return DecodedCodon(lprob, ccode.a + ccode.b + ccode.c)
+
+
 def ccodon_code(seq: bytes):
     ccode = ffi.new("struct nmm_ccode *")
     ccode.a = seq[0:1]

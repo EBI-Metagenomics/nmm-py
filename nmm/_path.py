@@ -2,9 +2,19 @@ from typing import List, Sequence, Union
 
 from ._ffi import ffi, lib
 from ._step import CStep, Step
+from ._state import State
 
 
 class CPath:
+    """
+    Wrapper around the C implementation of path.
+
+    Parameters
+    ----------
+    cdata : `<cdata 'struct imm_path *'>` or `None`. Passing `None` will create a new path at the
+    underlying library level.
+    """
+
     def __init__(self, cdata: Union[ffi.CData, None]):
         if cdata is None:
             cdata = lib.imm_path_create()
@@ -48,11 +58,17 @@ class CPath:
 
 
 class Path(CPath):
-    def __init__(self, steps: Sequence[Step]):
+    def __init__(self):
         super().__init__(None)
 
-        self._steps: List[CStep] = []
-        for step in steps:
-            imm_step = self.append(step.state.imm_state, step.seq_len)
-            step.set_imm_step(imm_step)
-            self._steps.append(step)
+        self._steps: List[Step] = []
+        # for step in steps:
+        #     imm_step = self.append(step.state.imm_state, step.seq_len)
+        #     step.set_imm_step(imm_step)
+        #     self._steps.append(step)
+
+    def append(self, state: State, seq_len: int) -> ffi.CData:
+        imm_step = super().append(state.imm_state, seq_len)
+        step = Step(imm_step, state, seq_len)
+        self._steps.append(step)
+        return step

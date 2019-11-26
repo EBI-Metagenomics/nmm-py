@@ -2,6 +2,14 @@ from ._ffi import ffi, lib
 
 
 class CAlphabet:
+    """
+    Wrapper around the C implementation of alphabet set.
+
+    Parameters
+    ----------
+    cdata : `<cdata 'struct imm_abc *'>`.
+    """
+
     def __init__(self, cdata: ffi.CData):
         self.__cdata = cdata
 
@@ -28,6 +36,14 @@ class CAlphabet:
 
 
 class Alphabet(CAlphabet):
+    """
+    Alphabet set for Markov models.
+
+    Parameters
+    ----------
+    symbols : set of symbols as an array of bytes.
+    """
+
     def __init__(self, symbols: bytes):
         self._symbols = symbols
         cdata = ffi.NULL

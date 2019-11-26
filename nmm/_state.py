@@ -38,8 +38,7 @@ class CState:
 
         Parameters
         ----------
-        seq : str
-            Sequence.
+        seq : Sequence.
         """
         return lib.imm_state_lprob(self.__cdata, seq, len(seq))
 
@@ -49,8 +48,8 @@ class State(CState):
         """
         Parameters
         ----------
-        alphabet : str
-            Alphabet.
+        cdata : `struct imm_state *`
+        alphabet : Alphabet.
         """
         super().__init__(cdata)
         self._alphabet = alphabet
@@ -68,10 +67,8 @@ class MuteState(State):
         """
         Parameters
         ----------
-        name : bytes
-            Name.
-        alphabet : Alphabet
-            Alphabet.
+        name : Name.
+        alphabet : Alphabet.
         """
         cdata = lib.imm_mute_state_create(name, alphabet.imm_abc)
         if cdata == ffi.NULL:
@@ -92,12 +89,9 @@ class NormalState(State):
         """
         Parameters
         ----------
-        name : bytes
-            Name.
-        alphabet : Alphabet
-            Alphabet.
-        lprobs : dict
-            List of probabilities in log-space.
+        name : Name.
+        alphabet : Alphabet.
+        lprobs : Emission probabilities in log-space.
         """
 
         if len(set(b"".join(lprobs.keys())) - set(alphabet.symbols)) > 0:
@@ -132,12 +126,9 @@ class TableState(State):
         """
         Parameters
         ----------
-        name : bytes
-            Name.
-        alphabet : Alphabet
-            Alphabet.
-        emission : dict
-            Emission probabilities in log-space.
+        name : Name.
+        alphabet : Alphabet.
+        emission : Emission probabilities in log-space.
         """
         cdata = lib.imm_table_state_create(name, alphabet.imm_abc)
         if cdata == ffi.NULL:
@@ -167,14 +158,10 @@ class FrameState(State):
         """
         Parameters
         ----------
-        name : bytes
-            Name.
-        base : Base
-            Base.
-        codon : Codon
-            Codon.
-        epsilon : float
-            Epsilon.
+        name : Name.
+        base : Base.
+        codon : Codon.
+        epsilon : Epsilon.
         """
         if set(base.alphabet.symbols) != set(codon.alphabet.symbols):
             raise ValueError("Alphabet symbols of `base` and `codon` are not equal.")
