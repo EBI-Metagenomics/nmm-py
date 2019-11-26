@@ -93,9 +93,35 @@ class FrameProfile:
     def lr(self, seq: bytes) -> Result:
         self._set_target_length(seq)
         score0 = self._bg.likelihood(seq)
-        result = self._viterbi(seq)
-        score = result.score - score0
-        return Result(score, seq, result.path)
+        path_result = self._viterbi(seq)
+        score = path_result.score - score0
+        self._convert_to_codon_path(seq, path_result)
+        return Result(score, seq, path_result.path)
+
+    def _convert_to_codon_path(self, seq: bytes, path_result: PathScore):
+        from .._path import Step, Path
+
+        # CPath()
+        # class Path(CPath):
+        # def __init__(self, steps: Sequence[Step]):
+
+        nseq: List[bytes] = []
+        npath: List[Step] = []
+        start: int = 0
+        for step in path_result.path.steps():
+            state = self._hmm.states[step.state.imm_state]
+            print(step.state.name, step.seq_len, state)
+            if step.seq_len == 0:
+                npath.append(Step(state, 0))
+            else:
+                fstate: FrameState = state
+                decoded_codon = fstate.decode(seq[start : start + step.seq_len])
+                nseq.append(decoded_codon.codon)
+                npath.append(Step(fstate, 3))
+            start += step.seq_len
+
+        p = Path(npath)
+        return (b"".join(nseq), PathScore(0.0, p))
 
     def _finalize(self):
         self._set_fragment_length()

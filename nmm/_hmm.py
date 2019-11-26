@@ -67,7 +67,7 @@ class HMM:
         if err != 0:
             raise RuntimeError("Could not set transition probability.")
 
-    def find_state(self, state_name: str):
+    def find_state(self, state_name: bytes):
         return self._states[self._state_names.inverse[state_name]]
 
     @property
@@ -75,7 +75,7 @@ class HMM:
         return self._alphabet
 
     def add_state(
-        self, state: State, start_lprob: float = LOG0, name: Optional[str] = None
+        self, state: State, start_lprob: float = LOG0, name: Optional[bytes] = None
     ):
         """
         Parameters

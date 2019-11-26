@@ -79,7 +79,8 @@ def search(profile, target, epsilon: float, output):
                         attributes=f"Epsilon={epsilon}",
                     )
                 )
-    gff.dump(output)
+    if output is not None:
+        gff.dump(output)
 
 
 cli.add_command(search)
