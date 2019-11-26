@@ -285,8 +285,8 @@ def test_hmm_viterbi_1():
     assert_allclose(hmm.transition(S, E), LOG0)
     assert_allclose(hmm.transition(E, S), LOG0)
 
-    lik = hmm.viterbi(b"AC", E)
-    assert_allclose(lik.score, log(0.3))
+    score = hmm.viterbi(b"AC", E)[0]
+    assert_allclose(score, log(0.3))
 
 
 def test_hmm_viterbi_2():
@@ -312,25 +312,25 @@ def test_hmm_viterbi_2():
     hmm.normalize()
     hmm.set_transition(E, E, LOG0)
 
-    lik = hmm.viterbi(b"AC", E)
-    assert_allclose(lik.score, log(0.48))
+    score = hmm.viterbi(b"AC", E)[0]
+    assert_allclose(score, log(0.48))
 
-    lik = hmm.viterbi(b"AA", E)
-    assert_allclose(lik.score, log(0.32))
+    score = hmm.viterbi(b"AA", E)[0]
+    assert_allclose(score, log(0.32))
 
-    lik = hmm.viterbi(b"CA", E)
-    assert_allclose(lik.score, log(0.08))
+    score = hmm.viterbi(b"CA", E)[0]
+    assert_allclose(score, log(0.08))
 
-    lik = hmm.viterbi(b"CC", E)
-    assert_allclose(lik.score, log(0.12))
+    score = hmm.viterbi(b"CC", E)[0]
+    assert_allclose(score, log(0.12))
 
     hmm.set_transition(M1, E, log(1.0))
 
-    lik = hmm.viterbi(b"AC", E)
-    assert_allclose(lik.score, log(0.48))
+    score = hmm.viterbi(b"AC", E)[0]
+    assert_allclose(score, log(0.48))
 
-    lik = hmm.viterbi(b"AA", E)
-    assert_allclose(lik.score, log(0.32))
+    score = hmm.viterbi(b"AA", E)[0]
+    assert_allclose(score, log(0.32))
 
 
 def test_hmm_viterbi_3():
@@ -370,22 +370,22 @@ def test_hmm_viterbi_3():
     hmm.normalize()
     hmm.set_transition(E, E, LOG0)
 
-    lik = hmm.viterbi(b"AC", E)
-    assert_allclose(lik.score, log(0.3072))
+    score = hmm.viterbi(b"AC", E)[0]
+    assert_allclose(score, log(0.3072))
 
-    lik = hmm.viterbi(b"AA", E)
-    assert_allclose(lik.score, log(0.2048))
+    score = hmm.viterbi(b"AA", E)[0]
+    assert_allclose(score, log(0.2048))
 
-    lik = hmm.viterbi(b"A", E)
-    assert_allclose(lik.score, log(0.128))
+    score = hmm.viterbi(b"A", E)[0]
+    assert_allclose(score, log(0.128))
 
-    lik = hmm.viterbi(b"AC", E)
-    assert_allclose(lik.score, log(0.3072))
+    score = hmm.viterbi(b"AC", E)[0]
+    assert_allclose(score, log(0.3072))
 
-    lik = hmm.viterbi(b"AC", M2)
-    assert_allclose(lik.score, log(0.3072))
+    score = hmm.viterbi(b"AC", M2)[0]
+    assert_allclose(score, log(0.3072))
 
     hmm.del_state(E)
 
-    lik = hmm.viterbi(b"AC", M2)
-    assert_allclose(lik.score, log(0.3072))
+    score = hmm.viterbi(b"AC", M2)[0]
+    assert_allclose(score, log(0.3072))

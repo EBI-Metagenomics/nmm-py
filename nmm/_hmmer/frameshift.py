@@ -7,8 +7,9 @@ from .._alphabet import Alphabet
 from .._base import Base
 from .._codon import CodonTable
 from .._gencode import GeneticCode
-from .._hmm import HMM, PathScore
+from .._hmm import HMM
 from .._log import LOG0, LOG1
+from .._path import CPath, Path
 from .._state import FrameState, MuteState
 from .core import CoreModel, NullModel, SpecialTrans, Trans
 from .result import Result
@@ -93,21 +94,19 @@ class FrameProfile:
     def lr(self, seq: bytes) -> Tuple[Result, Result]:
         self._set_target_length(seq)
         score0 = self._bg.likelihood(seq)
-        path_result = self._viterbi(seq)
-        score = path_result.score - score0
-        codon_seq, codon_path = self._convert_to_codon_path(seq, path_result)
+        score1, path = self._viterbi(seq)
+        score = score1 - score0
+        codon_seq, codon_path = self._convert_to_codon_path(seq, path)
         return (
-            Result(score, seq, path_result.path),
-            Result(0.0, codon_seq, codon_path.path),
+            Result(score, seq, path),
+            Result(score, codon_seq, codon_path),
         )
 
-    def _convert_to_codon_path(self, seq: bytes, path_result: PathScore):
-        from .._path import Path
-
+    def _convert_to_codon_path(self, seq: bytes, path):
         nseq: List[bytes] = []
         npath = Path()
         start: int = 0
-        for step in path_result.path.steps():
+        for step in path.steps():
             state = self._hmm.states()[step.state.imm_state]
             if step.seq_len == 0:
                 npath.append(state, 0)
@@ -118,7 +117,7 @@ class FrameProfile:
                 npath.append(fstate, 3)
             start += step.seq_len
 
-        return (b"".join(nseq), PathScore(0.0, npath))
+        return (b"".join(nseq), npath)
 
     def _finalize(self):
         self._set_fragment_length()
@@ -184,7 +183,7 @@ class FrameProfile:
 
         self._bg.set_transition(t.RR)
 
-    def _viterbi(self, seq: bytes) -> PathScore:
+    def _viterbi(self, seq: bytes) -> Tuple[float, CPath]:
         self._set_target_length(seq)
         return self._hmm.viterbi(seq, self._special_node.T)
 

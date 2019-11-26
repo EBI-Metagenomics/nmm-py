@@ -1,11 +1,12 @@
 from math import log
-from typing import List, NamedTuple, Dict, Any
+from typing import Any, Dict, List, NamedTuple, Tuple
 
 from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
-from .._hmm import HMM, PathScore
+from .._hmm import HMM
 from .._log import LOG0, LOG1
+from .._path import CPath
 from .._state import MuteState, NormalState
 from .core import CoreModel, NullModel, SpecialTrans, Trans
 from .result import Result
@@ -88,9 +89,9 @@ class NormalProfile:
     def lr(self, seq: bytes) -> Result:
         self._set_target_length(seq)
         score0 = self._bg.likelihood(seq)
-        result = self._viterbi(seq)
-        score = result.score - score0
-        return Result(score, seq, result.path)
+        score1, path = self._viterbi(seq)
+        score = score1 - score0
+        return Result(score, seq, path)
 
     def _finalize(self):
         self._set_fragment_length()
@@ -156,7 +157,7 @@ class NormalProfile:
 
         self._bg.set_transition(t.RR)
 
-    def _viterbi(self, seq: bytes) -> PathScore:
+    def _viterbi(self, seq: bytes) -> Tuple[float, CPath]:
         self._set_target_length(seq)
         return self._hmm.viterbi(seq, self._special_node.T)
 

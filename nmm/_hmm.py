@@ -3,12 +3,10 @@ from ._path import Path, CPath
 from ._log import LOG0
 from ._state import State
 from ._alphabet import Alphabet
-from typing import Dict, NamedTuple
+from typing import Dict, Tuple
 
 
 from ._ffi import ffi, lib
-
-PathScore = NamedTuple("PathScore", [("score", float), ("path", CPath)])
 
 
 class HMM:
@@ -115,20 +113,18 @@ class HMM:
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
-    def viterbi(self, seq: bytes, end_state: State) -> PathScore:
+    def viterbi(self, seq: bytes, end_state: State) -> Tuple[float, CPath]:
         cpath = lib.imm_path_create()
         if cpath == ffi.NULL:
             raise RuntimeError("Could not create `cpath`.")
         try:
-            lprob: float = lib.imm_hmm_viterbi(
-                self._hmm, seq, end_state.imm_state, cpath
-            )
+            imm_state = end_state.imm_state
+            lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, imm_state, cpath)
         except Exception as e:
             lib.imm_path_destroy(cpath)
             raise e
 
-        path = CPath(cpath)
-        return PathScore(score=lprob, path=path)
+        return (lprob, CPath(cpath))
 
     def __del__(self):
         if self._hmm != ffi.NULL:
