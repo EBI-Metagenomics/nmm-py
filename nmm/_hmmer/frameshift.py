@@ -102,23 +102,23 @@ class FrameProfile:
         )
 
     def _convert_to_codon_path(self, seq: bytes, path_result: PathScore):
-        from .._path import Step, Path
+        from .._path import Path
 
         nseq: List[bytes] = []
-        npath: List[Step] = []
+        npath = Path()
         start: int = 0
         for step in path_result.path.steps():
             state = self._hmm.states[step.state.imm_state]
             if step.seq_len == 0:
-                npath.append(Step(state, 0))
+                npath.append(state, 0)
             else:
                 fstate: FrameState = state
                 decoded_codon = fstate.decode(seq[start : start + step.seq_len])
                 nseq.append(decoded_codon.codon)
-                npath.append(Step(fstate, 3))
+                npath.append(fstate, 3)
             start += step.seq_len
 
-        return (b"".join(nseq), PathScore(0.0, Path(npath)))
+        return (b"".join(nseq), PathScore(0.0, npath))
 
     def _finalize(self):
         self._set_fragment_length()
