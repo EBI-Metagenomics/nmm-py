@@ -1,5 +1,5 @@
 from math import log
-from typing import Any, Dict, List, NamedTuple
+from typing import Any, Dict, List, NamedTuple, Tuple
 
 from hmmer_reader import HMMEReader
 
@@ -90,27 +90,25 @@ class FrameProfile:
     def hmm(self) -> HMM:
         return self._hmm
 
-    def lr(self, seq: bytes) -> Result:
+    def lr(self, seq: bytes) -> Tuple[Result, Result]:
         self._set_target_length(seq)
         score0 = self._bg.likelihood(seq)
         path_result = self._viterbi(seq)
         score = path_result.score - score0
-        self._convert_to_codon_path(seq, path_result)
-        return Result(score, seq, path_result.path)
+        codon_seq, codon_path = self._convert_to_codon_path(seq, path_result)
+        return (
+            Result(score, seq, path_result.path),
+            Result(0.0, codon_seq, codon_path.path),
+        )
 
     def _convert_to_codon_path(self, seq: bytes, path_result: PathScore):
         from .._path import Step, Path
-
-        # CPath()
-        # class Path(CPath):
-        # def __init__(self, steps: Sequence[Step]):
 
         nseq: List[bytes] = []
         npath: List[Step] = []
         start: int = 0
         for step in path_result.path.steps():
             state = self._hmm.states[step.state.imm_state]
-            print(step.state.name, step.seq_len, state)
             if step.seq_len == 0:
                 npath.append(Step(state, 0))
             else:
@@ -120,8 +118,7 @@ class FrameProfile:
                 npath.append(Step(fstate, 3))
             start += step.seq_len
 
-        p = Path(npath)
-        return (b"".join(nseq), PathScore(0.0, p))
+        return (b"".join(nseq), PathScore(0.0, Path(npath)))
 
     def _finalize(self):
         self._set_fragment_length()

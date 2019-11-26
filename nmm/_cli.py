@@ -45,15 +45,43 @@ def search(profile, target, epsilon: float, output):
             print(target.sequence)
 
             seq = target.sequence.encode().replace(b"T", b"U")
-            r = prof.lr(seq)
+            r, cr = prof.lr(seq)
             frags = r.fragments
 
             hfrags = [frag for frag in r.fragments if frag.homologous]
+            chfrags = [frag for frag in cr.fragments if frag.homologous]
 
             print()
             print(f"Found {len(hfrags)} homologous fragments ({len(frags)} in total).")
 
             for fi, frag in enumerate(hfrags):
+                start = frag.interval.start
+                end = frag.interval.end
+                print(f"Homologous fragment={fi}; Position=[{start}, {end}]")
+                states = []
+                matches = []
+                for i in frag.items():
+                    states.append(i[1].state.name.decode())
+                    matches.append(i[0].decode())
+
+                print("\t".join(states))
+                print("\t".join(matches))
+
+                gff.append(
+                    GFFItem(
+                        seqid=f"{target.defline.split()[0]}",
+                        source=f"nmm:{prof_acc}",
+                        type=".",
+                        start=start,
+                        end=end,
+                        score=0.0,
+                        strand="+",
+                        phase=".",
+                        attributes=f"Epsilon={epsilon}",
+                    )
+                )
+
+            for fi, frag in enumerate(chfrags):
                 start = frag.interval.start
                 end = frag.interval.end
                 print(f"Homologous fragment={fi}; Position=[{start}, {end}]")

@@ -13,7 +13,7 @@ def test_read_hmmer_frame_1(tmp_path):
     most_likely_rna_seq = b"CCU GGU AAA GAA GAU AAU AAC AAA"
     most_likely_rna_seq = most_likely_rna_seq.replace(b" ", b"")
 
-    r = hmmer.lr(most_likely_rna_seq)
+    r = hmmer.lr(most_likely_rna_seq)[0]
     assert_allclose(r.score, 125.83363182422178)
     frags = r.fragments
     frag = frags[0]
@@ -30,7 +30,7 @@ def test_read_hmmer_frame_2(tmp_path):
     rna_seq = b"AAA AAA AAA CCU GGU AAA GAA GAU AAU AAC AAA"
     rna_seq = rna_seq.replace(b" ", b"")
 
-    r = hmmer.lr(rna_seq)
+    r = hmmer.lr(rna_seq)[0]
     assert_allclose(r.score, 168.23071232889802)
     frags = r.fragments
     assert_equal(frags[0].homologous, False)
@@ -48,7 +48,7 @@ def test_read_hmmer_frame_3(tmp_path):
     rna_seq = b"CCU GGU AAA GAA GAU AAU AAC AAA"
     rna_seq = rna_seq.replace(b" ", b"")
 
-    r = hmmer.lr(rna_seq)
+    r = hmmer.lr(rna_seq)[0]
     frags = r.fragments
     assert_equal(len(frags), 1)
     assert_equal(frags[0].homologous, True)
@@ -64,7 +64,7 @@ def test_read_hmmer_frame_4(tmp_path):
     rna_seq = b"CCUU GGU AAA GAA GAU AAU AAC AAA"
     rna_seq = rna_seq.replace(b" ", b"")
 
-    r = hmmer.lr(rna_seq)
+    r = hmmer.lr(rna_seq)[0]
     frags = r.fragments
     assert_equal(len(frags), 0)
 
@@ -78,7 +78,7 @@ def test_read_hmmer_frame_5(tmp_path):
     rna_seq = b"CCUU GGU AAA GAA GAU AAU AAC AAA"
     rna_seq = rna_seq.replace(b" ", b"")
 
-    r = hmmer.lr(rna_seq)
+    r = hmmer.lr(rna_seq)[0]
     frags = r.fragments
     assert_equal(len(frags), 1)
     assert_equal(frags[0].homologous, True)
@@ -94,7 +94,7 @@ def test_read_hmmer_frame_6(tmp_path):
     rna_seq = b"AAGA AAA AAA CCU GGU AAA GAA GAU AAU AAC AAA"
     rna_seq = rna_seq.replace(b" ", b"")
 
-    r = hmmer.lr(rna_seq)
+    r = hmmer.lr(rna_seq)[0]
     assert_allclose(r.score, 171.5602273844319)
     frags = r.fragments
 
