@@ -11,8 +11,9 @@ from .._hmm import HMM
 from .._log import LOG0, LOG1
 from .._path import CPath, Path
 from .._state import FrameState, MuteState
-from .core import CoreModel, NullModel, SpecialTrans, Trans
+from .core import CoreModel, NullModel
 from .result import Result
+from .transition import SpecialTransitions, Transitions
 
 Node = NamedTuple("Node", [("M", FrameState), ("I", FrameState), ("D", MuteState)])
 
@@ -73,7 +74,7 @@ class FrameProfile:
 
         self._hmm = hmm
         self._special_node = special_node
-        self._special_trans = SpecialTrans()
+        self._special_trans = SpecialTransitions()
 
         self._core_nodes: List[Node] = []
 
@@ -251,7 +252,7 @@ def create_frame_profile(reader: HMMEReader, epsilon: float = 0.1) -> FrameProfi
                 I=ffact.create(f"I{m}".encode(), _bytes_dict(reader.insert(m))),
                 D=MuteState(f"D{m}".encode(), bases),
             )
-            trans = Trans(**reader.trans(m - 1))
+            trans = Transitions(**reader.trans(m - 1))
             trans.normalize()
             core.add_node(node, trans)
 

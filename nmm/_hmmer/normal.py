@@ -8,8 +8,9 @@ from .._hmm import HMM
 from .._log import LOG0, LOG1
 from .._path import CPath
 from .._state import MuteState, NormalState
-from .core import CoreModel, NullModel, SpecialTrans, Trans
+from .core import CoreModel, NullModel
 from .result import Result
+from .transition import SpecialTransitions, Transitions
 
 Node = NamedTuple("Node", [("M", NormalState), ("I", NormalState), ("D", MuteState)])
 
@@ -68,7 +69,7 @@ class NormalProfile:
 
         self._hmm = hmm
         self._special_node = special_node
-        self._special_trans = SpecialTrans()
+        self._special_trans = SpecialTransitions()
 
         self._core_nodes: List[Node] = []
 
@@ -182,7 +183,7 @@ def create_hmmer_profile(reader: HMMEReader) -> NormalProfile:
             )
             node.M.normalize()
             node.I.normalize()
-            trans = Trans(**reader.trans(m - 1))
+            trans = Transitions(**reader.trans(m - 1))
             trans.normalize()
             core.add_node(node, trans)
 
