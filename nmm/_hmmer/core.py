@@ -52,48 +52,6 @@ class SpecialNode:
         raise NotImplementedError()
 
 
-class CoreModel:
-    def __init__(self, hmm: HMM, finalize: Callable[[], None]):
-        self._hmm = hmm
-        self._finalize = finalize
-
-    def _add_node(self, node: Node, trans: Transitions):
-        self._hmm.add_state(node.M)
-        self._hmm.add_state(node.I)
-        self._hmm.add_state(node.D)
-
-        if self.model_length == 1:
-            return
-
-        prev = self.core_nodes()[-2]
-        self._hmm.set_transition(prev.M, node.M, trans.MM)
-        self._hmm.set_transition(prev.M, prev.I, trans.MI)
-        self._hmm.set_transition(prev.M, node.D, trans.MD)
-        self._hmm.set_transition(prev.I, node.M, trans.IM)
-        self._hmm.set_transition(prev.I, prev.I, trans.II)
-        self._hmm.set_transition(prev.D, node.M, trans.DM)
-        self._hmm.set_transition(prev.D, node.D, trans.DD)
-
-    def core_nodes(self) -> Sequence[Node]:
-        raise NotImplementedError()
-
-    @property
-    def model_length(self) -> int:
-        return len(self.core_nodes())
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type, value, traceback):
-        if self.model_length > 0:
-            self._hmm.del_state(self.core_nodes()[0].D)
-            self._hmm.del_state(self.core_nodes()[-1].I)
-        self._finalize()
-        del type
-        del value
-        del traceback
-
-
 class NullModel:
     def __init__(self, state: State):
         self._hmm = HMM(state.alphabet)
@@ -103,9 +61,9 @@ class NullModel:
     def state(self) -> State:
         raise NotImplementedError()
 
-    @property
-    def hmm(self) -> HMM:
-        return self._hmm
+    # @property
+    # def hmm(self) -> HMM:
+    #     return self._hmm
 
     def set_transition(self, lprob: float):
         self._hmm.set_transition(self.state, self.state, lprob)
@@ -115,9 +73,12 @@ class NullModel:
         return self._hmm.likelihood(seq, path)
 
 
-class Profile:
-    def __init__(self, special_node: SpecialNode):
-
+class AltModel:
+    def __init__(
+        self,
+        special_node: SpecialNode,
+        core_nodes_trans: Sequence[Tuple[Node, Transitions]],
+    ):
         hmm = HMM(special_node.S.alphabet)
         hmm.add_state(special_node.S, LOG1)
         hmm.add_state(special_node.N)
@@ -127,12 +88,38 @@ class Profile:
         hmm.add_state(special_node.C)
         hmm.add_state(special_node.T)
 
-        self._hmm = hmm
-        self._multiple_hits: bool = True
         self._special_transitions = SpecialTransitions()
 
-    @property
-    def null_model(self) -> NullModel:
+        if len(core_nodes_trans) > 0:
+            node, trans = core_nodes_trans[0]
+            hmm.add_state(node.M)
+            hmm.add_state(node.I)
+            hmm.add_state(node.D)
+            prev = node
+
+            for node, trans in core_nodes_trans[1:]:
+                hmm.add_state(node.M)
+                hmm.add_state(node.I)
+                hmm.add_state(node.D)
+
+                hmm.set_transition(prev.M, node.M, trans.MM)
+                hmm.set_transition(prev.M, prev.I, trans.MI)
+                hmm.set_transition(prev.M, node.D, trans.MD)
+                hmm.set_transition(prev.I, node.M, trans.IM)
+                hmm.set_transition(prev.I, prev.I, trans.II)
+                hmm.set_transition(prev.D, node.M, trans.DM)
+                hmm.set_transition(prev.D, node.D, trans.DD)
+                prev = node
+
+            hmm.del_state(core_nodes_trans[0][0].D)
+            hmm.del_state(core_nodes_trans[-1][0].I)
+
+        self._hmm = hmm
+
+    def set_transition(self, a: State, b: State, lprob: float):
+        self._hmm.set_transition(a, b, lprob)
+
+    def core_nodes(self) -> Sequence[Node]:
         raise NotImplementedError()
 
     @property
@@ -140,48 +127,63 @@ class Profile:
         raise NotImplementedError()
 
     @property
+    def special_transitions(self) -> SpecialTransitions:
+        return self._special_transitions
+
+    @property
     def length(self) -> int:
         raise NotImplementedError()
 
-    def core_nodes(self) -> Sequence[Node]:
+
+class Profile:
+    def __init__(self):
+        self._multiple_hits: bool = True
+
+    @property
+    def null_model(self) -> NullModel:
         raise NotImplementedError()
 
     @property
-    def core_model(self):
+    def alt_model(self) -> AltModel:
         raise NotImplementedError()
 
-    def set_multiple_hits(self, multiple_hits: bool):
+    @property
+    def multiple_hits(self) -> bool:
+        return self._multiple_hits
+
+    @multiple_hits.setter
+    def multiple_hits(self, multiple_hits: bool):
         self._multiple_hits = multiple_hits
 
-    @property
-    def hmm(self) -> HMM:
-        return self._hmm
+    # @property
+    # def hmm(self) -> HMM:
+    #     return self._hmm
 
-    def _finalize(self):
-        self._set_fragment_length()
+    # def _finalize(self):
+    #     self._set_fragment_length()
 
     def _set_fragment_length(self):
-        if self.length == 0:
+        if self.alt_model.length == 0:
             return
 
-        B = self._special_node.B
-        E = self._special_node.E
+        B = self.alt_model.special_node.B
+        E = self.alt_model.special_node.E
 
         # Uniform local alignment fragment length distribution
-        t = self._special_transitions
-        t.BM = log(2) - log(self.length) - log(self.length + 1)
+        t = self.alt_model.special_transitions
+        t.BM = log(2) - log(self.alt_model.length) - log(self.alt_model.length + 1)
         t.ME = 0.0
-        for node in self.core_nodes():
-            self._hmm.set_transition(B, node.M, t.BM)
-            self._hmm.set_transition(node.M, E, t.ME)
+        for node in self.alt_model.core_nodes():
+            self.alt_model.set_transition(B, node.M, t.BM)
+            self.alt_model.set_transition(node.M, E, t.ME)
 
-        for node in self.core_nodes()[1:]:
-            self._hmm.set_transition(node.D, E, 0.0)
+        for node in self.alt_model.core_nodes()[1:]:
+            self.alt_model.set_transition(node.D, E, 0.0)
 
-    def _set_target_length(self, seq: bytes):
+    def _set_target_length(self, length: int):
         from math import exp
 
-        L = len(seq)
+        L = length
         if L == 0:
             return
 
@@ -195,32 +197,28 @@ class Profile:
         l1p = log(2 + q / (1 - q)) - log(L + 2 + q / (1 - q))
         lr = log(L) - log(L + 1)
 
-        t = self._special_transitions
+        t = self.alt_model.special_transitions
 
         t.NN = t.CC = t.JJ = lp
         t.NB = t.CT = t.JB = l1p
         t.RR = lr
         t.EC = t.EJ = lq
 
-        node = self.special_node
+        node = self.alt_model.special_node
 
-        self._hmm.set_transition(node.S, node.B, t.NB)
-        self._hmm.set_transition(node.S, node.N, t.NN)
-        self._hmm.set_transition(node.N, node.N, t.NN)
-        self._hmm.set_transition(node.N, node.B, t.NB)
+        self.alt_model.set_transition(node.S, node.B, t.NB)
+        self.alt_model.set_transition(node.S, node.N, t.NN)
+        self.alt_model.set_transition(node.N, node.N, t.NN)
+        self.alt_model.set_transition(node.N, node.B, t.NB)
 
-        self._hmm.set_transition(node.E, node.T, t.EC + t.CT)
-        self._hmm.set_transition(node.E, node.C, t.EC + t.CC)
-        self._hmm.set_transition(node.C, node.C, t.CC)
-        self._hmm.set_transition(node.C, node.T, t.CT)
+        self.alt_model.set_transition(node.E, node.T, t.EC + t.CT)
+        self.alt_model.set_transition(node.E, node.C, t.EC + t.CC)
+        self.alt_model.set_transition(node.C, node.C, t.CC)
+        self.alt_model.set_transition(node.C, node.T, t.CT)
 
-        self._hmm.set_transition(node.E, node.B, t.EJ + t.JB)
-        self._hmm.set_transition(node.E, node.J, t.EJ + t.JJ)
-        self._hmm.set_transition(node.J, node.J, t.JJ)
-        self._hmm.set_transition(node.J, node.B, t.JB)
+        self.alt_model.set_transition(node.E, node.B, t.EJ + t.JB)
+        self.alt_model.set_transition(node.E, node.J, t.EJ + t.JJ)
+        self.alt_model.set_transition(node.J, node.J, t.JJ)
+        self.alt_model.set_transition(node.J, node.B, t.JB)
 
         self.null_model.set_transition(t.RR)
-
-    def _viterbi(self, seq: bytes) -> Tuple[float, CPath]:
-        self._set_target_length(seq)
-        return self._hmm.viterbi(seq, self.special_node.T)

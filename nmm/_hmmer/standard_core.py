@@ -1,9 +1,10 @@
-from typing import Callable, List, Sequence
+from typing import Callable, List, Sequence, Tuple
 
 
 from .._hmm import HMM
 from .._state import MuteState, NormalState
-from .core import CoreModel, Node, NullModel, SpecialNode
+from .._path import CPath
+from .core import AltModel, Node, NullModel, SpecialNode
 from .transition import Transitions
 
 
@@ -74,25 +75,6 @@ class StandardSpecialNode(SpecialNode):
         return self._T
 
 
-class StandardCoreModel(CoreModel):
-    def __init__(
-        self, hmm: HMM, core_nodes: List[StandardNode], finalize: Callable[[], None]
-    ):
-        super().__init__(hmm, finalize)
-        self._core_nodes = core_nodes
-
-    def add_node(self, node: StandardNode, trans: Transitions):
-
-        self._core_nodes.append(node)
-        self._add_node(node, trans)
-
-        if len(self._core_nodes) == 1:
-            return
-
-    def core_nodes(self) -> Sequence[StandardNode]:
-        return self._core_nodes
-
-
 class StandardNullModel(NullModel):
     def __init__(self, state: NormalState):
         super().__init__(state)
@@ -101,3 +83,36 @@ class StandardNullModel(NullModel):
     @property
     def state(self) -> NormalState:
         return self._normal_state
+
+
+class StandardAltModel(AltModel):
+    def __init__(
+        self,
+        special_node: StandardSpecialNode,
+        core_nodes_trans: Sequence[Tuple[StandardNode, Transitions]],
+    ):
+        self._special_node = special_node
+        super().__init__(special_node, core_nodes_trans)
+        self._core_nodes = [nt[0] for nt in core_nodes_trans]
+
+    # def add_node(self, node: StandardNode, trans: Transitions):
+
+    #     self._core_nodes.append(node)
+    #     self._add_node(node, trans)
+
+    #     if len(self._core_nodes) == 1:
+    #         return
+
+    @property
+    def length(self):
+        return len(self._core_nodes)
+
+    def core_nodes(self) -> Sequence[StandardNode]:
+        return self._core_nodes
+
+    @property
+    def special_node(self) -> StandardSpecialNode:
+        return self._special_node
+
+    def viterbi(self, seq: bytes) -> Tuple[float, CPath]:
+        return self._hmm.viterbi(seq, self.special_node.T)

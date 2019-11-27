@@ -11,7 +11,7 @@ from .._hmm import HMM
 from .._log import LOG0, LOG1
 from .._path import CPath, Path
 from .._state import FrameState, MuteState
-from .core import CoreModel, NullModel
+from .core import AltModel, NullModel
 from .result import Result
 from .transition import SpecialTransitions, Transitions
 
@@ -41,7 +41,7 @@ class FrameNullModel(NullModel):
         return self._frame_state
 
 
-class FrameCoreModel(CoreModel):
+class FrameCoreModel(AltModel):
     pass
 
 
