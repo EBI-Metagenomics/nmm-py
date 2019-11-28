@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple, Union, TypeVar, Iterator, List, Dict
+from typing import Dict, Iterator, List, Sequence, Tuple, TypeVar, Union
 
 from .._ffi import ffi
 from .._path import Path

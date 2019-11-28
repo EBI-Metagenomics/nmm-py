@@ -1,11 +1,11 @@
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import create_hmmer_profile, read_hmmer
+from nmm import create_standard_profile, read_hmmer
 
 
 def test_standard_profile_unihit_homologous_1(PF03373):
     reader = read_hmmer(PF03373)
-    hmmer = create_hmmer_profile(reader)
+    hmmer = create_standard_profile(reader)
     most_likely_seq = b"PGKEDNNK"
     r = hmmer.search(most_likely_seq)
     assert_allclose(r.score, 11.867796719423442)
@@ -18,7 +18,7 @@ def test_standard_profile_unihit_homologous_1(PF03373):
 
 def test_standard_profile_unihit_homologous_2(PF03373):
     reader = read_hmmer(PF03373)
-    hmmer = create_hmmer_profile(reader)
+    hmmer = create_standard_profile(reader)
     seq = b"PGKENNK"
     r = hmmer.search(seq)
     assert_allclose(r.score, 3.299501501364073)
@@ -31,7 +31,7 @@ def test_standard_profile_unihit_homologous_2(PF03373):
 
 def test_standard_profile_unihit_homologous_3(PF03373):
     reader = read_hmmer(PF03373)
-    hmmer = create_hmmer_profile(reader)
+    hmmer = create_standard_profile(reader)
     seq = b"PGKEPNNK"
     r = hmmer.search(seq)
     assert_allclose(r.score, 6.883636719423446)
@@ -44,7 +44,7 @@ def test_standard_profile_unihit_homologous_3(PF03373):
 
 def test_standard_profile_nonhomo_and_homologous(PF03373):
     reader = read_hmmer(PF03373)
-    hmmer = create_hmmer_profile(reader)
+    hmmer = create_standard_profile(reader)
     seq = b"KKKPGKEDNNK"
     r = hmmer.search(seq)
     assert_allclose(r.score, 10.707618955640605)
@@ -58,7 +58,7 @@ def test_standard_profile_nonhomo_and_homologous(PF03373):
 
 def test_standard_profile_multihit_homologous(PF03373):
     reader = read_hmmer(PF03373)
-    hmmer = create_hmmer_profile(reader)
+    hmmer = create_standard_profile(reader)
     seq = b"PPPPGKEDNNKDDDPGKEDNNKEEEE"
     r = hmmer.search(seq)
     assert_allclose(r.score, 20.329227532144742)

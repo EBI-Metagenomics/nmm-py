@@ -58,7 +58,7 @@ class StandardProfile(Profile):
         return SearchResult(score, seq, path)
 
 
-def create_hmmer_profile(reader: HMMEReader) -> StandardProfile:
+def create_standard_profile(reader: HMMEReader) -> StandardProfile:
 
     alphabet = Alphabet(reader.alphabet.encode())
     null_lprobs = _dict(reader.insert(0))

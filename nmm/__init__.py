@@ -3,7 +3,7 @@ from ._alphabet import Alphabet
 from ._base import Base
 from ._codon import CodonTable
 from ._hmm import HMM
-from ._hmmer import create_frame_profile, create_hmmer_profile, read_hmmer
+from ._hmmer import create_frame_profile, create_standard_profile, read_hmmer
 from ._log import LOG0
 from ._path import Path
 from ._state import FrameState, MuteState, NormalState, TableState
@@ -37,7 +37,7 @@ __all__ = [
     "TableState",
     "__version__",
     "create_frame_profile",
-    "create_hmmer_profile",
+    "create_standard_profile",
     "read_hmmer",
     "cli",
 ]
