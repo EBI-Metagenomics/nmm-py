@@ -1,12 +1,10 @@
-import importlib_resources as pkg_resources
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import read_hmmer, create_hmmer_profile
+from nmm import create_hmmer_profile, read_hmmer
 
 
-def test_standard_profile_unihit_homologous_1(tmp_path):
-    filepath = write_file(tmp_path, "PF03373.hmm")
-    reader = read_hmmer(filepath)
+def test_standard_profile_unihit_homologous_1(PF03373):
+    reader = read_hmmer(PF03373)
     hmmer = create_hmmer_profile(reader)
     most_likely_seq = b"PGKEDNNK"
     r = hmmer.lr(most_likely_seq)
@@ -18,9 +16,8 @@ def test_standard_profile_unihit_homologous_1(tmp_path):
     assert_equal(frag.sequence, most_likely_seq)
 
 
-def test_standard_profile_unihit_homologous_2(tmp_path):
-    filepath = write_file(tmp_path, "PF03373.hmm")
-    reader = read_hmmer(filepath)
+def test_standard_profile_unihit_homologous_2(PF03373):
+    reader = read_hmmer(PF03373)
     hmmer = create_hmmer_profile(reader)
     seq = b"PGKENNK"
     r = hmmer.lr(seq)
@@ -32,9 +29,8 @@ def test_standard_profile_unihit_homologous_2(tmp_path):
     assert_equal(frag.sequence, seq)
 
 
-def test_standard_profile_unihit_homologous_3(tmp_path):
-    filepath = write_file(tmp_path, "PF03373.hmm")
-    reader = read_hmmer(filepath)
+def test_standard_profile_unihit_homologous_3(PF03373):
+    reader = read_hmmer(PF03373)
     hmmer = create_hmmer_profile(reader)
     seq = b"PGKEPNNK"
     r = hmmer.lr(seq)
@@ -46,9 +42,8 @@ def test_standard_profile_unihit_homologous_3(tmp_path):
     assert_equal(frag.sequence, seq)
 
 
-def test_standard_profile_nonhomo_and_homologous(tmp_path):
-    filepath = write_file(tmp_path, "PF03373.hmm")
-    reader = read_hmmer(filepath)
+def test_standard_profile_nonhomo_and_homologous(PF03373):
+    reader = read_hmmer(PF03373)
     hmmer = create_hmmer_profile(reader)
     seq = b"KKKPGKEDNNK"
     r = hmmer.lr(seq)
@@ -61,9 +56,8 @@ def test_standard_profile_nonhomo_and_homologous(tmp_path):
     assert_equal(frags[1].sequence, b"PGKEDNNK")
 
 
-def test_standard_profile_multihit_homologous(tmp_path):
-    filepath = write_file(tmp_path, "PF03373.hmm")
-    reader = read_hmmer(filepath)
+def test_standard_profile_multihit_homologous(PF03373):
+    reader = read_hmmer(PF03373)
     hmmer = create_hmmer_profile(reader)
     seq = b"PPPPGKEDNNKDDDPGKEDNNKEEEE"
     r = hmmer.lr(seq)
@@ -110,14 +104,3 @@ def test_standard_profile_multihit_homologous(tmp_path):
     assert_equal(str(items[6][1]), "<M7,1>")
     assert_equal(items[7][0], b"K")
     assert_equal(str(items[7][1]), "<M8,1>")
-
-
-def write_file(path, filename):
-    import nmm
-
-    text = pkg_resources.read_text(nmm._hmmer.test, filename)
-
-    with open(path / filename, "w") as f:
-        f.write(text)
-
-    return path / filename
