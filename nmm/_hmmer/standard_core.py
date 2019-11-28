@@ -125,9 +125,20 @@ class StandardAltModel(AltModel):
     ):
         self._special_node = special_node
         self._core_nodes = [nt[0] for nt in nodes_trans]
-        # self._states: Dict[ffi.CData, Union[MuteState, NormalState]] = {}
-        # for node in self._core_nodes:
-        #     self._states[node.M
+        self._states: Dict[ffi.CData, Union[MuteState, NormalState]] = {}
+        for node in self._core_nodes:
+            self._states[node.M.imm_state] = node.M
+            self._states[node.I.imm_state] = node.I
+            self._states[node.D.imm_state] = node.D
+
+        self._states[special_node.S.imm_state] = special_node.S
+        self._states[special_node.N.imm_state] = special_node.N
+        self._states[special_node.B.imm_state] = special_node.B
+        self._states[special_node.E.imm_state] = special_node.E
+        self._states[special_node.J.imm_state] = special_node.J
+        self._states[special_node.C.imm_state] = special_node.C
+        self._states[special_node.T.imm_state] = special_node.T
+
         super().__init__(special_node, nodes_trans)
 
     @property
@@ -142,12 +153,11 @@ class StandardAltModel(AltModel):
         return self._special_node
 
     def viterbi(self, seq: bytes) -> Tuple[float, StandardPath]:
-        return self._hmm.viterbi(seq, self.special_node.T)
-        # score, path = self._hmm.viterbi(seq, self.special_node.T)
+        score, path = self._hmm.viterbi(seq, self.special_node.T)
 
-        # spath = StandardPath()
-        # for step in path.steps():
-        #     imm_state = self._hmm.states()[step.state.imm_state]
-        #     # spath.append_standard()
+        spath = StandardPath()
+        for step in path.steps():
+            imm_state = step.state.imm_state
+            spath.append_standard(self._states[imm_state], step.seq_len)
 
-        # return (score, spath)
+        return (score, spath)
