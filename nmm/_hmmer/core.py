@@ -106,8 +106,8 @@ class AltModel:
                 hmm.set_transition(prev.D, node.D, trans.DD)
                 prev = node
 
-            hmm.del_state(core_nodes_trans[0][0].D)
-            hmm.del_state(core_nodes_trans[-1][0].I)
+            # hmm.del_state(core_nodes_trans[0][0].D)
+            # hmm.del_state(core_nodes_trans[-1][0].I)
 
         self._hmm = hmm
 

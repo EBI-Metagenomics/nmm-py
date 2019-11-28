@@ -23,36 +23,36 @@ class CPath:
                 raise RuntimeError("`imm_path_create` failed.")
         elif imm_path == ffi.NULL:
             raise RuntimeError("`cdata` cannot be NULL.")
-        self.__cdata = imm_path
+        self.__imm_path = imm_path
 
     @property
     def imm_path(self) -> ffi.CData:
-        return self.__cdata
+        return self.__imm_path
 
     def steps(self) -> Iterator[CStep]:
-        step = lib.imm_path_first(self.__cdata)
+        step = lib.imm_path_first(self.__imm_path)
         while step != ffi.NULL:
             yield CStep(step)
-            step = lib.imm_path_next(self.__cdata, step)
+            step = lib.imm_path_next(self.__imm_path, step)
 
     def append(self, state: ffi.CData, seq_len: int) -> ffi.CData:
-        err: int = lib.imm_path_append(self.__cdata, state, seq_len)
+        err: int = lib.imm_path_append(self.__imm_path, state, seq_len)
         if err != 0:
             raise RuntimeError("Could not add step.")
-        return lib.imm_path_last(self.__cdata)
+        return lib.imm_path_last(self.__imm_path)
 
     def __del__(self):
-        if self.__cdata != ffi.NULL:
-            lib.imm_path_destroy(self.__cdata)
+        if self.__imm_path != ffi.NULL:
+            lib.imm_path_destroy(self.__imm_path)
 
     def __repr__(self):
         step_repr = []
-        step = lib.imm_path_first(self.__cdata)
+        step = lib.imm_path_first(self.__imm_path)
         while step != ffi.NULL:
             name = ffi.string(lib.imm_state_get_name(lib.imm_step_state(step)))
             seq_len = lib.imm_step_seq_len(step)
             step_repr += [f"<{name.decode()}:{seq_len}>"]
-            step = lib.imm_path_next(self.__cdata, step)
+            step = lib.imm_path_next(self.__imm_path, step)
 
         msg = "".join(step_repr)
         return f"<{self.__class__.__name__}:{msg}>"
@@ -84,3 +84,6 @@ class Path(CPath):
         step = Step(imm_step, state, seq_len)
         self.__steps.append(step)
         return step
+
+    def steps(self) -> Iterator[Step]:
+        return iter(self.__steps)

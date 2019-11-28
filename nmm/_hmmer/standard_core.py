@@ -1,11 +1,43 @@
-from typing import Sequence, Tuple, Union, TypeVar, Type
+from typing import Sequence, Tuple, Union, TypeVar, Iterator, List, Dict
 
-from .._ffi import ffi, lib
-from .._path import CPath, Path
+from .._ffi import ffi
+from .._path import Path
 from .._state import MuteState, NormalState
 from .._step import Step
 from .core import AltModel, Node, NullModel, SpecialNode
 from .transition import Transitions
+
+
+class StandardStep(Step):
+    def __init__(
+        self, imm_step: ffi.CData, state: Union[MuteState, NormalState], seq_len: int
+    ):
+        super().__init__(imm_step, state, seq_len)
+        self._state = state
+
+    @property
+    def state(self) -> Union[MuteState, NormalState]:
+        return self._state
+
+
+T = TypeVar("T", bound="StandardPath")
+
+
+class StandardPath(Path):
+    def __init__(self):
+        super().__init__()
+        self._steps: List[StandardStep] = []
+
+    def append_standard(
+        self, state: Union[MuteState, NormalState], seq_len: int
+    ) -> ffi.CData:
+        imm_step = super().append(state, seq_len)
+        step = StandardStep(imm_step, state, seq_len)
+        self._steps.append(step)
+        return step
+
+    def steps(self) -> Iterator[StandardStep]:
+        return iter(self._steps)
 
 
 class StandardNode(Node):
@@ -93,6 +125,9 @@ class StandardAltModel(AltModel):
     ):
         self._special_node = special_node
         self._core_nodes = [nt[0] for nt in nodes_trans]
+        # self._states: Dict[ffi.CData, Union[MuteState, NormalState]] = {}
+        # for node in self._core_nodes:
+        #     self._states[node.M
         super().__init__(special_node, nodes_trans)
 
     @property
@@ -106,40 +141,13 @@ class StandardAltModel(AltModel):
     def special_node(self) -> StandardSpecialNode:
         return self._special_node
 
-    def viterbi(self, seq: bytes) -> Tuple[float, CPath]:
+    def viterbi(self, seq: bytes) -> Tuple[float, StandardPath]:
         return self._hmm.viterbi(seq, self.special_node.T)
+        # score, path = self._hmm.viterbi(seq, self.special_node.T)
 
+        # spath = StandardPath()
+        # for step in path.steps():
+        #     imm_state = self._hmm.states()[step.state.imm_state]
+        #     # spath.append_standard()
 
-class StandardStep(Step):
-    def __init__(
-        self, imm_step: ffi.CData, state: Union[MuteState, NormalState], seq_len: int
-    ):
-        super().__init__(imm_step, state, seq_len)
-        self._state = state
-
-    @property
-    def state(self) -> Union[MuteState, NormalState]:
-        return self._state
-
-
-# T = TypeVar("T", bound="StandardPath")
-
-
-# class StandardPath(Path):
-#     def __init__(self):
-#         super().__init__()
-
-#     @classmethod
-#     def create(
-#         cls: Type[T], steps: Sequence[Tuple[Union[MuteState, NormalState], int]]
-#     ) -> T:
-#         path = cls()
-#         for state, seq_len in steps:
-#             path.append(state, seq_len)
-#         return path
-
-# def append(self, state: Union[MuteState, NormalState], seq_len: int) -> ffi.CData:
-#     imm_step = super().append(state.imm_state, seq_len)
-#     step = Step(imm_step, state, seq_len)
-#     self.__steps.append(step)
-#     return step
+        # return (score, spath)
