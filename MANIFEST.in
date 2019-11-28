@@ -2,7 +2,7 @@ include LICENSE.md
 include README.md
 include nmm/test/Nckap1.hmm
 include nmm/test/PF02545.hmm
-include nmm/test/PF03373.hmm
+include nmm/_hmmer/test/PF03373.hmm
 include nmm/test/PF03373.seq
 include nmm/test/PF03373_rna1.seq
 include version.py
