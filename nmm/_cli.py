@@ -57,7 +57,7 @@ def search(profile, target, epsilon: float, output):
             for fi, frag in enumerate(hfrags):
                 start = frag.interval.start
                 end = frag.interval.end
-                print(f"Homologous fragment={fi}; Position=[{start}, {end}]")
+                print(f"Homologous fragment={fi}; Position=[{start + 1}, {end}]")
                 states = []
                 matches = []
                 for i in frag.items():
@@ -72,7 +72,7 @@ def search(profile, target, epsilon: float, output):
                         seqid=f"{target.defline.split()[0]}",
                         source=f"nmm:{prof_acc}",
                         type=".",
-                        start=start,
+                        start=start + 1,
                         end=end,
                         score=0.0,
                         strand="+",
@@ -84,7 +84,7 @@ def search(profile, target, epsilon: float, output):
             for fi, frag in enumerate(chfrags):
                 start = frag.interval.start
                 end = frag.interval.end
-                print(f"Homologous fragment={fi}; Position=[{start}, {end}]")
+                print(f"Homologous fragment={fi}; Position=[{start + 1}, {end}]")
                 states = []
                 matches = []
                 for i in frag.items():
@@ -99,7 +99,7 @@ def search(profile, target, epsilon: float, output):
                         seqid=f"{target.defline.split()[0]}",
                         source=f"nmm:{prof_acc}",
                         type=".",
-                        start=start,
+                        start=start + 1,
                         end=end,
                         score=0.0,
                         strand="+",

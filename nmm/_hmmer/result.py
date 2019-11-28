@@ -6,10 +6,10 @@ Interval = NamedTuple("Interval", [("start", int), ("end", int)])
 
 
 class Fragment:
-    def __init__(self, seq: bytes, homologous: bool, interval: Interval):
+    def __init__(self, seq: bytes, interval: Interval, homologous: bool):
         self._seq = seq
-        self._homologous = homologous
         self._interval = interval
+        self._homologous = homologous
 
     @property
     def interval(self) -> Interval:
@@ -17,7 +17,7 @@ class Fragment:
 
     @property
     def sequence(self) -> bytes:
-        return self._seq
+        return self._seq[self._interval.start : self._interval.end]
 
     def items(self) -> Iterator[Tuple[bytes, Step]]:
         raise NotImplementedError()
@@ -35,7 +35,6 @@ class SearchResult:
     @property
     def fragments(self) -> Sequence[Fragment]:
         raise NotImplementedError()
-        return self._fragments
 
     @property
     def score(self) -> float:

@@ -6,27 +6,28 @@ from .standard_core import StandardPath, StandardStep
 
 class StandardFragment(Fragment):
     def __init__(
-        self,
-        seq: bytes,
-        steps: List[StandardStep],
-        homologous: bool,
-        interval: Interval,
+        self, seq: bytes, interval: Interval, path: StandardPath, homologous: bool,
     ):
-        super().__init__(seq, homologous, interval)
-        self._path = StandardPath()
-        for step in steps:
-            self._path.append_standard_step(step.state, step.seq_len)
+        super().__init__(seq, interval, homologous)
+        self._path = path
 
     def items(self) -> Iterator[Tuple[bytes, StandardStep]]:
         start = end = 0
         for step in self._path.steps():
             end += step.seq_len
-            yield (self._seq[start:end], step)
+            yield (self.sequence[start:end], step)
             start = end
 
     def __repr__(self):
         seq = self.sequence.decode()
         return f"<{self.__class__.__name__}:{seq}>"
+
+
+def _create_path(steps: List[StandardStep]):
+    path = StandardPath()
+    for step in steps:
+        path.append_standard_step(step.state, step.seq_len)
+    return path
 
 
 class StandardSearchResult(SearchResult):
@@ -46,9 +47,10 @@ class StandardSearchResult(SearchResult):
 
             if not homologous and name.startswith(b"M"):
                 if frag_start < frag_end:
-                    s = seq[frag_start:frag_end]
-                    i = Interval(frag_start + 1, frag_end)
-                    frag = StandardFragment(s, steps[idx_start:idx_end], False, i)
+                    # s = seq[frag_start:frag_end]
+                    i = Interval(frag_start, frag_end)
+                    spath = _create_path(steps[idx_start:idx_end])
+                    frag = StandardFragment(seq, i, spath, False)
                     self._fragments.append(frag)
                 homologous = True
                 frag_start = frag_end
@@ -56,9 +58,10 @@ class StandardSearchResult(SearchResult):
 
             elif homologous and name.startswith(b"E"):
                 if frag_start < frag_end:
-                    s = seq[frag_start:frag_end]
-                    i = Interval(frag_start + 1, frag_end)
-                    frag = StandardFragment(s, steps[idx_start:idx_end], True, i)
+                    # s = seq[frag_start:frag_end]
+                    i = Interval(frag_start, frag_end)
+                    spath = _create_path(steps[idx_start:idx_end])
+                    frag = StandardFragment(seq, i, spath, True)
                     self._fragments.append(frag)
                 homologous = False
                 frag_start = frag_end
@@ -66,6 +69,9 @@ class StandardSearchResult(SearchResult):
 
             frag_end += seq_len
             idx_end += 1
+
+    # def _append_fragment(self, seq: bytes, homologous: bool, ):
+    #     pass
 
     @property
     def fragments(self) -> Sequence[StandardFragment]:
