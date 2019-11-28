@@ -4,8 +4,8 @@ from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
 from .._state import MuteState, NormalState
-from .core import Profile
-from .result import Result
+from .profile import Profile
+from .result import SearchResult
 from .standard_core import (
     StandardAltModel,
     StandardNode,
@@ -50,12 +50,12 @@ class StandardProfile(Profile):
     def alt_model(self) -> StandardAltModel:
         return self._alt_model
 
-    def lr(self, seq: bytes) -> Result:
+    def search(self, seq: bytes) -> SearchResult:
         self._set_target_length(len(seq))
         score0 = self.null_model.likelihood(seq)
         score1, path = self.alt_model.viterbi(seq)
         score = score1 - score0
-        return Result(score, seq, path)
+        return SearchResult(score, seq, path)
 
 
 def create_hmmer_profile(reader: HMMEReader) -> StandardProfile:

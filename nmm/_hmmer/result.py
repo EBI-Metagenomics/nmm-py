@@ -4,7 +4,7 @@ from .._path import CPath
 from .fragment import Fragment, Interval
 
 
-class Result:
+class SearchResult:
     def __init__(self, score: float, seq: bytes, path: CPath):
         self._score = score
 

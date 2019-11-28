@@ -12,7 +12,7 @@ from .._log import LOG0, LOG1
 from .._path import CPath, Path
 from .._state import FrameState, MuteState
 from .core import AltModel, NullModel
-from .result import Result
+from .result import SearchResult
 from .transition import SpecialTransitions, Transitions
 
 Node = NamedTuple("Node", [("M", FrameState), ("I", FrameState), ("D", MuteState)])
@@ -92,15 +92,15 @@ class FrameProfile:
     def hmm(self) -> HMM:
         return self._hmm
 
-    def lr(self, seq: bytes) -> Tuple[Result, Result]:
+    def lr(self, seq: bytes) -> Tuple[SearchResult, SearchResult]:
         self._set_target_length(seq)
         score0 = self._bg.likelihood(seq)
         score1, path = self._viterbi(seq)
         score = score1 - score0
         codon_seq, codon_path = self._convert_to_codon_path(seq, path)
         return (
-            Result(score, seq, path),
-            Result(score, codon_seq, codon_path),
+            SearchResult(score, seq, path),
+            SearchResult(score, codon_seq, codon_path),
         )
 
     def _convert_to_codon_path(self, seq: bytes, path):
