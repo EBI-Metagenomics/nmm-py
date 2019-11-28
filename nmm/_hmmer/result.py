@@ -1,7 +1,7 @@
 from typing import Iterator, NamedTuple, Sequence, Tuple
 
-from .._step import Step
 from .._path import Path
+from .._step import Step
 
 Interval = NamedTuple("Interval", [("start", int), ("end", int)])
 
@@ -50,9 +50,9 @@ class SearchResult:
                     stepi = Interval(step_start, step_end)
                     yield (fragi, stepi, homologous)
 
-                homologous = not homologous
                 frag_start = frag_end
                 step_start = step_end
+                homologous = not homologous
 
             frag_end += step.seq_len
 

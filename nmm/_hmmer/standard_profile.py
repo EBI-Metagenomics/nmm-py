@@ -23,6 +23,7 @@ class StandardProfile(Profile):
         nodes_trans: Sequence[Tuple[StandardNode, Transitions]],
     ):
         super().__init__()
+
         R = NormalState(b"R", alphabet, null_lprobs)
         R.normalize()
         self._null_model = StandardNullModel(R)

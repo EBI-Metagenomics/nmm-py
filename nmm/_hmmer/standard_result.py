@@ -23,13 +23,6 @@ class StandardFragment(Fragment):
         return f"<{self.__class__.__name__}:{seq}>"
 
 
-def _create_path(steps: List[StandardStep]):
-    path = StandardPath()
-    for step in steps:
-        path.append_standard_step(step.state, step.seq_len)
-    return path
-
-
 class StandardSearchResult(SearchResult):
     def __init__(self, score: float, seq: bytes, path: StandardPath):
         self._score = score
@@ -48,3 +41,10 @@ class StandardSearchResult(SearchResult):
     @property
     def score(self) -> float:
         return self._score
+
+
+def _create_path(steps: List[StandardStep]):
+    path = StandardPath()
+    for step in steps:
+        path.append_standard_step(step.state, step.seq_len)
+    return path
