@@ -1,6 +1,6 @@
 from typing import Iterator, List, Sequence, Tuple
 
-from .result import Fragment, Interval
+from .result import Fragment, Interval, SearchResult
 from .standard_core import StandardPath, StandardStep
 
 
@@ -33,7 +33,7 @@ class StandardFragment(Fragment):
         return f"<{self.__class__.__name__}:{seq}>"
 
 
-class StandardSearchResult:
+class StandardSearchResult(SearchResult):
     def __init__(self, score: float, seq: bytes, path: StandardPath):
         self._score = score
 

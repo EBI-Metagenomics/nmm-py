@@ -1,19 +1,17 @@
-from typing import Any, Dict, List, Sequence, Tuple, Iterator
+from typing import Any, Dict, List, Sequence, Tuple
 
 from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
 from .._state import MuteState, NormalState
 from .profile import Profile
-from .standard_result import StandardFragment, StandardSearchResult
 from .standard_core import (
     StandardAltModel,
     StandardNode,
     StandardNullModel,
     StandardSpecialNode,
-    StandardStep,
-    StandardPath,
 )
+from .standard_result import StandardSearchResult
 from .transition import Transitions
 
 
