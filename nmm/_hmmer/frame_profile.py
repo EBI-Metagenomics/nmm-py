@@ -1,5 +1,5 @@
 from math import log
-from typing import Any, Dict, List, NamedTuple, Tuple
+from typing import Any, Dict, List, NamedTuple, Tuple, Sequence
 
 from hmmer_reader import HMMEReader
 
@@ -12,181 +12,194 @@ from .._log import LOG0, LOG1
 from .._path import CPath, Path
 from .._state import FrameState, MuteState
 from .core import AltModel, NullModel
+from .profile import Profile
 from .result import SearchResult
+from .frame_result import FrameSearchResult
 from .transition import SpecialTransitions, Transitions
-
-Node = NamedTuple("Node", [("M", FrameState), ("I", FrameState), ("D", MuteState)])
-
-SpecialNode = NamedTuple(
-    "SpecialNode",
-    [
-        ("S", MuteState),
-        ("N", FrameState),
-        ("B", MuteState),
-        ("E", MuteState),
-        ("J", FrameState),
-        ("C", FrameState),
-        ("T", MuteState),
-    ],
+from .frame_core import (
+    FrameAltModel,
+    FrameNode,
+    FrameNullModel,
+    FrameSpecialNode,
 )
 
 
-class FrameNullModel(NullModel):
-    def __init__(self, state: FrameState):
-        super().__init__(state)
-        self._frame_state = state
+class FrameStateFactory:
+    def __init__(
+        self,
+        bases: Alphabet,
+        gcode: GeneticCode,
+        aa_lprobs: Dict[bytes, float],
+        epsilon: float,
+    ):
+        self._bases = bases
+        self._gcode = gcode
+        self._epsilon = epsilon
+        codon_lprobs = _infer_codon_lprobs(aa_lprobs, self._gcode)
+        base_lprobs = _infer_base_lprobs(codon_lprobs, self._bases)
+        self._base_table = Base(self._bases, base_lprobs)
+        self._codon_table = CodonTable(self._bases, codon_lprobs)
+
+    def create(self, name: bytes) -> FrameState:
+        return FrameState(name, self._base_table, self._codon_table, self._epsilon)
 
     @property
-    def state(self) -> FrameState:
-        return self._frame_state
-
-
-class FrameCoreModel(AltModel):
-    pass
-
-
-class FrameProfile:
-    def __init__(self, bg: FrameNullModel):
-        self._multiple_hits: bool = True
-        self._bg = bg
-
-        alphabet = bg.state.alphabet
-        base = bg.state.base
-        codon = bg.state.codon
-        epsilon = bg.state.epsilon
-        special_node = SpecialNode(
-            S=MuteState(b"S", alphabet),
-            N=FrameState(b"N", base, codon, epsilon),
-            B=MuteState(b"B", alphabet),
-            E=MuteState(b"E", alphabet),
-            J=FrameState(b"J", base, codon, epsilon),
-            C=FrameState(b"C", base, codon, epsilon),
-            T=MuteState(b"T", alphabet),
-        )
-        hmm = HMM(alphabet)
-        hmm.add_state(special_node.S, LOG1)
-        hmm.add_state(special_node.N)
-        hmm.add_state(special_node.B)
-        hmm.add_state(special_node.E)
-        hmm.add_state(special_node.J)
-        hmm.add_state(special_node.C)
-        hmm.add_state(special_node.T)
-
-        self._hmm = hmm
-        self._special_node = special_node
-        self._special_trans = SpecialTransitions()
-
-        self._core_nodes: List[Node] = []
-
-    def core_model(self):
-        return FrameCoreModel(self._hmm, self._core_nodes, self._finalize)
+    def bases(self) -> Alphabet:
+        return self._bases
 
     @property
-    def length(self):
-        return len(self._core_nodes)
-
-    def set_multiple_hits(self, multiple_hits: bool):
-        self._multiple_hits = multiple_hits
+    def genetic_code(self) -> GeneticCode:
+        return self._gcode
 
     @property
-    def hmm(self) -> HMM:
-        return self._hmm
+    def epsilon(self) -> float:
+        return self._epsilon
 
-    def lr(self, seq: bytes) -> Tuple[SearchResult, SearchResult]:
-        self._set_target_length(seq)
-        score0 = self._bg.likelihood(seq)
-        score1, path = self._viterbi(seq)
-        score = score1 - score0
-        codon_seq, codon_path = self._convert_to_codon_path(seq, path)
-        return (
-            SearchResult(score, seq, path),
-            SearchResult(score, codon_seq, codon_path),
+
+class FrameProfile(Profile):
+    def __init__(
+        self,
+        fstate_factory: FrameStateFactory,
+        nodes_trans: Sequence[Tuple[FrameNode, Transitions]],
+    ):
+        super().__init__()
+
+        R = fstate_factory.create(b"R")
+        self._null_model = FrameNullModel(R)
+
+        # emission_table = R.emission_table()
+        # special_node = FrameSpecialNode(
+        #     S=MuteState(b"S", alphabet),
+        #     N=FrameState(b"N", alphabet, emission_table),
+        #     B=MuteState(b"B", alphabet),
+        #     E=MuteState(b"E", alphabet),
+        #     J=FrameState(b"J", alphabet, emission_table),
+        #     C=FrameState(b"C", alphabet, emission_table),
+        #     T=MuteState(b"T", alphabet),
+        # )
+
+        # base = bg.state.base
+        # codon = bg.state.codon
+        # epsilon = bg.state.epsilon
+        special_node = FrameSpecialNode(
+            S=MuteState(b"S", fstate_factory.bases),
+            N=fstate_factory.create(b"N"),
+            B=MuteState(b"B", fstate_factory.bases),
+            E=MuteState(b"E", fstate_factory.bases),
+            J=fstate_factory.create(b"J"),
+            C=fstate_factory.create(b"C"),
+            T=MuteState(b"T", fstate_factory.bases),
         )
 
-    def _convert_to_codon_path(self, seq: bytes, path):
-        nseq: List[bytes] = []
-        npath = Path()
-        start: int = 0
-        for step in path.steps():
-            state = self._hmm.states()[step.state.imm_state]
-            if step.seq_len == 0:
-                npath.append(state, 0)
-            else:
-                fstate: FrameState = state
-                decoded_codon = fstate.decode(seq[start : start + step.seq_len])
-                nseq.append(decoded_codon.codon)
-                npath.append(fstate, 3)
-            start += step.seq_len
-
-        return (b"".join(nseq), npath)
-
-    def _finalize(self):
+        self._alt_model = FrameAltModel(special_node, nodes_trans)
         self._set_fragment_length()
 
-    def _set_fragment_length(self):
-        if self.length == 0:
-            return
+    @property
+    def null_model(self) -> FrameNullModel:
+        return self._null_model
 
-        B = self._special_node.B
-        E = self._special_node.E
+    @property
+    def alt_model(self) -> FrameAltModel:
+        return self._alt_model
 
-        # Uniform local alignment fragment length distribution
-        t = self._special_trans
-        t.BM = log(2) - log(self.length) - log(self.length + 1)
-        t.ME = 0.0
-        for node in self._core_nodes:
-            self._hmm.set_transition(B, node.M, t.BM)
-            self._hmm.set_transition(node.M, E, t.ME)
+    def search(self, seq: bytes) -> FrameSearchResult:
+        self._set_target_length(len(seq))
+        score0 = self.null_model.likelihood(seq)
+        score1, path = self.alt_model.viterbi(seq)
+        score = score1 - score0
+        return FrameSearchResult(score, seq, path)
 
-        for node in self._core_nodes[1:]:
-            self._hmm.set_transition(node.D, E, 0.0)
+    # def lr(self, seq: bytes) -> Tuple[SearchResult, SearchResult]:
+    #     self._set_target_length(seq)
+    #     score0 = self._bg.likelihood(seq)
+    #     score1, path = self._viterbi(seq)
+    #     score = score1 - score0
+    #     codon_seq, codon_path = self._convert_to_codon_path(seq, path)
+    #     return (
+    #         SearchResult(score, seq, path),
+    #         SearchResult(score, codon_seq, codon_path),
+    #     )
 
-    def _set_target_length(self, seq: bytes):
-        from math import exp
+    # def _convert_to_codon_path(self, seq: bytes, path):
+    #     nseq: List[bytes] = []
+    #     npath = Path()
+    #     start: int = 0
+    #     for step in path.steps():
+    #         state = self._hmm.states()[step.state.imm_state]
+    #         if step.seq_len == 0:
+    #             npath.append(state, 0)
+    #         else:
+    #             fstate: FrameState = state
+    #             decoded_codon = fstate.decode(seq[start : start + step.seq_len])
+    #             nseq.append(decoded_codon.codon)
+    #             npath.append(fstate, 3)
+    #         start += step.seq_len
 
-        L = len(seq)
-        if L == 0:
-            return
+    #     return (b"".join(nseq), npath)
 
-        if self._multiple_hits:
-            lq = -log(2)
-        else:
-            lq = LOG0
+    # def _finalize(self):
+    #     self._set_fragment_length()
 
-        q = exp(lq)
-        lp = log(L) - log(L + 2 + q / (1 - q))
-        l1p = log(2 + q / (1 - q)) - log(L + 2 + q / (1 - q))
-        lr = log(L) - log(L + 1)
+    # def _set_fragment_length(self):
+    #     if self.length == 0:
+    #         return
 
-        t = self._special_trans
+    #     B = self._special_node.B
+    #     E = self._special_node.E
 
-        t.NN = t.CC = t.JJ = lp
-        t.NB = t.CT = t.JB = l1p
-        t.RR = lr
-        t.EC = t.EJ = lq
+    #     # Uniform local alignment fragment length distribution
+    #     t = self._special_trans
+    #     t.BM = log(2) - log(self.length) - log(self.length + 1)
+    #     t.ME = 0.0
+    #     for node in self._core_nodes:
+    #         self._hmm.set_transition(B, node.M, t.BM)
+    #         self._hmm.set_transition(node.M, E, t.ME)
 
-        node = self._special_node
+    #     for node in self._core_nodes[1:]:
+    #         self._hmm.set_transition(node.D, E, 0.0)
 
-        self._hmm.set_transition(node.S, node.B, t.NB)
-        self._hmm.set_transition(node.S, node.N, t.NN)
-        self._hmm.set_transition(node.N, node.N, t.NN)
-        self._hmm.set_transition(node.N, node.B, t.NB)
+    # def _set_target_length(self, seq: bytes):
+    #     from math import exp
 
-        self._hmm.set_transition(node.E, node.T, t.EC + t.CT)
-        self._hmm.set_transition(node.E, node.C, t.EC + t.CC)
-        self._hmm.set_transition(node.C, node.C, t.CC)
-        self._hmm.set_transition(node.C, node.T, t.CT)
+    #     L = len(seq)
+    #     if L == 0:
+    #         return
 
-        self._hmm.set_transition(node.E, node.B, t.EJ + t.JB)
-        self._hmm.set_transition(node.E, node.J, t.EJ + t.JJ)
-        self._hmm.set_transition(node.J, node.J, t.JJ)
-        self._hmm.set_transition(node.J, node.B, t.JB)
+    #     if self._multiple_hits:
+    #         lq = -log(2)
+    #     else:
+    #         lq = LOG0
 
-        self._bg.set_transition(t.RR)
+    #     q = exp(lq)
+    #     lp = log(L) - log(L + 2 + q / (1 - q))
+    #     l1p = log(2 + q / (1 - q)) - log(L + 2 + q / (1 - q))
+    #     lr = log(L) - log(L + 1)
 
-    def _viterbi(self, seq: bytes) -> Tuple[float, CPath]:
-        self._set_target_length(seq)
-        return self._hmm.viterbi(seq, self._special_node.T)
+    #     t = self._special_trans
+
+    #     t.NN = t.CC = t.JJ = lp
+    #     t.NB = t.CT = t.JB = l1p
+    #     t.RR = lr
+    #     t.EC = t.EJ = lq
+
+    #     node = self._special_node
+
+    #     self._hmm.set_transition(node.S, node.B, t.NB)
+    #     self._hmm.set_transition(node.S, node.N, t.NN)
+    #     self._hmm.set_transition(node.N, node.N, t.NN)
+    #     self._hmm.set_transition(node.N, node.B, t.NB)
+
+    #     self._hmm.set_transition(node.E, node.T, t.EC + t.CT)
+    #     self._hmm.set_transition(node.E, node.C, t.EC + t.CC)
+    #     self._hmm.set_transition(node.C, node.C, t.CC)
+    #     self._hmm.set_transition(node.C, node.T, t.CT)
+
+    #     self._hmm.set_transition(node.E, node.B, t.EJ + t.JB)
+    #     self._hmm.set_transition(node.E, node.J, t.EJ + t.JJ)
+    #     self._hmm.set_transition(node.J, node.J, t.JJ)
+    #     self._hmm.set_transition(node.J, node.B, t.JB)
+
+    #     self._bg.set_transition(t.RR)
 
 
 def _infer_codon_lprobs(aa_lprobs: Dict[bytes, float], gencode: GeneticCode):
@@ -222,24 +235,10 @@ def _infer_base_lprobs(codon_lprobs, alphabet: Alphabet):
     return {b: logsumexp(lp) for b, lp in lprobs.items()}
 
 
-class _FrameStateFactory:
-    def __init__(self, bases: Alphabet, gcode: GeneticCode, epsilon: float):
-        self._bases = bases
-        self._gcode = gcode
-        self._epsilon = epsilon
-
-    def create(self, name: bytes, aa_lprobs: Dict[bytes, float]) -> FrameState:
-        codon_lprobs = _infer_codon_lprobs(aa_lprobs, self._gcode)
-        base_lprobs = _infer_base_lprobs(codon_lprobs, self._bases)
-        base = Base(self._bases, base_lprobs)
-        codon = CodonTable(self._bases, codon_lprobs)
-        return FrameState(name, base, codon, self._epsilon)
-
-
 def create_frame_profile(reader: HMMEReader, epsilon: float = 0.1) -> FrameProfile:
     bases = Alphabet(b"ACGU")
-    ffact = _FrameStateFactory(bases, GeneticCode(), epsilon)
-    R = ffact.create(b"R", _bytes_dict(reader.insert(0)))
+    ffact = FrameStateFactory(bases, GeneticCode(), epsilon)
+    R = ffact.create(b"R", _dict(reader.insert(0)))
 
     # TODO: the null model is not property set.
     # It is supposed to be temporary.
@@ -248,8 +247,8 @@ def create_frame_profile(reader: HMMEReader, epsilon: float = 0.1) -> FrameProfi
     with hmmer.core_model() as core:
         for m in range(1, reader.M + 1):
             node = Node(
-                M=ffact.create(f"M{m}".encode(), _bytes_dict(reader.match(m))),
-                I=ffact.create(f"I{m}".encode(), _bytes_dict(reader.insert(m))),
+                M=ffact.create(f"M{m}".encode(), _dict(reader.match(m))),
+                I=ffact.create(f"I{m}".encode(), _dict(reader.insert(m))),
                 D=MuteState(f"D{m}".encode(), bases),
             )
             trans = Transitions(**reader.trans(m - 1))
@@ -259,5 +258,5 @@ def create_frame_profile(reader: HMMEReader, epsilon: float = 0.1) -> FrameProfi
     return hmmer
 
 
-def _bytes_dict(d: Dict[str, Any]):
+def _dict(d: Dict[str, Any]):
     return {k.encode(): v for k, v in d.items()}

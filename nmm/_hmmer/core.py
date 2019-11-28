@@ -128,3 +128,6 @@ class AltModel:
     @property
     def length(self) -> int:
         raise NotImplementedError()
+
+    def viterbi(self, seq: bytes) -> Tuple[float, Path]:
+        return self._hmm.viterbi(seq, self.special_node.T)

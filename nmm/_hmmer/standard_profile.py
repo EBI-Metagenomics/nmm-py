@@ -22,7 +22,6 @@ class StandardProfile(Profile):
         null_lprobs: Dict[bytes, float],
         nodes_trans: Sequence[Tuple[StandardNode, Transitions]],
     ):
-
         super().__init__()
         R = NormalState(b"R", alphabet, null_lprobs)
         R.normalize()

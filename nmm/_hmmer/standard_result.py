@@ -15,7 +15,7 @@ class StandardFragment(Fragment):
         super().__init__(seq, homologous, interval)
         self._path = StandardPath()
         for step in steps:
-            self._path.append_standard(step.state, step.seq_len)
+            self._path.append_standard_step(step.state, step.seq_len)
 
     def items(self) -> Iterator[Tuple[bytes, StandardStep]]:
         start = end = 0
@@ -23,10 +23,6 @@ class StandardFragment(Fragment):
             end += step.seq_len
             yield (self._seq[start:end], step)
             start = end
-
-    @property
-    def homologous(self):
-        return self._homologous
 
     def __repr__(self):
         seq = self.sequence.decode()
