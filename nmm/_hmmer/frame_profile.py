@@ -1,5 +1,5 @@
 from math import log
-from typing import Any, Dict, List, NamedTuple, Tuple, Sequence
+from typing import Any, Dict, List, Sequence, Tuple
 
 from hmmer_reader import HMMEReader
 
@@ -7,15 +7,11 @@ from .._alphabet import Alphabet
 from .._base import Base
 from .._codon import CodonTable
 from .._gencode import GeneticCode
-from .._hmm import HMM
-from .._log import LOG0, LOG1
-from .._path import CPath, Path
+from .._log import LOG0
 from .._state import FrameState, MuteState
-from .core import AltModel, NullModel
 from .profile import Profile
-from .result import SearchResult
 from .frame_result import FrameSearchResult
-from .transition import SpecialTransitions, Transitions
+from .transition import Transitions
 from .frame_core import (
     FrameAltModel,
     FrameNode,
