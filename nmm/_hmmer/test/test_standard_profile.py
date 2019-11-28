@@ -4,7 +4,7 @@ from numpy.testing import assert_allclose, assert_equal
 from nmm import read_hmmer, create_hmmer_profile
 
 
-def test_read_hmmer_unihit_homologous_1(tmp_path):
+def test_standard_profile_unihit_homologous_1(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
     reader = read_hmmer(filepath)
     hmmer = create_hmmer_profile(reader)
@@ -18,7 +18,7 @@ def test_read_hmmer_unihit_homologous_1(tmp_path):
     assert_equal(frag.sequence, most_likely_seq)
 
 
-def test_read_hmmer_unihit_homologous_2(tmp_path):
+def test_standard_profile_unihit_homologous_2(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
     reader = read_hmmer(filepath)
     hmmer = create_hmmer_profile(reader)
@@ -32,7 +32,7 @@ def test_read_hmmer_unihit_homologous_2(tmp_path):
     assert_equal(frag.sequence, seq)
 
 
-def test_read_hmmer_unihit_homologous_3(tmp_path):
+def test_standard_profile_unihit_homologous_3(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
     reader = read_hmmer(filepath)
     hmmer = create_hmmer_profile(reader)
@@ -46,7 +46,7 @@ def test_read_hmmer_unihit_homologous_3(tmp_path):
     assert_equal(frag.sequence, seq)
 
 
-def test_read_hmmer_nonhomo_and_homologous(tmp_path):
+def test_standard_profile_nonhomo_and_homologous(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
     reader = read_hmmer(filepath)
     hmmer = create_hmmer_profile(reader)
@@ -61,7 +61,7 @@ def test_read_hmmer_nonhomo_and_homologous(tmp_path):
     assert_equal(frags[1].sequence, b"PGKEDNNK")
 
 
-def test_read_hmmer_multihit_homologous(tmp_path):
+def test_standard_profile_multihit_homologous(tmp_path):
     filepath = write_file(tmp_path, "PF03373.hmm")
     reader = read_hmmer(filepath)
     hmmer = create_hmmer_profile(reader)
@@ -115,7 +115,7 @@ def test_read_hmmer_multihit_homologous(tmp_path):
 def write_file(path, filename):
     import nmm
 
-    text = pkg_resources.read_text(nmm.test, filename)
+    text = pkg_resources.read_text(nmm._hmmer.test, filename)
 
     with open(path / filename, "w") as f:
         f.write(text)
