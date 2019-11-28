@@ -2,7 +2,7 @@ from typing import Dict, Iterator, List, Sequence, Tuple, TypeVar, Union
 
 from .._ffi import ffi
 from .._path import Path
-from .._state import MuteState, FrameState
+from .._state import MuteState, FrameState, State
 from .._step import Step
 from .core import AltModel, Node, NullModel, SpecialNode
 from .transition import Transitions
@@ -31,10 +31,16 @@ class FramePath(Path):
     def append_frame_step(
         self, state: Union[MuteState, FrameState], seq_len: int
     ) -> ffi.CData:
-        imm_step = super().append(state, seq_len)
+        imm_step = self._append_imm_step(state.imm_state, seq_len)
         step = FrameStep(imm_step, state, seq_len)
         self._steps.append(step)
         return step
+
+    def append(self, state: State, seq_len: int) -> ffi.CData:
+        # TODO: think in a better solution
+        raise RuntimeError("Call `append_frame_step` instead.")
+        del state
+        del seq_len
 
     def steps(self) -> Iterator[FrameStep]:
         return iter(self._steps)

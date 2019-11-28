@@ -35,7 +35,7 @@ class CPath:
             yield CStep(step)
             step = lib.imm_path_next(self.__imm_path, step)
 
-    def append(self, state: ffi.CData, seq_len: int) -> ffi.CData:
+    def _append_imm_step(self, state: ffi.CData, seq_len: int) -> ffi.CData:
         err: int = lib.imm_path_append(self.__imm_path, state, seq_len)
         if err != 0:
             raise RuntimeError("Could not add step.")
@@ -80,7 +80,7 @@ class Path(CPath):
         return path
 
     def append(self, state: State, seq_len: int) -> ffi.CData:
-        imm_step = super().append(state.imm_state, seq_len)
+        imm_step = self._append_imm_step(state.imm_state, seq_len)
         step = Step(imm_step, state, seq_len)
         self.__steps.append(step)
         return step

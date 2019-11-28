@@ -17,6 +17,7 @@ from .frame_core import (
     FrameNode,
     FrameNullModel,
     FrameSpecialNode,
+    FramePath,
 )
 
 

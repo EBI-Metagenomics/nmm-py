@@ -2,6 +2,7 @@ from typing import Iterator, List, Sequence, Tuple
 
 from .result import Fragment, Interval, SearchResult
 from .frame_core import FramePath, FrameStep
+from .._state import MuteState, FrameState
 
 
 class FrameFragment(Fragment):
@@ -17,6 +18,28 @@ class FrameFragment(Fragment):
             end += step.seq_len
             yield (self.sequence[start:end], step)
             start = end
+
+    def convert_to_codons(self):
+        nseq: List[bytes] = []
+        npath = FramePath()
+
+        start: int = 0
+        seq = self.sequence
+        for step in self._path.steps():
+            if isinstance(step.state, MuteState):
+                npath.append_frame_step(step.state, 0)
+            else:
+                assert isinstance(step.state, FrameState)
+                decoded_codon = step.state.decode(seq[start : start + step.seq_len])
+                nseq.append(decoded_codon.codon)
+                npath.append_frame_step(step.state, 3)
+
+            start += step.seq_len
+
+        # TODO: Interval in the Fragment was not the greatest idea,
+        # it create a dependency on the preceding fragments. Fix it.
+        interval = Interval(0, len(seq))
+        return FrameFragment(b"".join(nseq), interval, npath, self.homologous)
 
     def __repr__(self):
         seq = self.sequence.decode()
