@@ -1,16 +1,18 @@
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Any, Dict, List, Sequence, Tuple, Iterator
 
 from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
 from .._state import MuteState, NormalState
 from .profile import Profile
-from .result import SearchResult
+from .standard_result import StandardFragment, StandardSearchResult
 from .standard_core import (
     StandardAltModel,
     StandardNode,
     StandardNullModel,
     StandardSpecialNode,
+    StandardStep,
+    StandardPath,
 )
 from .transition import Transitions
 
@@ -50,12 +52,12 @@ class StandardProfile(Profile):
     def alt_model(self) -> StandardAltModel:
         return self._alt_model
 
-    def search(self, seq: bytes) -> SearchResult:
+    def search(self, seq: bytes) -> StandardSearchResult:
         self._set_target_length(len(seq))
         score0 = self.null_model.likelihood(seq)
         score1, path = self.alt_model.viterbi(seq)
         score = score1 - score0
-        return SearchResult(score, seq, path)
+        return StandardSearchResult(score, seq, path)
 
 
 def create_standard_profile(reader: HMMEReader) -> StandardProfile:
