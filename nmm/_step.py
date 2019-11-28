@@ -56,12 +56,12 @@ class Step(CStep):
 
     def __init__(self, imm_step: ffi.CData, state: State, seq_len: int):
         super().__init__(imm_step)
-        self._state = state
+        self.__state = state
         self._seq_len = seq_len
 
     @property
     def state(self) -> State:
-        return self._state
+        return self.__state
 
     @property
     def seq_len(self) -> int:

@@ -113,18 +113,22 @@ class HMM:
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
-    def viterbi(self, seq: bytes, end_state: State) -> Tuple[float, CPath]:
-        cpath = lib.imm_path_create()
-        if cpath == ffi.NULL:
-            raise RuntimeError("Could not create `cpath`.")
+    def viterbi(self, seq: bytes, end_state: State) -> Tuple[float, Path]:
+        imm_path = lib.imm_path_create()
+        if imm_path == ffi.NULL:
+            raise RuntimeError("Could not create `imm_path`.")
         try:
             imm_state = end_state.imm_state
-            lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, imm_state, cpath)
+            lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, imm_state, imm_path)
         except Exception as e:
-            lib.imm_path_destroy(cpath)
+            lib.imm_path_destroy(imm_path)
             raise e
 
-        return (lprob, CPath(cpath))
+        path = Path()
+        for step in CPath(imm_path).steps():
+            path.append(self._states[step.state.imm_state], step.seq_len)
+
+        return (lprob, path)
 
     def __del__(self):
         if self._hmm != ffi.NULL:

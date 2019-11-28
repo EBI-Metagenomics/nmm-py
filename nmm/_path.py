@@ -1,4 +1,4 @@
-from typing import List, Sequence, Tuple, Type, TypeVar, Optional
+from typing import List, Sequence, Tuple, Type, TypeVar, Optional, Iterator
 
 from ._ffi import ffi, lib
 from ._step import CStep, Step
@@ -29,7 +29,7 @@ class CPath:
     def imm_path(self) -> ffi.CData:
         return self.__cdata
 
-    def steps(self):
+    def steps(self) -> Iterator[CStep]:
         step = lib.imm_path_first(self.__cdata)
         while step != ffi.NULL:
             yield CStep(step)
@@ -70,7 +70,7 @@ class Path(CPath):
 
     def __init__(self):
         super().__init__()
-        self._steps: List[Step] = []
+        self.__steps: List[Step] = []
 
     @classmethod
     def create(cls: Type[T], steps: Sequence[Tuple[State, int]]) -> T:
@@ -82,5 +82,5 @@ class Path(CPath):
     def append(self, state: State, seq_len: int) -> ffi.CData:
         imm_step = super().append(state.imm_state, seq_len)
         step = Step(imm_step, state, seq_len)
-        self._steps.append(step)
+        self.__steps.append(step)
         return step
