@@ -1,6 +1,7 @@
 from typing import Iterator, NamedTuple, Sequence, Tuple
 
 from .._step import Step
+from .._path import Path
 
 Interval = NamedTuple("Interval", [("start", int), ("end", int)])
 
@@ -32,6 +33,29 @@ class Fragment:
 
 
 class SearchResult:
+    def _create_fragments(self, path: Path):
+
+        frag_start = frag_end = 0
+        step_start = step_end = 0
+        homologous = False
+
+        for step_end, step in enumerate(path.steps()):
+
+            change = not homologous and step.state.name.startswith(b"M")
+            change = change or homologous and step.state.name.startswith(b"E")
+
+            if change:
+                if frag_start < frag_end:
+                    fragi = Interval(frag_start, frag_end)
+                    stepi = Interval(step_start, step_end)
+                    yield (fragi, stepi, homologous)
+
+                homologous = not homologous
+                frag_start = frag_end
+                step_start = step_end
+
+            frag_end += step.seq_len
+
     @property
     def fragments(self) -> Sequence[Fragment]:
         raise NotImplementedError()

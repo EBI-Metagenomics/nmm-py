@@ -28,15 +28,6 @@ class StandardPath(Path):
         super().__init__()
         self._steps: List[StandardStep] = []
 
-    # @classmethod
-    # def create_standard_path(
-    #     cls: Type[T], steps: Sequence[Tuple[Union[MuteState, NormalState], int]]
-    # ) -> T:
-    #     path = cls()
-    #     for state, seq_len in steps:
-    #         path.append(state, seq_len)
-    #     return path
-
     def append_standard_step(
         self, state: Union[MuteState, NormalState], seq_len: int
     ) -> ffi.CData:
