@@ -1,9 +1,7 @@
-from typing import Callable, List, Sequence, Tuple
+from typing import Sequence, Tuple
 
-
-from .._hmm import HMM
-from .._state import MuteState, NormalState
 from .._path import CPath
+from .._state import MuteState, NormalState
 from .core import AltModel, Node, NullModel, SpecialNode
 from .transition import Transitions
 
@@ -89,19 +87,11 @@ class StandardAltModel(AltModel):
     def __init__(
         self,
         special_node: StandardSpecialNode,
-        core_nodes_trans: Sequence[Tuple[StandardNode, Transitions]],
+        nodes_trans: Sequence[Tuple[StandardNode, Transitions]],
     ):
         self._special_node = special_node
-        super().__init__(special_node, core_nodes_trans)
-        self._core_nodes = [nt[0] for nt in core_nodes_trans]
-
-    # def add_node(self, node: StandardNode, trans: Transitions):
-
-    #     self._core_nodes.append(node)
-    #     self._add_node(node, trans)
-
-    #     if len(self._core_nodes) == 1:
-    #         return
+        self._core_nodes = [nt[0] for nt in nodes_trans]
+        super().__init__(special_node, nodes_trans)
 
     @property
     def length(self):

@@ -6,13 +6,13 @@ from .._alphabet import Alphabet
 from .._state import MuteState, NormalState
 from .core import Profile
 from .result import Result
-from .transition import Transitions
 from .standard_core import (
-    StandardNullModel,
     StandardAltModel,
-    StandardSpecialNode,
     StandardNode,
+    StandardNullModel,
+    StandardSpecialNode,
 )
+from .transition import Transitions
 
 
 class StandardProfile(Profile):
@@ -49,13 +49,6 @@ class StandardProfile(Profile):
     @property
     def alt_model(self) -> StandardAltModel:
         return self._alt_model
-
-    # @property
-    # def length(self):
-    #     return len(self._core_nodes)
-
-    # def core_nodes(self) -> Sequence[StandardNode]:
-    #     return self._core_nodes
 
     def lr(self, seq: bytes) -> Result:
         self._set_target_length(len(seq))

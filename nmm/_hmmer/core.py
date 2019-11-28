@@ -1,9 +1,9 @@
-from typing import Callable, Sequence, Tuple
+from typing import Sequence, Tuple
 
 from math import log
 from .._hmm import HMM
 from .._log import LOG1, LOG0
-from .._path import Path, CPath
+from .._path import Path
 from .._state import State, MuteState
 from .transition import Transitions, SpecialTransitions
 
@@ -60,10 +60,6 @@ class NullModel:
     @property
     def state(self) -> State:
         raise NotImplementedError()
-
-    # @property
-    # def hmm(self) -> HMM:
-    #     return self._hmm
 
     def set_transition(self, lprob: float):
         self._hmm.set_transition(self.state, self.state, lprob)
@@ -154,13 +150,6 @@ class Profile:
     @multiple_hits.setter
     def multiple_hits(self, multiple_hits: bool):
         self._multiple_hits = multiple_hits
-
-    # @property
-    # def hmm(self) -> HMM:
-    #     return self._hmm
-
-    # def _finalize(self):
-    #     self._set_fragment_length()
 
     def _set_fragment_length(self):
         if self.alt_model.length == 0:
