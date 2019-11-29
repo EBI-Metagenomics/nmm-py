@@ -30,3 +30,6 @@ def test_alphabet():
 
     with pytest.raises(TypeError):
         Alphabet("ACGTç")
+
+    with pytest.raises(RuntimeError):
+        Alphabet("ACGTç".encode())

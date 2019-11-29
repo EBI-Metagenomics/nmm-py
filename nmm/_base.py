@@ -24,7 +24,7 @@ class CBase:
             if alphabet is None:
                 raise ValueError("`alphabet` is `None`")
 
-            self.__cdata = lib.nmm_base_create(alphabet.imm_abc)
+            self.__cdata = lib.nmm_baset_create(alphabet.imm_abc)
         else:
             if alphabet is not None:
                 raise ValueError("`alphabet` is not `None`")
@@ -40,14 +40,14 @@ class CBase:
 
     @property
     def imm_abc(self) -> ffi.CData:
-        return lib.nmm_base_get_abc(self.__cdata)
+        return lib.nmm_baset_get_abc(self.__cdata)
 
     def set_lprob(self, nucleotide: bytes, lprob: float) -> None:
         letter = nucleotide
         if len(letter) != 1:
             raise ValueError("Nucleotide must be a single letter.")
 
-        err: int = lib.nmm_base_set_lprob(self.__cdata, letter, lprob)
+        err: int = lib.nmm_baset_set_lprob(self.__cdata, letter, lprob)
         if err != 0:
             nucl = nucleotide.decode()
             raise ValueError(f"Could not set a probability for `{nucl}`.")
@@ -57,16 +57,16 @@ class CBase:
         if len(letter) != 1:
             raise ValueError("Nucleotide must be a single letter.")
 
-        return lib.nmm_base_get_lprob(self.__cdata, letter)
+        return lib.nmm_baset_get_lprob(self.__cdata, letter)
 
     def normalize(self) -> None:
-        err: int = lib.nmm_base_normalize(self.__cdata)
+        err: int = lib.nmm_baset_normalize(self.__cdata)
         if err != 0:
             raise RuntimeError("Normalization error.")
 
     def __del__(self):
         if self.__cdata != ffi.NULL:
-            lib.nmm_base_destroy(self.__cdata)
+            lib.nmm_baset_destroy(self.__cdata)
 
 
 class Base(CBase):
