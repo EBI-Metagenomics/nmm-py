@@ -3,12 +3,12 @@ import pytest
 from numpy import nan
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import LOG0, Alphabet, Base
+from nmm import LOG0, Alphabet, BaseTable
 
 
 def test_base():
     alphabet = Alphabet(b"ACGT")
-    base = Base(alphabet)
+    base = BaseTable(alphabet)
     base.set_lprob(b"A", log(0.3))
     base.set_lprob(b"T", log(0.3))
 

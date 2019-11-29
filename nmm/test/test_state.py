@@ -6,7 +6,7 @@ from numpy.testing import assert_allclose, assert_equal
 from nmm import (
     LOG0,
     Alphabet,
-    Base,
+    BaseTable,
     CodonTable,
     FrameState,
     MuteState,
@@ -84,7 +84,7 @@ def test_table_state():
 
 def test_frame_state():
     alphabet = Alphabet(b"ACGU")
-    base = Base(
+    base = BaseTable(
         alphabet, {b"A": log(0.25), b"C": log(0.25), b"G": log(0.25), b"U": log(0.25)}
     )
     codon = CodonTable(alphabet, {b"AUG": log(0.8), b"AUU": log(0.1)})
@@ -110,7 +110,7 @@ def test_frame_state():
     assert_allclose(frame_state.lprob(b"AUUAAA"), LOG0)
 
     alphabet = Alphabet(b"ACGT")
-    base = Base(
+    base = BaseTable(
         alphabet, {b"A": log(0.1), b"C": log(0.2), b"G": log(0.3), b"T": log(0.4)}
     )
     codon = CodonTable(alphabet, {b"ATG": log(0.8), b"ATT": log(0.1), b"GTC": log(0.4)})

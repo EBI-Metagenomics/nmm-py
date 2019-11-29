@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Sequence, Tuple
 from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
-from .._base import Base
+from .._base import BaseTable
 from .._codon import CodonTable
 from .._gencode import GeneticCode
 from .._log import LOG0
@@ -17,7 +17,6 @@ from .frame_core import (
     FrameNode,
     FrameNullModel,
     FrameSpecialNode,
-    FramePath,
 )
 
 
@@ -32,7 +31,7 @@ class FrameStateFactory:
     def create(self, name: bytes, aa_lprobs: Dict[bytes, float]) -> FrameState:
         codon_lprobs = _infer_codon_lprobs(aa_lprobs, self._gcode)
         base_lprobs = _infer_base_lprobs(codon_lprobs, self._bases)
-        base_table = Base(self._bases, base_lprobs)
+        base_table = BaseTable(self._bases, base_lprobs)
         codon_table = CodonTable(self._bases, codon_lprobs)
         return FrameState(name, base_table, codon_table, self._epsilon)
 

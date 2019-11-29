@@ -1,7 +1,7 @@
 from typing import Dict, NamedTuple
 
 from ._alphabet import Alphabet
-from ._base import Base
+from ._base import BaseTable
 from ._codon import CodonTable
 from ._ffi import ffi, lib
 from ._log import LOG0
@@ -154,13 +154,13 @@ class TableState(State):
 
 
 class FrameState(State):
-    def __init__(self, name: bytes, base: Base, codon: CodonTable, epsilon: float):
+    def __init__(self, name: bytes, base: BaseTable, codon: CodonTable, epsilon: float):
         """
         Parameters
         ----------
         name : Name.
-        base : Base.
-        codon : Codon.
+        base : Base table.
+        codon : Codon table.
         epsilon : Epsilon.
         """
         if set(base.alphabet.symbols) != set(codon.alphabet.symbols):
@@ -171,7 +171,7 @@ class FrameState(State):
         self._epsilon = epsilon
 
         cdata = lib.nmm_frame_state_create(
-            name, base.nmm_base, codon.nmm_codon, epsilon
+            name, base.nmm_baset, codon.nmm_codont, epsilon
         )
         if cdata == ffi.NULL:
             raise RuntimeError("Could not create state.")
@@ -180,7 +180,7 @@ class FrameState(State):
         super().__init__(lib.imm_state_cast_c(cdata), codon.alphabet)
 
     @property
-    def base(self) -> Base:
+    def base(self) -> BaseTable:
         return self._base
 
     @property
