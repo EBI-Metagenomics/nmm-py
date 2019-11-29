@@ -27,6 +27,7 @@ def test_standard_profile_unihit_homologous_2(PF03373):
     frag = frags[0]
     assert_equal(frag.homologous, True)
     assert_equal(frag.sequence, seq)
+    assert_equal(str(frag), "<StandardFragment:PGKENNK>")
 
 
 def test_standard_profile_unihit_homologous_3(PF03373):

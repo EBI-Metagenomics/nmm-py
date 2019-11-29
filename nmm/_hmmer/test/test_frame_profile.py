@@ -17,6 +17,7 @@ def test_frame_profile_frame1(PF03373):
     frag = frags[0]
     assert_equal(frag.homologous, True)
     assert_equal(frag.sequence, most_likely_rna_seq)
+    assert_equal(str(frag), "<FrameFragment:CCUGGUAAAGAAGAUAAUAACAAA>")
 
 
 def test_frame_profile_frame2(PF03373):

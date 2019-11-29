@@ -1,4 +1,5 @@
 from typing import Iterator, NamedTuple, Sequence, Tuple
+from abc import ABC, abstractmethod
 
 from .._path import Path
 from .._step import Step
@@ -6,7 +7,7 @@ from .._step import Step
 Interval = NamedTuple("Interval", [("start", int), ("end", int)])
 
 
-class Fragment:
+class Fragment(ABC):
     def __init__(self, sequence: bytes, homologous: bool):
         self._sequence = sequence
         self._homologous = homologous
@@ -15,6 +16,7 @@ class Fragment:
     def sequence(self) -> bytes:
         return self._sequence
 
+    @abstractmethod
     def items(self) -> Iterator[Tuple[bytes, Step]]:
         raise NotImplementedError()
 
@@ -22,12 +24,8 @@ class Fragment:
     def homologous(self) -> bool:
         return self._homologous
 
-    def __repr__(self):
-        seq = self.sequence.decode()
-        return f"<{self.__class__.__name__}:{seq}>"
 
-
-class SearchResult:
+class SearchResult(ABC):
     def _create_fragments(self, path: Path):
 
         frag_start = frag_end = 0
@@ -52,13 +50,16 @@ class SearchResult:
             frag_end += step.seq_len
 
     @property
+    @abstractmethod
     def fragments(self) -> Sequence[Fragment]:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def interval(self) -> Sequence[Interval]:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def score(self) -> float:
         raise NotImplementedError()
