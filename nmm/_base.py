@@ -22,6 +22,7 @@ class CBaseTable:
         nmm_baset: Optional[ffi.CData] = None,
         alphabet: Optional[CAlphabet] = None,
     ):
+        self.__nmm_baset = ffi.NULL
         if nmm_baset is None:
             if alphabet is None:
                 raise ValueError("`alphabet` is `None`")
@@ -34,7 +35,7 @@ class CBaseTable:
             self.__nmm_baset = nmm_baset
 
         if self.__nmm_baset == ffi.NULL:
-            raise RuntimeError("`cdata` is NULL.")
+            raise RuntimeError("`nmm_baset` is NULL.")
 
     @property
     def nmm_baset(self) -> ffi.CData:

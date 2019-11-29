@@ -1,9 +1,12 @@
 from math import log
+
 import pytest
 from numpy import nan
 from numpy.testing import assert_allclose, assert_equal
 
 from nmm import LOG0, Alphabet, BaseTable
+from nmm._base import CBaseTable
+from nmm._ffi import lib, ffi
 
 
 def test_base():
@@ -48,3 +51,23 @@ def test_base():
 
     with pytest.raises(RuntimeError):
         base.normalize()
+
+
+def test_base_errors():
+
+    with pytest.raises(ValueError):
+        BaseTable(None)
+
+    with pytest.raises(ValueError):
+        CBaseTable(nmm_baset=None, alphabet=None)
+
+    with pytest.raises(RuntimeError):
+        CBaseTable(nmm_baset=ffi.NULL, alphabet=None)
+
+    with pytest.raises(ValueError):
+        CBaseTable(nmm_baset=ffi.NULL, alphabet=Alphabet(b"abcd"))
+
+    alphabet = Alphabet(b"abcd")
+    nmm_baset = lib.nmm_baset_create(alphabet.imm_abc)
+    baset = CBaseTable(nmm_baset=nmm_baset)
+    assert_equal(baset.imm_abc, alphabet.imm_abc)
