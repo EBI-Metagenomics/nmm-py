@@ -6,9 +6,9 @@ from .standard_core import StandardPath, StandardStep
 
 class StandardFragment(Fragment):
     def __init__(
-        self, seq: bytes, interval: Interval, path: StandardPath, homologous: bool,
+        self, sequence: bytes, path: StandardPath, homologous: bool,
     ):
-        super().__init__(seq, interval, homologous)
+        super().__init__(sequence, homologous)
         self._path = path
 
     def items(self) -> Iterator[Tuple[bytes, StandardStep]]:
@@ -24,19 +24,27 @@ class StandardFragment(Fragment):
 
 
 class StandardSearchResult(SearchResult):
-    def __init__(self, score: float, seq: bytes, path: StandardPath):
+    def __init__(self, score: float, sequence: bytes, path: StandardPath):
         self._score = score
 
         self._fragments: List[StandardFragment] = []
+        self._intervals: List[Interval] = []
 
         steps = list(path.steps())
         for fragi, stepi, homologous in self._create_fragments(path):
             spath = _create_path(steps[stepi.start : stepi.end])
-            self._fragments.append(StandardFragment(seq, fragi, spath, homologous))
+            seq = sequence[fragi.start : fragi.end]
+            frag = StandardFragment(seq, spath, homologous)
+            self._fragments.append(frag)
+            self._intervals.append(fragi)
 
     @property
     def fragments(self) -> Sequence[StandardFragment]:
         return self._fragments
+
+    @property
+    def interval(self) -> Sequence[Interval]:
+        return self._intervals
 
     @property
     def score(self) -> float:

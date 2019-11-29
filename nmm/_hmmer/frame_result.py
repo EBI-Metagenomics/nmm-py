@@ -7,9 +7,9 @@ from .._state import MuteState, FrameState
 
 class FrameFragment(Fragment):
     def __init__(
-        self, seq: bytes, interval: Interval, path: FramePath, homologous: bool,
+        self, sequence: bytes, path: FramePath, homologous: bool,
     ):
-        super().__init__(seq, interval, homologous)
+        super().__init__(sequence, homologous)
         self._path = path
 
     def items(self) -> Iterator[Tuple[bytes, FrameStep]]:
@@ -36,10 +36,7 @@ class FrameFragment(Fragment):
 
             start += step.seq_len
 
-        # TODO: Interval in the Fragment was not the greatest idea,
-        # it create a dependency on the preceding fragments. Fix it.
-        interval = Interval(0, len(seq))
-        return FrameFragment(b"".join(nseq), interval, npath, self.homologous)
+        return FrameFragment(b"".join(nseq), npath, self.homologous)
 
     def __repr__(self):
         seq = self.sequence.decode()
@@ -47,19 +44,27 @@ class FrameFragment(Fragment):
 
 
 class FrameSearchResult(SearchResult):
-    def __init__(self, score: float, seq: bytes, path: FramePath):
+    def __init__(self, score: float, sequence: bytes, path: FramePath):
         self._score = score
 
         self._fragments: List[FrameFragment] = []
+        self._intervals: List[Interval] = []
 
         steps = list(path.steps())
         for fragi, stepi, homologous in self._create_fragments(path):
             spath = _create_path(steps[stepi.start : stepi.end])
-            self._fragments.append(FrameFragment(seq, fragi, spath, homologous))
+            seq = sequence[fragi.start : fragi.end]
+            frag = FrameFragment(seq, spath, homologous)
+            self._fragments.append(frag)
+            self._intervals.append(fragi)
 
     @property
     def fragments(self) -> Sequence[FrameFragment]:
         return self._fragments
+
+    @property
+    def interval(self) -> Sequence[Interval]:
+        return self._intervals
 
     @property
     def score(self) -> float:
