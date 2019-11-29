@@ -1,6 +1,6 @@
 from math import log
 
-from .._log import LOG0
+from .._log import LOG0, LOG1
 from .result import SearchResult
 from .core import NullModel, AltModel
 
@@ -55,9 +55,10 @@ class Profile:
             return
 
         if self._multiple_hits:
-            lq = -log(2)
+            l1q = lq = -log(2)
         else:
             lq = LOG0
+            l1q = LOG1
 
         q = exp(lq)
         lp = log(L) - log(L + 2 + q / (1 - q))
@@ -69,7 +70,8 @@ class Profile:
         t.NN = t.CC = t.JJ = lp
         t.NB = t.CT = t.JB = l1p
         t.RR = lr
-        t.EC = t.EJ = lq
+        t.EJ = lq
+        t.EC = l1q
 
         node = self.alt_model.special_node
 

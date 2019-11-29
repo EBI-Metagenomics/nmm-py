@@ -36,6 +36,7 @@ class SearchResult(ABC):
 
             change = not homologous and step.state.name.startswith(b"M")
             change = change or homologous and step.state.name.startswith(b"E")
+            change = change or not homologous and step.state.name.startswith(b"T")
 
             if change:
                 if frag_start < frag_end:

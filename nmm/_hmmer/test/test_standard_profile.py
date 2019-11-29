@@ -15,6 +15,15 @@ def test_standard_profile_unihit_homologous_1(PF03373):
     assert_equal(frag.homologous, True)
     assert_equal(frag.sequence, most_likely_seq)
 
+    hmmer.multiple_hits = False
+    r = hmmer.search(most_likely_seq)
+    assert_allclose(r.score, 11.94063404337571)
+    frags = r.fragments
+    assert_equal(len(frags), 1)
+    frag = frags[0]
+    assert_equal(frag.homologous, True)
+    assert_equal(frag.sequence, most_likely_seq)
+
 
 def test_standard_profile_unihit_homologous_2(PF03373):
     reader = read_hmmer(PF03373)
@@ -47,6 +56,7 @@ def test_standard_profile_nonhomo_and_homologous(PF03373):
     reader = read_hmmer(PF03373)
     hmmer = create_standard_profile(reader)
     seq = b"KKKPGKEDNNK"
+    assert_equal(hmmer.multiple_hits, True)
     r = hmmer.search(seq)
     assert_allclose(r.score, 10.707618955640605)
     frags = r.fragments
@@ -56,15 +66,26 @@ def test_standard_profile_nonhomo_and_homologous(PF03373):
     assert_equal(frags[1].homologous, True)
     assert_equal(frags[1].sequence, b"PGKEDNNK")
 
+    hmmer.multiple_hits = False
+    assert_equal(hmmer.multiple_hits, False)
+    r = hmmer.search(seq)
+    assert_allclose(r.score, 10.96037578075283)
+    frags = r.fragments
+    assert_equal(len(frags), 2)
+    assert_equal(frags[0].homologous, False)
+    assert_equal(frags[0].sequence, b"KKK")
+    assert_equal(frags[1].homologous, True)
+    assert_equal(frags[1].sequence, b"PGKEDNNK")
 
-def test_standard_profile_multihit_homologous(PF03373):
+
+def test_standard_profile_multihit_homologous1(PF03373):
     reader = read_hmmer(PF03373)
     hmmer = create_standard_profile(reader)
     seq = b"PPPPGKEDNNKDDDPGKEDNNKEEEE"
     r = hmmer.search(seq)
     assert_allclose(r.score, 20.329227532144742)
     frags = r.fragments
-    assert_equal(len(frags), 4)
+    assert_equal(len(frags), 5)
     assert_equal(frags[0].homologous, False)
     assert_equal(frags[0].sequence, b"PPP")
     assert_equal(frags[1].homologous, True)
@@ -73,6 +94,8 @@ def test_standard_profile_multihit_homologous(PF03373):
     assert_equal(frags[2].sequence, b"DDD")
     assert_equal(frags[3].homologous, True)
     assert_equal(frags[3].sequence, b"PGKEDNNK")
+    assert_equal(frags[4].homologous, False)
+    assert_equal(frags[4].sequence, b"EEEE")
 
     items = list(frags[0].items())
 
@@ -105,3 +128,15 @@ def test_standard_profile_multihit_homologous(PF03373):
     assert_equal(str(items[6][1]), "<M7,1>")
     assert_equal(items[7][0], b"K")
     assert_equal(str(items[7][1]), "<M8,1>")
+
+    hmmer.multiple_hits = False
+    r = hmmer.search(seq)
+    assert_allclose(r.score, 8.666478660222928)
+    frags = r.fragments
+    assert_equal(len(frags), 3)
+    assert_equal(frags[0].homologous, False)
+    assert_equal(frags[0].sequence, b"PPPPGKEDNNKDDD")
+    assert_equal(frags[1].homologous, True)
+    assert_equal(frags[1].sequence, b"PGKEDNNK")
+    assert_equal(frags[2].homologous, False)
+    assert_equal(frags[2].sequence, b"EEEE")
