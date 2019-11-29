@@ -1,4 +1,5 @@
 from typing import Sequence, Tuple
+from abc import ABC, abstractmethod
 
 from .._hmm import HMM
 from .._log import LOG1
@@ -7,56 +8,67 @@ from .._state import State, MuteState
 from .transition import Transitions, SpecialTransitions
 
 
-class Node:
+class Node(ABC):
     @property
+    @abstractmethod
     def M(self) -> State:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def I(self) -> State:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def D(self) -> State:
         raise NotImplementedError()
 
 
-class SpecialNode:
+class SpecialNode(ABC):
     @property
+    @abstractmethod
     def S(self) -> MuteState:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def N(self) -> State:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def B(self) -> MuteState:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def E(self) -> MuteState:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def J(self) -> State:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def C(self) -> State:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def T(self) -> MuteState:
         raise NotImplementedError()
 
 
-class NullModel:
+class NullModel(ABC):
     def __init__(self, state: State):
         self._hmm = HMM(state.alphabet)
         self._hmm.add_state(state, LOG1)
 
     @property
+    @abstractmethod
     def state(self) -> State:
         raise NotImplementedError()
 
@@ -68,7 +80,7 @@ class NullModel:
         return self._hmm.likelihood(seq, path)
 
 
-class AltModel:
+class AltModel(ABC):
     def __init__(
         self,
         special_node: SpecialNode,
@@ -106,18 +118,17 @@ class AltModel:
                 hmm.set_transition(prev.D, node.D, trans.DD)
                 prev = node
 
-            # hmm.del_state(core_nodes_trans[0][0].D)
-            # hmm.del_state(core_nodes_trans[-1][0].I)
-
         self._hmm = hmm
 
     def set_transition(self, a: State, b: State, lprob: float):
         self._hmm.set_transition(a, b, lprob)
 
+    @abstractmethod
     def core_nodes(self) -> Sequence[Node]:
         raise NotImplementedError()
 
     @property
+    @abstractmethod
     def special_node(self) -> SpecialNode:
         raise NotImplementedError()
 
@@ -126,6 +137,7 @@ class AltModel:
         return self._special_transitions
 
     @property
+    @abstractmethod
     def length(self) -> int:
         raise NotImplementedError()
 

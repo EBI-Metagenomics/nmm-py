@@ -337,6 +337,8 @@ def test_hmm_viterbi_3():
     alphabet = Alphabet(b"AC")
 
     hmm = HMM(alphabet)
+    assert_equal(alphabet, hmm.alphabet)
+
     S = MuteState(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
