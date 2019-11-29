@@ -14,6 +14,7 @@ def test_frame_profile_frame1(PF03373):
     r = hmmer.search(most_likely_rna_seq)
     assert_allclose(r.score, 125.83363182422178)
     frags = r.fragments
+    assert_equal(len(frags), 1)
     frag = frags[0]
     assert_equal(frag.homologous, True)
     assert_equal(frag.sequence, most_likely_rna_seq)
@@ -31,6 +32,7 @@ def test_frame_profile_frame2(PF03373):
     r = hmmer.search(rna_seq)
     assert_allclose(r.score, 168.23071232889802)
     frags = r.fragments
+    assert_equal(len(frags), 2)
     assert_equal(frags[0].homologous, False)
     assert_equal(frags[0].sequence, b"AAAAAAAAA")
     assert_equal(frags[1].homologous, True)
@@ -78,6 +80,39 @@ def test_frame_profile_frame5(PF03373):
     assert_equal(len(frags), 1)
     assert_equal(frags[0].homologous, True)
     assert_equal(frags[0].sequence, b"CCUUGGUAAAGAAGAUAAUAACAAA")
+
+
+def test_frame_profile_frame6(PF03373):
+    reader = read_hmmer(PF03373)
+    hmmer = create_frame_profile(reader, epsilon=0.00001)
+
+    # seq = b"PGKEDNNKEEPGKEDNNKEEE"
+    rna_seq = b"CCUU GGU AAA GAA GAU AAU AAC AAA GAA GAA CCU GGU AAA GAA GAU AAU AAC AAA GAA GAA GA"
+    rna_seq = rna_seq.replace(b" ", b"")
+
+    r = hmmer.search(rna_seq)
+    frags = r.fragments
+    assert_equal(len(frags), 4)
+    assert_equal(frags[0].homologous, True)
+    assert_equal(frags[0].sequence, b"CCUUGGUAAAGAAGAUAAUAACAAA")
+    assert_equal(frags[1].homologous, False)
+    assert_equal(frags[1].sequence, b"GAAGAA")
+    assert_equal(frags[2].homologous, True)
+    assert_equal(frags[2].sequence, b"CCUGGUAAAGAAGAUAAUAACAAA")
+    assert_equal(frags[3].homologous, False)
+    assert_equal(frags[3].sequence, b"GAAGAAGA")
+
+    hmmer.multiple_hits = False
+    r = hmmer.search(rna_seq)
+    frags = r.fragments
+    assert_allclose(r.score, 1445.0314253859958)
+    assert_equal(len(frags), 3)
+    assert_equal(frags[0].homologous, False)
+    assert_equal(frags[0].sequence, b"CCUUGGUAAAGAAGAUAAUAACAAAGAAGAA")
+    assert_equal(frags[1].homologous, True)
+    assert_equal(frags[1].sequence, b"CCUGGUAAAGAAGAUAAUAACAAA")
+    assert_equal(frags[2].homologous, False)
+    assert_equal(frags[2].sequence, b"GAAGAAGA")
 
 
 def test_frame_profile_codons(PF03373):
