@@ -2,7 +2,6 @@ from typing import Iterator, List, Sequence, Tuple
 
 from .result import Fragment, Interval, SearchResult
 from .frame_core import FramePath, FrameStep
-from .._gencode import GeneticCode
 from .._log import LOG1
 from .._state import MuteState, FrameState, CodonState
 from .codon import CodonFragment, CodonPath
@@ -46,9 +45,6 @@ class FrameFragment(Fragment):
             start += step.seq_len
 
         return CodonFragment(b"".join(nseq), npath, self.homologous)
-
-    def decode_amino_acids(self, genetic_code: GeneticCode):
-        pass
 
     def __repr__(self):
         seq = self.sequence.decode()

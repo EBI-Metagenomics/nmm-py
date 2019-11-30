@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Set
 
 GENCODE = {
     "standard": {
@@ -30,22 +30,18 @@ GENCODE = {
 class GeneticCode:
     def __init__(self, name: str = "standard"):
         self._gencode = GENCODE[name]
+        self._amino_acid: Dict[bytes, bytes] = {}
+        for aa, codons in self._gencode.items():
+            for codon in codons:
+                self._amino_acid[codon] = aa
 
     def codons(self, amino_acid: bytes) -> List[bytes]:
         amino_acid = amino_acid.upper()
         return self._gencode.get(amino_acid, [])
 
+    def amino_acid(self, codon: bytes) -> bytes:
+        codon = codon.upper()
+        return self._amino_acid[codon]
 
-def generate_codon_lprobs(aa_lprobs: Dict[bytes, float], gencode: GeneticCode):
-    from math import log
-
-    codon_lprobs: Dict[bytes, float] = {}
-    for aa, logp in aa_lprobs.items():
-        codons = gencode.codons(aa)
-        if len(codons) == 0:
-            continue
-        logp_norm = log(len(codons))
-        for codon in codons:
-            codon_lprobs[codon] = logp - logp_norm
-
-    return codon_lprobs
+    def amino_acids(self) -> Set[bytes]:
+        return set(self._gencode.keys())
