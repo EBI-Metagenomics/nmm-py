@@ -128,7 +128,6 @@ def test_frame_profile_codons(PF03373):
     assert_allclose(r.score, 175.35113397356454)
     frags = r.fragments
     cfrags = [f.decode_codons() for f in frags]
-    # breakpoint()
     aafrags = [f.decode(gcode) for f in cfrags]
 
     assert_equal(len(frags), 2)
@@ -137,51 +136,71 @@ def test_frame_profile_codons(PF03373):
 
     assert_equal(frags[0].homologous, False)
     assert_equal(cfrags[0].homologous, False)
+    assert_equal(aafrags[0].homologous, False)
     assert_equal(frags[0].sequence, b"AAGAAAAAAA")
     assert_equal(cfrags[0].sequence, b"AAGAAAAAA")
+    assert_equal(aafrags[0].sequence, b"KKK")
 
     items = list(frags[0].items())
     citems = list(cfrags[0].items())
+    aaitems = list(aafrags[0].items())
 
     assert_equal(items[0][0], b"")
     assert_equal(str(items[0][1]), "<S,0>")
     assert_equal(citems[0][0], b"")
     assert_equal(str(citems[0][1]), "<S,0>")
+    assert_equal(aaitems[0][0], b"")
+    assert_equal(str(aaitems[0][1]), "<S,0>")
 
     assert_equal(items[1][0], b"AAG")
     assert_equal(str(items[1][1]), "<N,3>")
     assert_equal(citems[1][0], b"AAG")
     assert_equal(str(citems[1][1]), "<N,3>")
+    assert_equal(aaitems[1][0], b"K")
+    assert_equal(str(aaitems[1][1]), "<N,1>")
 
     assert_equal(items[2][0], b"AAAA")
     assert_equal(str(items[2][1]), "<N,4>")
     assert_equal(citems[2][0], b"AAA")
     assert_equal(str(citems[2][1]), "<N,3>")
+    assert_equal(aaitems[2][0], b"K")
+    assert_equal(str(aaitems[2][1]), "<N,1>")
 
     assert_equal(items[3][0], b"AAA")
     assert_equal(str(items[3][1]), "<N,3>")
     assert_equal(citems[3][0], b"AAA")
     assert_equal(str(citems[3][1]), "<N,3>")
+    assert_equal(aaitems[3][0], b"K")
+    assert_equal(str(aaitems[3][1]), "<N,1>")
 
     assert_equal(items[4][0], b"")
     assert_equal(str(items[4][1]), "<B,0>")
     assert_equal(citems[4][0], b"")
     assert_equal(str(citems[4][1]), "<B,0>")
+    assert_equal(aaitems[4][0], b"")
+    assert_equal(str(aaitems[4][1]), "<B,0>")
 
     assert_equal(frags[1].homologous, True)
     assert_equal(cfrags[1].homologous, True)
+    assert_equal(aafrags[1].homologous, True)
     assert_equal(frags[1].sequence, b"CCUGGUAAAGAAGAUAAUAACAAAG")
     assert_equal(cfrags[1].sequence, b"CCUGGUAAAGAAGAUAAUAACAAG")
+    assert_equal(aafrags[1].sequence, b"PGKEDNNK")
 
     items = list(frags[1].items())
     citems = list(cfrags[1].items())
+    aaitems = list(aafrags[1].items())
 
     assert_equal(items[0][0], b"CCU")
     assert_equal(str(items[0][1]), "<M1,3>")
     assert_equal(citems[0][0], b"CCU")
     assert_equal(str(citems[0][1]), "<M1,3>")
+    assert_equal(aaitems[0][0], b"P")
+    assert_equal(str(aaitems[0][1]), "<M1,1>")
 
     assert_equal(items[7][0], b"AAAG")
     assert_equal(str(items[7][1]), "<M8,4>")
     assert_equal(citems[7][0], b"AAG")
     assert_equal(str(citems[7][1]), "<M8,3>")
+    assert_equal(aaitems[7][0], b"K")
+    assert_equal(str(aaitems[7][1]), "<M8,1>")
