@@ -8,7 +8,7 @@ struct imm_step;
 struct imm_table_state;
 
 /* Alphabet */
-struct imm_abc *imm_abc_create(char const *symbols);
+struct imm_abc *imm_abc_create(char const *symbols, char any_symbol);
 void            imm_abc_destroy(struct imm_abc *abc);
 int             imm_abc_length(struct imm_abc const *abc);
 char const *    imm_abc_symbols(struct imm_abc const *abc);

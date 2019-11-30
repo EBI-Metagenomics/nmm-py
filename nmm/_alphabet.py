@@ -45,10 +45,13 @@ class Alphabet(CAlphabet):
         Set of symbols as an array of bytes.
     """
 
-    def __init__(self, symbols: bytes):
+    def __init__(self, symbols: bytes, any_symbol: bytes = b"X"):
         self._symbols = symbols
+        if len(any_symbol) != 1:
+            raise ValueError("`any_symbol` has length different than 1.")
+        self._any_symbol = any_symbol
         cdata = ffi.NULL
-        cdata = lib.imm_abc_create(self._symbols)
+        cdata = lib.imm_abc_create(self._symbols, any_symbol)
         if cdata == ffi.NULL:
             raise RuntimeError("`imm_abc_create` failed.")
         super().__init__(cdata)

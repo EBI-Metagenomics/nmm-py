@@ -1,6 +1,6 @@
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import create_frame_profile, read_hmmer
+from nmm import create_frame_profile, read_hmmer, GeneticCode
 
 
 def test_frame_profile_frame1(PF03373):
@@ -118,6 +118,7 @@ def test_frame_profile_frame6(PF03373):
 def test_frame_profile_codons(PF03373):
     reader = read_hmmer(PF03373)
     hmmer = create_frame_profile(reader, epsilon=0.1)
+    gcode = GeneticCode()
 
     # seq = b"KKKPGKEDNNK"
     rna_seq = b"AAGA AAA AAA CCU GGU AAA GAA GAU AAU AAC AAA G"
@@ -127,9 +128,12 @@ def test_frame_profile_codons(PF03373):
     assert_allclose(r.score, 175.35113397356454)
     frags = r.fragments
     cfrags = [f.decode_codons() for f in frags]
+    # breakpoint()
+    aafrags = [f.decode(gcode) for f in cfrags]
 
     assert_equal(len(frags), 2)
     assert_equal(len(cfrags), 2)
+    assert_equal(len(aafrags), 2)
 
     assert_equal(frags[0].homologous, False)
     assert_equal(cfrags[0].homologous, False)
