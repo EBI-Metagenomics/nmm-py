@@ -38,6 +38,8 @@ class FramePath(Path):
 
     def append(self, state: State, seq_len: int) -> ffi.CData:
         # TODO: think in a better solution
+        # Solution: I should not have a class base with methods
+        # i cannot truly inherit.
         raise RuntimeError("Call `append_frame_step` instead.")
         del state
         del seq_len

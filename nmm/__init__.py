@@ -1,12 +1,13 @@
-from ._cli import cli
 from ._alphabet import Alphabet
 from ._base import BaseTable
+from ._cli import cli
 from ._codon import CodonTable
+from ._gencode import GeneticCode
 from ._hmm import HMM
 from ._hmmer import create_frame_profile, create_standard_profile, read_hmmer
 from ._log import LOG0
 from ._path import Path
-from ._state import FrameState, MuteState, NormalState, TableState
+from ._state import FrameState, MuteState, NormalState, TableState, CodonState
 from ._step import Step
 
 try:
@@ -26,8 +27,10 @@ __version__ = "0.0.1"
 __all__ = [
     "Alphabet",
     "BaseTable",
+    "CodonState",
     "CodonTable",
     "FrameState",
+    "GeneticCode",
     "HMM",
     "LOG0",
     "MuteState",
@@ -36,8 +39,8 @@ __all__ = [
     "Step",
     "TableState",
     "__version__",
+    "cli",
     "create_frame_profile",
     "create_standard_profile",
     "read_hmmer",
-    "cli",
 ]

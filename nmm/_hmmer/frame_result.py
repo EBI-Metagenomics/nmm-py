@@ -2,9 +2,13 @@ from typing import Iterator, List, Sequence, Tuple
 
 from .result import Fragment, Interval, SearchResult
 from .frame_core import FramePath, FrameStep
-from .._state import MuteState, FrameState
+from .._gencode import GeneticCode
+from .._log import LOG1
+from .._state import MuteState, FrameState, CodonState
+from .codon import CodonFragment, CodonPath
 
 
+# (self, name: bytes, base: BaseTable, codon: CodonTable, epsilon: float)
 class FrameFragment(Fragment):
     def __init__(
         self, sequence: bytes, path: FramePath, homologous: bool,
@@ -19,24 +23,32 @@ class FrameFragment(Fragment):
             yield (self.sequence[start:end], step)
             start = end
 
-    def convert_to_codons(self):
+    def decode_codons(self) -> CodonFragment:
         nseq: List[bytes] = []
-        npath = FramePath()
+        npath = CodonPath()
 
         start: int = 0
         seq = self.sequence
         for step in self._path.steps():
             if isinstance(step.state, MuteState):
-                npath.append_frame_step(step.state, 0)
+                mstate = MuteState(step.state.name, step.state.alphabet)
+                npath.append_codon_step(mstate, 0)
             else:
                 assert isinstance(step.state, FrameState)
-                decoded_codon = step.state.decode(seq[start : start + step.seq_len])
-                nseq.append(decoded_codon.codon)
-                npath.append_frame_step(step.state, 3)
+
+                dcodon = step.state.decode(seq[start : start + step.seq_len])
+                codon = dcodon.codon
+                nseq.append(codon)
+
+                cstate = CodonState(step.state.name, step.state.alphabet, {codon: LOG1})
+                npath.append_codon_step(cstate, 3)
 
             start += step.seq_len
 
-        return FrameFragment(b"".join(nseq), npath, self.homologous)
+        return CodonFragment(b"".join(nseq), npath, self.homologous)
+
+    def decode_amino_acids(self, genetic_code: GeneticCode):
+        pass
 
     def __repr__(self):
         seq = self.sequence.decode()

@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple
+from typing import Dict, NamedTuple, Tuple
 
 from ._alphabet import Alphabet
 from ._base import BaseTable
@@ -9,6 +9,8 @@ from ._log import LOG0
 DecodedCodon = NamedTuple("DecodedCodon", [("lprob", float), ("codon", bytes)])
 
 
+# TODO: consider removing CState (and other C classes) as base classes,
+# and instead to help compose their respective Python classes.
 class CState:
     def __init__(self, cdata: ffi.CData):
         self.__cdata = cdata
@@ -151,6 +153,18 @@ class TableState(State):
     def __del__(self):
         if self._cdata != ffi.NULL:
             lib.imm_table_state_destroy(self._cdata)
+
+
+class CodonState(TableState):
+    # TODO: consider creating a Codon type and place it in the keys as a type.
+    def __init__(self, name: bytes, alphabet: Alphabet, emission: Dict[bytes, float]):
+        if sum(len(k) != 3 for k in emission.keys()) > 0:
+            raise ValueError("Codon must be composed of three bases.")
+
+        super().__init__(name, alphabet, emission)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{self.name.decode()}>"
 
 
 class FrameState(State):
