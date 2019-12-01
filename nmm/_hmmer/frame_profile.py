@@ -31,7 +31,7 @@ class FrameStateFactory:
     def create(self, name: bytes, aa_lprobs: Dict[bytes, float]) -> FrameState:
         codon_lprobs = _infer_codon_lprobs(aa_lprobs, self._gcode)
         base_lprobs = _infer_base_lprobs(codon_lprobs, self._bases)
-        base_table = BaseTable(self._bases, base_lprobs)
+        base_table = BaseTable.create(self._bases, base_lprobs)
         codon_table = CodonTable(self._bases, codon_lprobs)
         return FrameState(name, base_table, codon_table, self._epsilon)
 

@@ -3,7 +3,7 @@ from math import log
 import pytest
 from numpy.testing import assert_equal
 
-from nmm import Alphabet, MuteState, NormalState, CPath
+from nmm import Alphabet, CPath, MuteState, NormalState
 
 
 def test_path():

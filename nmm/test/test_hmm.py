@@ -3,7 +3,7 @@ from math import log, nan
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import HMM, LOG0, Alphabet, MuteState, NormalState, CPath, TableState
+from nmm import HMM, LOG0, Alphabet, CPath, MuteState, NormalState, TableState
 
 
 def test_hmm_states():
