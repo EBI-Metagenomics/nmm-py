@@ -3,25 +3,25 @@ from abc import ABC, abstractmethod
 
 from .._hmm import HMM
 from .._log import LOG1
-from .._path import Path
-from .._state import State, MuteState
+from .._path import CPath
+from .._state import CState, StateBase, MuteState
 from .transition import Transitions, SpecialTransitions
 
 
 class Node(ABC):
     @property
     @abstractmethod
-    def M(self) -> State:
+    def M(self) -> CState:
         raise NotImplementedError()
 
     @property
     @abstractmethod
-    def I(self) -> State:
+    def I(self) -> CState:
         raise NotImplementedError()
 
     @property
     @abstractmethod
-    def D(self) -> State:
+    def D(self) -> CState:
         raise NotImplementedError()
 
 
@@ -33,7 +33,7 @@ class SpecialNode(ABC):
 
     @property
     @abstractmethod
-    def N(self) -> State:
+    def N(self) -> CState:
         raise NotImplementedError()
 
     @property
@@ -48,12 +48,12 @@ class SpecialNode(ABC):
 
     @property
     @abstractmethod
-    def J(self) -> State:
+    def J(self) -> CState:
         raise NotImplementedError()
 
     @property
     @abstractmethod
-    def C(self) -> State:
+    def C(self) -> CState:
         raise NotImplementedError()
 
     @property
@@ -63,20 +63,22 @@ class SpecialNode(ABC):
 
 
 class NullModel(ABC):
-    def __init__(self, state: State):
+    def __init__(self, state: CState):
         self._hmm = HMM(state.alphabet)
         self._hmm.add_state(state, LOG1)
 
     @property
     @abstractmethod
-    def state(self) -> State:
+    def state(self) -> CState:
         raise NotImplementedError()
 
     def set_transition(self, lprob: float):
         self._hmm.set_transition(self.state, self.state, lprob)
 
     def likelihood(self, seq: bytes):
-        path = Path.create([(self.state, 1) for i in range(len(seq))])
+        path = CPath.create_cpath()
+        for i in range(len(seq)):
+            path.append_cstep(self.state, 1)
         return self._hmm.likelihood(seq, path)
 
 
@@ -120,7 +122,7 @@ class AltModel(ABC):
 
         self._hmm = hmm
 
-    def set_transition(self, a: State, b: State, lprob: float):
+    def set_transition(self, a: CState, b: CState, lprob: float):
         self._hmm.set_transition(a, b, lprob)
 
     @abstractmethod
@@ -141,5 +143,5 @@ class AltModel(ABC):
     def length(self) -> int:
         raise NotImplementedError()
 
-    def viterbi(self, seq: bytes) -> Tuple[float, Path]:
+    def viterbi(self, seq: bytes) -> Tuple[float, CPath]:
         return self._hmm.viterbi(seq, self.special_node.T)

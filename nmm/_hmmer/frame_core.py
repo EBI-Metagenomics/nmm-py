@@ -1,18 +1,16 @@
 from typing import Dict, Iterator, List, Sequence, Tuple, TypeVar, Union
 
 from .._ffi import ffi
-from .._path import Path
-from .._state import MuteState, FrameState, State
-from .._step import Step
+from .._path import CPath
+from .._state import MuteState, FrameState
+from .._step import CStep
 from .core import AltModel, Node, NullModel, SpecialNode
 from .transition import Transitions
 
 
-class FrameStep(Step):
-    def __init__(
-        self, imm_step: ffi.CData, state: Union[MuteState, FrameState], seq_len: int
-    ):
-        super().__init__(imm_step, state, seq_len)
+class FrameStep(CStep):
+    def __init__(self, imm_step: ffi.CData, state: Union[MuteState, FrameState]):
+        super().__init__(imm_step)
         self._state = state
 
     @property
@@ -23,26 +21,17 @@ class FrameStep(Step):
 T = TypeVar("T", bound="FramePath")
 
 
-class FramePath(Path):
+class FramePath(CPath):
     def __init__(self):
         super().__init__()
         self._steps: List[FrameStep] = []
 
     def append_frame_step(
         self, state: Union[MuteState, FrameState], seq_len: int
-    ) -> ffi.CData:
-        imm_step = self._append_imm_step(state.imm_state, seq_len)
-        step = FrameStep(imm_step, state, seq_len)
-        self._steps.append(step)
-        return step
-
-    def append(self, state: State, seq_len: int) -> ffi.CData:
-        # TODO: think in a better solution
-        # Solution: I should not have a class base with methods
-        # i cannot truly inherit.
-        raise RuntimeError("Call `append_frame_step` instead.")
-        del state
-        del seq_len
+    ) -> FrameStep:
+        cstep = self.append_cstep(state, seq_len)
+        self._steps.append(FrameStep(cstep.imm_step, state))
+        return self._steps[-1]
 
     def steps(self) -> Iterator[FrameStep]:
         return iter(self._steps)

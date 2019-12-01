@@ -3,7 +3,7 @@ from math import log, nan
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import HMM, LOG0, Alphabet, MuteState, NormalState, Path, TableState
+from nmm import HMM, LOG0, Alphabet, MuteState, NormalState, CPath, TableState
 
 
 def test_hmm_states():
@@ -105,62 +105,62 @@ def test_hmm_lik_1():
     hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
 
-    p = hmm.likelihood(b"AC", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"AC", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.3))
 
-    p = hmm.likelihood(b"AA", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"AA", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.2))
 
-    p = hmm.likelihood(b"AG", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"AG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"AU", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"AU", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.3))
 
-    p = hmm.likelihood(b"CC", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"CC", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.075))
 
-    p = hmm.likelihood(b"CA", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"CA", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.05))
 
-    p = hmm.likelihood(b"CG", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"CG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"CG", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"CG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"CU", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"CU", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.075))
 
-    p = hmm.likelihood(b"GC", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"GC", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"GA", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"GA", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"GG", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"GG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"GU", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"GU", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"UC", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"UC", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"UA", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"UA", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"UG", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"UG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
-    p = hmm.likelihood(b"UU", Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"UU", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
     assert_allclose(p, LOG0)
 
     M3 = NormalState(
         b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6), b"G": LOG0, b"U": log(0.6)}
     )
     with pytest.raises(ValueError):
-        hmm.likelihood(b"UU", Path.create([(S, 0), (M1, 1), (M3, 1), (E, 0)]))
+        hmm.likelihood(b"UU", CPath.create_cpath([(S, 0), (M1, 1), (M3, 1), (E, 0)]))
 
 
 def test_hmm_lik_2():
@@ -177,32 +177,32 @@ def test_hmm_lik_2():
 
     hmm.set_transition(S, E, log(1.0))
 
-    p = hmm.likelihood(b"A", Path.create([(S, 1), (E, 0)]))
+    p = hmm.likelihood(b"A", CPath.create_cpath([(S, 1), (E, 0)]))
     assert_allclose(p, log(0.8))
 
-    p = hmm.likelihood(b"C", Path.create([(S, 1), (E, 0)]))
+    p = hmm.likelihood(b"C", CPath.create_cpath([(S, 1), (E, 0)]))
     assert_allclose(p, log(0.2))
 
-    p = hmm.likelihood(b"A", Path.create([(S, 1)]))
+    p = hmm.likelihood(b"A", CPath.create_cpath([(S, 1)]))
     assert_allclose(p, log(0.8))
 
-    p = hmm.likelihood(b"C", Path.create([(S, 1)]))
+    p = hmm.likelihood(b"C", CPath.create_cpath([(S, 1)]))
     assert_allclose(p, log(0.2))
 
     with pytest.raises(RuntimeError):
-        Path.create([(S, 2)])
+        CPath.create_cpath([(S, 2)])
 
     with pytest.raises(RuntimeError):
-        Path.create([(S, 0)])
+        CPath.create_cpath([(S, 0)])
 
     with pytest.raises(RuntimeError):
-        Path.create([(E, 1)])
+        CPath.create_cpath([(E, 1)])
 
     with pytest.raises(ValueError):
-        hmm.likelihood(b"", Path.create([]))
+        hmm.likelihood(b"", CPath.create_cpath([]))
 
     with pytest.raises(ValueError):
-        hmm.likelihood(b"A", Path.create([]))
+        hmm.likelihood(b"A", CPath.create_cpath([]))
 
 
 def test_hmm_lik_3():
@@ -228,27 +228,27 @@ def test_hmm_lik_3():
     hmm.normalize()
 
     with pytest.raises(RuntimeError):
-        Path.create([(S, 1), (E, 0)])
+        CPath.create_cpath([(S, 1), (E, 0)])
 
-    p = hmm.likelihood(b"A", Path.create([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"A", CPath.create_cpath([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.8))
 
-    p = hmm.likelihood(b"C", Path.create([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"C", CPath.create_cpath([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.2))
 
     with pytest.raises(RuntimeError):
-        Path.create([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+        CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)])
 
     hmm.set_transition(M1, E, log(1.0))
     hmm.normalize()
 
-    p = hmm.likelihood(b"A", Path.create([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"A", CPath.create_cpath([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.4))
 
-    p = hmm.likelihood(b"C", Path.create([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
+    p = hmm.likelihood(b"C", CPath.create_cpath([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
     assert_allclose(p, log(0.1))
 
-    p = hmm.likelihood(b"", Path.create([(S, 0), (M1, 0), (E, 0)]))
+    p = hmm.likelihood(b"", CPath.create_cpath([(S, 0), (M1, 0), (E, 0)]))
     assert_allclose(p, log(0.5))
 
 

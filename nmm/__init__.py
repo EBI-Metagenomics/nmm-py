@@ -6,9 +6,9 @@ from ._gencode import GeneticCode
 from ._hmm import HMM
 from ._hmmer import create_frame_profile, create_standard_profile, read_hmmer
 from ._log import LOG0
-from ._path import Path
+from ._path import CPath
 from ._state import FrameState, MuteState, NormalState, TableState, CodonState
-from ._step import Step
+from ._step import CStep
 
 try:
     from ._ffi import ffi as _
@@ -35,8 +35,8 @@ __all__ = [
     "LOG0",
     "MuteState",
     "NormalState",
-    "Path",
-    "Step",
+    "CPath",
+    "CStep",
     "TableState",
     "__version__",
     "cli",

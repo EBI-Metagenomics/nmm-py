@@ -1,18 +1,16 @@
 from typing import Iterator, List, Tuple, TypeVar, Union
 
 from .result import Fragment
-from .._state import NormalState, MuteState, State
+from .._state import NormalState, MuteState
 
 from .._ffi import ffi
-from .._step import Step
-from .._path import Path
+from .._step import CStep
+from .._path import CPath
 
 
-class AminoAcidStep(Step):
-    def __init__(
-        self, imm_step: ffi.CData, state: Union[MuteState, NormalState], seq_len: int
-    ):
-        super().__init__(imm_step, state, seq_len)
+class AminoAcidStep(CStep):
+    def __init__(self, imm_step: ffi.CData, state: Union[MuteState, NormalState]):
+        super().__init__(imm_step)
         self._state = state
 
     @property
@@ -23,26 +21,17 @@ class AminoAcidStep(Step):
 T = TypeVar("T", bound="AminoAcidPath")
 
 
-class AminoAcidPath(Path):
+class AminoAcidPath(CPath):
     def __init__(self):
         super().__init__()
         self._steps: List[AminoAcidStep] = []
 
     def append_amino_acid_step(
         self, state: Union[MuteState, NormalState], seq_len: int
-    ) -> ffi.CData:
-        imm_step = self._append_imm_step(state.imm_state, seq_len)
-        step = AminoAcidStep(imm_step, state, seq_len)
-        self._steps.append(step)
-        return step
-
-    def append(self, state: State, seq_len: int) -> ffi.CData:
-        # TODO: think in a better solution
-        # Solution: I should not have a class base with methods
-        # i cannot truly inherit.
-        raise RuntimeError("Call `append_amino_acid_step` instead.")
-        del state
-        del seq_len
+    ) -> AminoAcidStep:
+        cstep = self.append_cstep(state, seq_len)
+        self._steps.append(AminoAcidStep(cstep.imm_step, state))
+        return self._steps[-1]
 
     def steps(self) -> Iterator[AminoAcidStep]:
         return iter(self._steps)

@@ -1,18 +1,16 @@
-from typing import Dict, Iterator, List, Sequence, Tuple, TypeVar, Union, Type
+from typing import Dict, Iterator, List, Sequence, Tuple, TypeVar, Union
 
 from .._ffi import ffi
-from .._path import Path
+from .._path import CPath
 from .._state import MuteState, NormalState
-from .._step import Step
+from .._step import CStep
 from .core import AltModel, Node, NullModel, SpecialNode
 from .transition import Transitions
 
 
-class StandardStep(Step):
-    def __init__(
-        self, imm_step: ffi.CData, state: Union[MuteState, NormalState], seq_len: int
-    ):
-        super().__init__(imm_step, state, seq_len)
+class StandardStep(CStep):
+    def __init__(self, imm_step: ffi.CData, state: Union[MuteState, NormalState]):
+        super().__init__(imm_step)
         self._state = state
 
     @property
@@ -23,18 +21,17 @@ class StandardStep(Step):
 T = TypeVar("T", bound="StandardPath")
 
 
-class StandardPath(Path):
+class StandardPath(CPath):
     def __init__(self):
         super().__init__()
         self._steps: List[StandardStep] = []
 
     def append_standard_step(
         self, state: Union[MuteState, NormalState], seq_len: int
-    ) -> ffi.CData:
-        imm_step = super().append(state, seq_len)
-        step = StandardStep(imm_step, state, seq_len)
-        self._steps.append(step)
-        return step
+    ) -> StandardStep:
+        cstep = self.append_cstep(state, seq_len)
+        self._steps.append(StandardStep(cstep.imm_step, state))
+        return self._steps[-1]
 
     def steps(self) -> Iterator[StandardStep]:
         return iter(self._steps)

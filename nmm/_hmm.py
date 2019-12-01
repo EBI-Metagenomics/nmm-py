@@ -1,8 +1,8 @@
 from math import isnan
-from ._path import Path, CPath
+from ._path import CPath
 from ._log import LOG0
-from ._state import State
-from ._alphabet import Alphabet
+from ._state import CState
+from ._alphabet import CAlphabet
 from typing import Dict, Tuple
 
 
@@ -15,32 +15,32 @@ class HMM:
 
     Parameters
     ----------
-    alphabet : Alphabet
+    alphabet : CAlphabet
         Alphabet.
     """
 
-    def __init__(self, alphabet: Alphabet):
+    def __init__(self, alphabet: CAlphabet):
         self._alphabet = alphabet
-        self._states: Dict[ffi.CData, State] = {}
+        self._states: Dict[ffi.CData, CState] = {}
         self._hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
         if self._hmm == ffi.NULL:
             raise RuntimeError("`imm_hmm_create` failed.")
 
-    def states(self) -> Dict[ffi.CData, State]:
+    def states(self) -> Dict[ffi.CData, CState]:
         return self._states
 
-    def set_start_lprob(self, state: State, lprob: float):
+    def set_start_lprob(self, state: CState, lprob: float):
         err: int = lib.imm_hmm_set_start(self._hmm, state.imm_state, lprob)
         if err != 0:
             raise RuntimeError("Could not set start probability.")
 
-    def transition(self, a: State, b: State):
+    def transition(self, a: CState, b: CState):
         """
         Parameters
         ----------
-        a : State
+        a : CState
             Source state.
-        b : State
+        b : CState
             Destination state.
         """
         lprob: float = lib.imm_hmm_get_trans(self._hmm, a.imm_state, b.imm_state)
@@ -48,13 +48,13 @@ class HMM:
             raise RuntimeError("Could not retrieve transition probability.")
         return lprob
 
-    def set_transition(self, a: State, b: State, lprob: float):
+    def set_transition(self, a: CState, b: CState, lprob: float):
         """
         Parameters
         ----------
-        a : State
+        a : CState
             Source state.
-        b : State
+        b : CState
             Destination state.
         lprob : float
             Transition probability in log-space.
@@ -70,10 +70,10 @@ class HMM:
             raise RuntimeError("Could not set transition probability.")
 
     @property
-    def alphabet(self):
+    def alphabet(self) -> CAlphabet:
         return self._alphabet
 
-    def add_state(self, state: State, start_lprob: float = LOG0):
+    def add_state(self, state: CState, start_lprob: float = LOG0):
         """
         Parameters
         ----------
@@ -87,7 +87,7 @@ class HMM:
             raise ValueError("Could not add state %s.", state)
         self._states[state.imm_state] = state
 
-    def del_state(self, state: State):
+    def del_state(self, state: CState):
         if state.imm_state not in self._states:
             raise ValueError(f"State {state} not found.")
 
@@ -102,18 +102,18 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def normalize_transitions(self, state: State):
+    def normalize_transitions(self, state: CState):
         err: int = lib.imm_hmm_normalize_trans(self._hmm, state.imm_state)
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def likelihood(self, seq: bytes, path: Path):
+    def likelihood(self, seq: bytes, path: CPath):
         lprob: float = lib.imm_hmm_likelihood(self._hmm, seq, path.imm_path)
         if isnan(lprob):
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
-    def viterbi(self, seq: bytes, end_state: State) -> Tuple[float, Path]:
+    def viterbi(self, seq: bytes, end_state: CState) -> Tuple[float, CPath]:
         imm_path = lib.imm_path_create()
         if imm_path == ffi.NULL:
             raise RuntimeError("Could not create `imm_path`.")
@@ -124,9 +124,9 @@ class HMM:
             lib.imm_path_destroy(imm_path)
             raise e
 
-        path = Path()
+        path = CPath.create_cpath()
         for step in CPath(imm_path).steps():
-            path.append(self._states[step.state.imm_state], step.seq_len)
+            path.append_cstep(self._states[step.state.imm_state], step.seq_len)
 
         return (lprob, path)
 

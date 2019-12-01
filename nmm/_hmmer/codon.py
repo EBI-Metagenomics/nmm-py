@@ -3,20 +3,18 @@ from typing import Iterator, List, Tuple, TypeVar, Union
 from .._ffi import ffi
 from .._gencode import GeneticCode
 from .._log import LOG1
-from .._path import Path
-from .._state import CodonState, MuteState, State, TableState, NormalState
-from .._step import Step
+from .._path import CPath
+from .._state import CodonState, MuteState, TableState, NormalState
+from .._step import CStep
 from .._alphabet import Alphabet
 from .result import Fragment
 
 from .amino_acid import AminoAcidFragment, AminoAcidPath
 
 
-class CodonStep(Step):
-    def __init__(
-        self, imm_step: ffi.CData, state: Union[MuteState, CodonState], seq_len: int
-    ):
-        super().__init__(imm_step, state, seq_len)
+class CodonStep(CStep):
+    def __init__(self, imm_step: ffi.CData, state: Union[MuteState, CodonState]):
+        super().__init__(imm_step)
         self._state = state
 
     @property
@@ -27,26 +25,17 @@ class CodonStep(Step):
 T = TypeVar("T", bound="CodonPath")
 
 
-class CodonPath(Path):
+class CodonPath(CPath):
     def __init__(self):
         super().__init__()
         self._steps: List[CodonStep] = []
 
     def append_codon_step(
         self, state: Union[MuteState, CodonState], seq_len: int
-    ) -> ffi.CData:
-        imm_step = self._append_imm_step(state.imm_state, seq_len)
-        step = CodonStep(imm_step, state, seq_len)
-        self._steps.append(step)
-        return step
-
-    def append(self, state: State, seq_len: int) -> ffi.CData:
-        # TODO: think in a better solution
-        # Solution: I should not have a class base with methods
-        # i cannot truly inherit.
-        raise RuntimeError("Call `append_codon_step` instead.")
-        del state
-        del seq_len
+    ) -> CodonStep:
+        cstep = self.append_cstep(state, seq_len)
+        self._steps.append(CodonStep(cstep.imm_step, state))
+        return self._steps[-1]
 
     def steps(self) -> Iterator[CodonStep]:
         return iter(self._steps)
