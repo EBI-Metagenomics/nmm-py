@@ -5,14 +5,23 @@ from ._ffi import ffi, lib
 
 
 class Base:
-    def __init__(self, base: Union[bytes, str]):
+    def __init__(self, base: Union[bytes, str, int]):
         if isinstance(base, str):
             base = base.encode()
+
+        if isinstance(base, int):
+            base = bytes([base])
 
         if len(base) != 1:
             raise ValueError("Base must be a single letter.")
 
         self._base = base
+
+    def __eq__(self, another):
+        return bytes(self) == bytes(another)
+
+    def __hash__(self):
+        return hash(bytes(self))
 
     def __bytes__(self) -> bytes:
         return self._base

@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Sequence, Tuple
 from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
-from .._base import BaseTable
+from .._base import BaseTable, Base
 from .._codon import CodonTable
 from .._gencode import GeneticCode
 from .._log import LOG0
@@ -135,12 +135,12 @@ def _infer_codon_lprobs(aa_lprobs: Dict[bytes, float], gencode: GeneticCode):
 def _infer_base_lprobs(codon_lprobs, alphabet: Alphabet):
     from scipy.special import logsumexp
 
-    lprobs: Dict[bytes, list] = {bytes([base]): [] for base in alphabet.symbols}
+    lprobs: Dict[Base, list] = {Base(sym): [] for sym in alphabet.symbols}
     lprob_norm = log(3)
     for codon, lprob in codon_lprobs.items():
-        lprobs[codon[0:1]] += [lprob - lprob_norm]
-        lprobs[codon[1:2]] += [lprob - lprob_norm]
-        lprobs[codon[2:3]] += [lprob - lprob_norm]
+        lprobs[codon.base(0)] += [lprob - lprob_norm]
+        lprobs[codon.base(1)] += [lprob - lprob_norm]
+        lprobs[codon.base(2)] += [lprob - lprob_norm]
 
     return {b: logsumexp(lp) for b, lp in lprobs.items()}
 

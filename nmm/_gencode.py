@@ -1,28 +1,50 @@
 from typing import List, Dict, Set
+from ._codon import Codon
 
-GENCODE = {
+GENCODE: Dict[str, Dict[bytes, List[Codon]]] = {
     "standard": {
-        b"F": [b"UUU", b"UUC"],
-        b"L": [b"UUA", b"UUG", b"CUU", b"CUC", b"CUA", b"CUG"],
-        b"I": [b"AUU", b"AUC", b"AUA"],
-        b"M": [b"AUG"],
-        b"V": [b"GUU", b"GUC", b"GUA", b"GUG"],
-        b"S": [b"UCU", b"UCC", b"UCA", b"UCG", b"AGU", b"AGC"],
-        b"P": [b"CCU", b"CCC", b"CCA", b"CCG"],
-        b"T": [b"ACU", b"ACC", b"ACA", b"ACG"],
-        b"A": [b"GCU", b"GCC", b"GCA", b"GCG"],
-        b"Y": [b"UAU", b"UAC"],
-        b"*": [b"UAA", b"UAG", b"UGA"],
-        b"H": [b"CAU", b"CAC"],
-        b"Q": [b"CAA", b"CAG"],
-        b"N": [b"AAU", b"AAC"],
-        b"K": [b"AAA", b"AAG"],
-        b"D": [b"GAU", b"GAC"],
-        b"E": [b"GAA", b"GAG"],
-        b"C": [b"UGU", b"UGC"],
-        b"W": [b"UGG"],
-        b"R": [b"CGU", b"CGC", b"CGA", b"CGG", b"AGA", b"AGG"],
-        b"G": [b"GGU", b"GGC", b"GGA", b"GGG"],
+        b"F": [Codon("UUU"), Codon("UUC")],
+        b"L": [
+            Codon("UUA"),
+            Codon("UUG"),
+            Codon("CUU"),
+            Codon("CUC"),
+            Codon("CUA"),
+            Codon("CUG"),
+        ],
+        b"I": [Codon("AUU"), Codon("AUC"), Codon("AUA")],
+        b"M": [Codon("AUG")],
+        b"V": [Codon("GUU"), Codon("GUC"), Codon("GUA"), Codon("GUG")],
+        b"S": [
+            Codon("UCU"),
+            Codon("UCC"),
+            Codon("UCA"),
+            Codon("UCG"),
+            Codon("AGU"),
+            Codon("AGC"),
+        ],
+        b"P": [Codon("CCU"), Codon("CCC"), Codon("CCA"), Codon("CCG")],
+        b"T": [Codon("ACU"), Codon("ACC"), Codon("ACA"), Codon("ACG")],
+        b"A": [Codon("GCU"), Codon("GCC"), Codon("GCA"), Codon("GCG")],
+        b"Y": [Codon("UAU"), Codon("UAC")],
+        b"*": [Codon("UAA"), Codon("UAG"), Codon("UGA")],
+        b"H": [Codon("CAU"), Codon("CAC")],
+        b"Q": [Codon("CAA"), Codon("CAG")],
+        b"N": [Codon("AAU"), Codon("AAC")],
+        b"K": [Codon("AAA"), Codon("AAG")],
+        b"D": [Codon("GAU"), Codon("GAC")],
+        b"E": [Codon("GAA"), Codon("GAG")],
+        b"C": [Codon("UGU"), Codon("UGC")],
+        b"W": [Codon("UGG")],
+        b"R": [
+            Codon("CGU"),
+            Codon("CGC"),
+            Codon("CGA"),
+            Codon("CGG"),
+            Codon("AGA"),
+            Codon("AGG"),
+        ],
+        b"G": [Codon("GGU"), Codon("GGC"), Codon("GGA"), Codon("GGG")],
     }
 }
 
@@ -30,17 +52,16 @@ GENCODE = {
 class GeneticCode:
     def __init__(self, name: str = "standard"):
         self._gencode = GENCODE[name]
-        self._amino_acid: Dict[bytes, bytes] = {}
+        self._amino_acid: Dict[Codon, bytes] = {}
         for aa, codons in self._gencode.items():
             for codon in codons:
                 self._amino_acid[codon] = aa
 
-    def codons(self, amino_acid: bytes) -> List[bytes]:
+    def codons(self, amino_acid: bytes) -> List[Codon]:
         amino_acid = amino_acid.upper()
         return self._gencode.get(amino_acid, [])
 
-    def amino_acid(self, codon: bytes) -> bytes:
-        codon = codon.upper()
+    def amino_acid(self, codon: Codon) -> bytes:
         return self._amino_acid[codon]
 
     def amino_acids(self) -> Set[bytes]:

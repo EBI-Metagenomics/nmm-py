@@ -4,6 +4,8 @@ import pytest
 from numpy.testing import assert_allclose, assert_equal
 
 from nmm import (
+    Base,
+    Codon,
     LOG0,
     Alphabet,
     BaseTable,
@@ -85,9 +87,15 @@ def test_table_state():
 def test_frame_state():
     alphabet = Alphabet(b"ACGU")
     base = BaseTable.create(
-        alphabet, {b"A": log(0.25), b"C": log(0.25), b"G": log(0.25), b"U": log(0.25)}
+        alphabet,
+        {
+            Base("A"): log(0.25),
+            Base("C"): log(0.25),
+            Base("G"): log(0.25),
+            Base("U"): log(0.25),
+        },
     )
-    codon = CodonTable(alphabet, {b"AUG": log(0.8), b"AUU": log(0.1)})
+    codon = CodonTable(alphabet, {Codon("AUG"): log(0.8), Codon("AUU"): log(0.1)})
 
     frame_state = FrameState(b"M1", base, codon, epsilon=0.0)
     assert_allclose(frame_state.lprob(b"AUA"), LOG0)
@@ -111,9 +119,18 @@ def test_frame_state():
 
     alphabet = Alphabet(b"ACGT")
     base = BaseTable.create(
-        alphabet, {b"A": log(0.1), b"C": log(0.2), b"G": log(0.3), b"T": log(0.4)}
+        alphabet,
+        {
+            Base("A"): log(0.1),
+            Base("C"): log(0.2),
+            Base("G"): log(0.3),
+            Base("T"): log(0.4),
+        },
     )
-    codon = CodonTable(alphabet, {b"ATG": log(0.8), b"ATT": log(0.1), b"GTC": log(0.4)})
+    codon = CodonTable(
+        alphabet,
+        {Codon("ATG"): log(0.8), Codon("ATT"): log(0.1), Codon("GTC"): log(0.4)},
+    )
     codon.normalize()
     frame_state = FrameState(b"M2", base, codon, 0.1)
     assert_allclose(frame_state.lprob(b"A"), -6.282228286097171)
