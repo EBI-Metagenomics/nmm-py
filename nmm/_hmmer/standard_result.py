@@ -8,8 +8,13 @@ class StandardFragment(Fragment):
     def __init__(
         self, sequence: bytes, path: StandardPath, homologous: bool,
     ):
-        super().__init__(sequence, homologous)
+        super().__init__(homologous)
+        self._sequence = sequence
         self._path = path
+
+    @property
+    def sequence(self) -> bytes:
+        return self._sequence
 
     def items(self) -> Iterator[Tuple[bytes, StandardStep]]:
         start = end = 0

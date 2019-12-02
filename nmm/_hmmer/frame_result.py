@@ -4,16 +4,21 @@ from .result import Fragment, Interval, SearchResult
 from .frame_core import FramePath, FrameStep
 from .._log import LOG1
 from .._state import MuteState, FrameState, CodonState
+from .._codon import Codon
 from .codon import CodonFragment, CodonPath
 
 
-# (self, name: bytes, base: BaseTable, codon: CodonTable, epsilon: float)
 class FrameFragment(Fragment):
     def __init__(
         self, sequence: bytes, path: FramePath, homologous: bool,
     ):
-        super().__init__(sequence, homologous)
+        super().__init__(homologous)
         self._path = path
+        self._sequence = sequence
+
+    @property
+    def sequence(self) -> bytes:
+        return self._sequence
 
     def items(self) -> Iterator[Tuple[bytes, FrameStep]]:
         start = end = 0
@@ -23,7 +28,7 @@ class FrameFragment(Fragment):
             start = end
 
     def decode_codons(self) -> CodonFragment:
-        nseq: List[bytes] = []
+        nseq: List[Codon] = []
         npath = CodonPath()
 
         start: int = 0
@@ -35,8 +40,7 @@ class FrameFragment(Fragment):
             else:
                 assert isinstance(step.state, FrameState)
 
-                dcodon = step.state.decode(seq[start : start + step.seq_len])
-                codon = dcodon.codon
+                codon = step.state.decode(seq[start : start + step.seq_len])[0]
                 nseq.append(codon)
 
                 cstate = CodonState(step.state.name, step.state.alphabet, {codon: LOG1})
@@ -44,7 +48,7 @@ class FrameFragment(Fragment):
 
             start += step.seq_len
 
-        return CodonFragment(b"".join(nseq), npath, self.homologous)
+        return CodonFragment(nseq, npath, self.homologous)
 
     def __repr__(self):
         seq = self.sequence.decode()

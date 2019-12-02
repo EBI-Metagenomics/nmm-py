@@ -1,9 +1,10 @@
-from typing import Iterator, List, Tuple, TypeVar, Union
+from typing import Iterator, List, Tuple, TypeVar, Union, Sequence
 
 from .._ffi import ffi
 from .._gencode import GeneticCode
 from .._log import LOG1
 from .._path import CPath
+from .._codon import Codon
 from .._state import CodonState, MuteState, TableState, NormalState
 from .._step import CStep
 from .._alphabet import Alphabet
@@ -43,10 +44,15 @@ class CodonPath(CPath):
 
 class CodonFragment(Fragment):
     def __init__(
-        self, sequence: bytes, path: CodonPath, homologous: bool,
+        self, codons: Sequence[Codon], path: CodonPath, homologous: bool,
     ):
-        super().__init__(sequence, homologous)
+        super().__init__(homologous)
+        self._codons = codons
         self._path = path
+
+    @property
+    def sequence(self) -> bytes:
+        return b"".join(bytes(codon) for codon in self._codons)
 
     def items(self) -> Iterator[Tuple[bytes, CodonStep]]:
         start = end = 0
@@ -63,18 +69,19 @@ class CodonFragment(Fragment):
         aa_alphabet = Alphabet(b"".join(amino_acids))
 
         start: int = 0
-        seq = self.sequence
+        i = 0
         for step in self._path.steps():
             if isinstance(step.state, MuteState):
                 mstate = MuteState(step.state.name, aa_alphabet)
                 npath.append_amino_acid_step(mstate, 0)
             else:
                 assert isinstance(step.state, TableState)
-                aa = genetic_code.amino_acid(seq[start : start + step.seq_len])
+                aa = genetic_code.amino_acid(self._codons[i])
                 nseq.append(aa)
 
                 nstate = NormalState(step.state.name, aa_alphabet, {aa: LOG1})
                 npath.append_amino_acid_step(nstate, 1)
+                i += 1
 
             start += step.seq_len
 

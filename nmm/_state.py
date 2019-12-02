@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Dict, NamedTuple
+from typing import Dict, Tuple
 
-from ._alphabet import Alphabet, AlphabetBase, CAlphabet
+from ._alphabet import AlphabetBase, CAlphabet
 from ._base import BaseTable
-from ._codon import CodonTable
+from ._codon import Codon, CodonTable
 from ._ffi import ffi, lib
 from ._log import LOG0
-
-DecodedCodon = NamedTuple("DecodedCodon", [("lprob", float), ("codon", bytes)])
 
 
 class StateBase(ABC):
@@ -80,39 +78,39 @@ class CState(StateBase):
 
 
 class MuteState(CState):
-    def __init__(self, name: bytes, alphabet: Alphabet):
+    def __init__(self, name: bytes, alphabet: CAlphabet):
         """
         Parameters
         ----------
         name : Name.
-        alphabet : Alphabet.
+        alphabet : CAlphabet.
         """
-        self._imm_state = lib.imm_mute_state_create(name, alphabet.imm_abc)
-        if self._imm_state == ffi.NULL:
+        self._imm_mute_state = lib.imm_mute_state_create(name, alphabet.imm_abc)
+        if self._imm_mute_state == ffi.NULL:
             raise RuntimeError("`imm_mute_state_create` failed.")
 
-        super().__init__(lib.imm_state_cast_c(self._imm_state))
+        super().__init__(lib.imm_state_cast_c(self._imm_mute_state))
         self._alphabet = alphabet
 
     @property
-    def alphabet(self) -> Alphabet:
+    def alphabet(self) -> CAlphabet:
         return self._alphabet
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name.decode()}>"
 
     def __del__(self):
-        if self._imm_state != ffi.NULL:
-            lib.imm_mute_state_destroy(self._imm_state)
+        if self._imm_mute_state != ffi.NULL:
+            lib.imm_mute_state_destroy(self._imm_mute_state)
 
 
 class NormalState(CState):
-    def __init__(self, name: bytes, alphabet: Alphabet, lprobs: Dict[bytes, float]):
+    def __init__(self, name: bytes, alphabet: CAlphabet, lprobs: Dict[bytes, float]):
         """
         Parameters
         ----------
         name : Name.
-        alphabet : Alphabet.
+        alphabet : CAlphabet.
         lprobs : Emission probabilities in log-space.
         """
         if len(set(b"".join(lprobs.keys())) - set(alphabet.symbols)) > 0:
@@ -130,7 +128,7 @@ class NormalState(CState):
         self._alphabet = alphabet
 
     @property
-    def alphabet(self) -> Alphabet:
+    def alphabet(self) -> CAlphabet:
         return self._alphabet
 
     def emission_table(self) -> Dict[bytes, float]:
@@ -150,12 +148,12 @@ class NormalState(CState):
 
 
 class TableState(CState):
-    def __init__(self, name: bytes, alphabet: Alphabet, emission: Dict[bytes, float]):
+    def __init__(self, name: bytes, alphabet: CAlphabet, emission: Dict[bytes, float]):
         """
         Parameters
         ----------
         name : Name.
-        alphabet : Alphabet.
+        alphabet : CAlphabet.
         emission : Emission probabilities in log-space.
         """
         self._imm_table_state = lib.imm_table_state_create(name, alphabet.imm_abc)
@@ -169,7 +167,7 @@ class TableState(CState):
         self._alphabet = alphabet
 
     @property
-    def alphabet(self) -> Alphabet:
+    def alphabet(self) -> CAlphabet:
         return self._alphabet
 
     def normalize(self) -> None:
@@ -186,12 +184,8 @@ class TableState(CState):
 
 
 class CodonState(TableState):
-    # TODO: consider creating a Codon type and place it in the keys as a type.
-    def __init__(self, name: bytes, alphabet: Alphabet, emission: Dict[bytes, float]):
-        if sum(len(k) != 3 for k in emission.keys()) > 0:
-            raise ValueError("Codon must be composed of three bases.")
-
-        super().__init__(name, alphabet, emission)
+    def __init__(self, name: bytes, alphabet: CAlphabet, emission: Dict[Codon, float]):
+        super().__init__(name, alphabet, {bytes(k): v for k, v in emission.items()})
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name.decode()}>"
@@ -225,7 +219,7 @@ class FrameState(CState):
         super().__init__(lib.imm_state_cast_c(self._imm_frame_state))
 
     @property
-    def alphabet(self) -> Alphabet:
+    def alphabet(self) -> CAlphabet:
         return self._baset.alphabet
 
     @property
@@ -240,12 +234,11 @@ class FrameState(CState):
     def epsilon(self):
         return self._epsilon
 
-    def decode(self, seq: bytes) -> DecodedCodon:
-        ccode = ffi.new("struct nmm_codon *")
-        lprob: float = lib.nmm_frame_state_decode(
-            self._imm_frame_state, seq, len(seq), ccode
-        )
-        return DecodedCodon(lprob, ccode.a + ccode.b + ccode.c)
+    def decode(self, seq: bytes) -> Tuple[Codon, float]:
+        codon = Codon("XXX")
+        st = self._imm_frame_state
+        lprob: float = lib.nmm_frame_state_decode(st, seq, len(seq), codon.nmm_codon)
+        return (codon, lprob)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{self.name.decode()}>"

@@ -8,13 +8,13 @@ Interval = NamedTuple("Interval", [("start", int), ("end", int)])
 
 
 class Fragment(ABC):
-    def __init__(self, sequence: bytes, homologous: bool):
-        self._sequence = sequence
+    def __init__(self, homologous: bool):
         self._homologous = homologous
 
     @property
+    @abstractmethod
     def sequence(self) -> bytes:
-        return self._sequence
+        raise NotImplementedError()
 
     @abstractmethod
     def items(self) -> Iterator[Tuple[bytes, StepBase]]:

@@ -41,8 +41,13 @@ class AminoAcidFragment(Fragment):
     def __init__(
         self, sequence: bytes, path: AminoAcidPath, homologous: bool,
     ):
-        super().__init__(sequence, homologous)
+        super().__init__(homologous)
+        self._sequence = sequence
         self._path = path
+
+    @property
+    def sequence(self) -> bytes:
+        return self._sequence
 
     def items(self) -> Iterator[Tuple[bytes, AminoAcidStep]]:
         start = end = 0
