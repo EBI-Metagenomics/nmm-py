@@ -1,5 +1,5 @@
 from ._alphabet import Alphabet, CAlphabet
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Type, TypeVar
 from ._base import Base
 from ._ffi import ffi, lib
 
@@ -58,42 +58,46 @@ class Codon:
         return f"<{self.__class__.__name__}:{codon.decode()}>"
 
 
-class CCodonTable:
+T = TypeVar("T", bound="CodonTable")
+
+
+class CodonTable:
     """
     Wrapper around the C implementation of a codon table.
 
     Parameters
     ----------
-    nmm_codont : Optional[ffi.CData]
-        Passing `None` will create a new codon table at the underlying library level using the
-        `alphabet` argument.
-    alphabet : Optional[CAlphabet]
-        Passing a `CAlphabet` will create a new codon table at the underlying library level.
+    nmm_codont : CData
+        Codon table.
     """
 
-    def __init__(
-        self,
-        nmm_codont: Optional[ffi.CData] = None,
-        alphabet: Optional[CAlphabet] = None,
-    ):
-        self._nmm_codont = ffi.NULL
-        if nmm_codont is None:
-            if alphabet is None:
-                raise ValueError("`alphabet` is `None`")
+    def __init__(self, nmm_codont: ffi.CData):
+        if nmm_codont == ffi.NULL:
+            raise RuntimeError("`nmm_codont` is NULL.")
+        self._nmm_codont = nmm_codont
+        imm_abc = lib.nmm_codont_get_abc(self._nmm_codont)
+        self._alphabet = CAlphabet.clone_from_imm_abc(imm_abc)
 
-            self._nmm_codont = lib.nmm_codont_create(alphabet.imm_abc)
-        else:
-            if alphabet is not None:
-                raise ValueError("`alphabet` is not `None`")
+    @classmethod
+    def create(cls: Type[T], alphabet: CAlphabet, lprobs: Dict[Codon, float] = {}) -> T:
 
-            self._nmm_codont = nmm_codont
+        nmm_codont = lib.nmm_codont_create(alphabet.imm_abc)
+        if nmm_codont == ffi.NULL:
+            raise RuntimeError("`nmm_codont_create` failed.")
 
-        if self._nmm_codont == ffi.NULL:
-            raise RuntimeError("`cdata` is NULL.")
+        codont = cls(nmm_codont)
+        for codon, lprob in lprobs.items():
+            codont.set_lprob(codon, lprob)
+
+        return codont
 
     @property
     def nmm_codont(self) -> ffi.CData:
         return self._nmm_codont
+
+    @property
+    def alphabet(self) -> CAlphabet:
+        return self._alphabet
 
     @property
     def imm_abc(self) -> ffi.CData:
@@ -115,26 +119,3 @@ class CCodonTable:
     def __del__(self):
         if self._nmm_codont != ffi.NULL:
             lib.nmm_codont_destroy(self._nmm_codont)
-
-
-class CodonTable(CCodonTable):
-    """
-    Codon table.
-
-    It is a table of probabilities for codons, in log-space.
-
-    Parameters
-    ----------
-    alphabet : Alphabet.
-    lprobs : Emission probabilities in log-space.
-    """
-
-    def __init__(self, alphabet: Alphabet, lprobs: Dict[Codon, float] = {}):
-        super().__init__(alphabet=alphabet)
-        self._alphabet = alphabet
-        for seq, lprob in lprobs.items():
-            self.set_lprob(seq, lprob)
-
-    @property
-    def alphabet(self) -> Alphabet:
-        return self._alphabet

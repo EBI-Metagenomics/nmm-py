@@ -61,7 +61,6 @@ class BaseTable:
             raise RuntimeError("`nmm_baset_create` failed.")
 
         baset = cls(nmm_baset)
-        baset._alphabet = alphabet
         for letter, lprob in lprobs.items():
             baset.set_lprob(letter, lprob)
 

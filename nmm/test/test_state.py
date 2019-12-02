@@ -4,11 +4,11 @@ import pytest
 from numpy.testing import assert_allclose, assert_equal
 
 from nmm import (
-    Base,
-    Codon,
     LOG0,
     Alphabet,
+    Base,
     BaseTable,
+    Codon,
     CodonTable,
     FrameState,
     MuteState,
@@ -95,7 +95,9 @@ def test_frame_state():
             Base("U"): log(0.25),
         },
     )
-    codon = CodonTable(alphabet, {Codon("AUG"): log(0.8), Codon("AUU"): log(0.1)})
+    codon = CodonTable.create(
+        alphabet, {Codon("AUG"): log(0.8), Codon("AUU"): log(0.1)}
+    )
 
     frame_state = FrameState(b"M1", base, codon, epsilon=0.0)
     assert_allclose(frame_state.lprob(b"AUA"), LOG0)
@@ -127,7 +129,7 @@ def test_frame_state():
             Base("T"): log(0.4),
         },
     )
-    codon = CodonTable(
+    codon = CodonTable.create(
         alphabet,
         {Codon("ATG"): log(0.8), Codon("ATT"): log(0.1), Codon("GTC"): log(0.4)},
     )
