@@ -1,5 +1,5 @@
 from ._alphabet import Alphabet
-from ._base import BaseTable
+from ._base import BaseTable, Base
 from ._cli import cli
 from ._codon import CodonTable
 from ._gencode import GeneticCode
@@ -25,6 +25,7 @@ and reinstall the package again."""
 __version__ = "0.0.1"
 
 __all__ = [
+    "Base",
     "Alphabet",
     "BaseTable",
     "CodonState",

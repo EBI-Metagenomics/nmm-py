@@ -1,7 +1,28 @@
-from typing import Dict, Optional, Type, TypeVar
+from typing import Dict, Optional, Type, TypeVar, Union
 
 from ._alphabet import CAlphabet
 from ._ffi import ffi, lib
+
+
+class Base:
+    def __init__(self, base: Union[bytes, str]):
+        if isinstance(base, str):
+            base = base.encode()
+
+        if len(base) != 1:
+            raise ValueError("Base must be a single letter.")
+
+        self._base = base
+
+    def __bytes__(self) -> bytes:
+        return self._base
+
+    def __str__(self) -> str:
+        return self._base.decode()
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}:{self._base.decode()}>"
+
 
 T = TypeVar("T", bound="BaseTable")
 
@@ -12,11 +33,8 @@ class BaseTable:
 
     Parameters
     ----------
-    nmm_baset : Optional[ffi.CData]
-        Passing `None` will create a new base at the underlying library level using the `alphabet`
-        argument.
-    alphabet : Optional[CAlphabet]
-        Passing a `CAlphabet` will create a new base at the underlying library level.
+    nmm_baset : CData
+        Base table.
     """
 
     def __init__(self, nmm_baset: ffi.CData):
@@ -26,7 +44,7 @@ class BaseTable:
             raise RuntimeError("`nmm_baset` is NULL.")
 
     @classmethod
-    def create(cls: Type[T], alphabet: CAlphabet, lprobs: Dict[bytes, float] = {}) -> T:
+    def create(cls: Type[T], alphabet: CAlphabet, lprobs: Dict[Base, float] = {}) -> T:
 
         nmm_baset = lib.nmm_baset_create(alphabet.imm_abc)
         if nmm_baset == ffi.NULL:
@@ -49,22 +67,14 @@ class BaseTable:
             return CAlphabet(lib.nmm_baset_get_abc(self._nmm_baset))
         return self._alphabet
 
-    def set_lprob(self, nucleotide: bytes, lprob: float) -> None:
-        letter = nucleotide
-        if len(letter) != 1:
-            raise ValueError("Nucleotide must be a single letter.")
-
-        err: int = lib.nmm_baset_set_lprob(self._nmm_baset, letter, lprob)
+    def set_lprob(self, base: Base, lprob: float) -> None:
+        err: int = lib.nmm_baset_set_lprob(self._nmm_baset, bytes(base), lprob)
         if err != 0:
-            nucl = nucleotide.decode()
+            nucl = str(base)
             raise ValueError(f"Could not set a probability for `{nucl}`.")
 
-    def get_lprob(self, nucleotide: bytes) -> float:
-        letter = nucleotide
-        if len(letter) != 1:
-            raise ValueError("Nucleotide must be a single letter.")
-
-        return lib.nmm_baset_get_lprob(self._nmm_baset, letter)
+    def get_lprob(self, base: Base) -> float:
+        return lib.nmm_baset_get_lprob(self._nmm_baset, bytes(base))
 
     def normalize(self) -> None:
         err: int = lib.nmm_baset_normalize(self._nmm_baset)
