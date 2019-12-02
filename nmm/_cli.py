@@ -1,4 +1,6 @@
 import click
+from click.utils import LazyFile
+from typing import Union, Any
 
 from nmm._gencode import GeneticCode
 from nmm._gff import GFFItem, GFFWriter
@@ -65,11 +67,29 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
                 write_target(oamino, seqid + "_amino", amino_result.sequence.decode())
                 create_gffitems(gff, amino_result, seqid + "_amino", acc, epsilon)
 
+    print()
     if output is not None:
         gff.dump(output)
+        finalize_stream(output)
+
+    if ocodon is not None:
+        finalize_stream(ocodon)
+
+    if oamino is not None:
+        finalize_stream(oamino)
 
 
 cli.add_command(search)
+
+
+def finalize_stream(stream: Union[LazyFile, Any]):
+    if not isinstance(stream, LazyFile):
+        return
+
+    if stream.name != "-":
+        print(f"Writing to <{stream.name}> file.")
+
+    stream.close_intelligently()
 
 
 def write_target(file, defline: str, sequence: str):

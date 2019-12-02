@@ -1,0 +1,4 @@
+##gff-version 3
+GALNBKIG_00914_ont_01_plus_strand	nmm:PF03373.14	.	1	34	0.0	+	.	Epsilon=0.01
+GALNBKIG_00914_ont_01_plus_strand_codon	nmm:PF03373.14	.	1	33	0.0	+	.	Epsilon=0.01
+GALNBKIG_00914_ont_01_plus_strand_amino	nmm:PF03373.14	.	1	11	0.0	+	.	Epsilon=0.01
