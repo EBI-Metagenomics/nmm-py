@@ -1,12 +1,8 @@
 include LICENSE.md
 include README.md
-include nmm/test/Nckap1.hmm
-include nmm/test/PF02545.hmm
 include nmm/_hmmer/test/PF03373.hmm
-include nmm/test/PF03373.hmm
-include nmm/test/PF03373.seq
-include nmm/test/PF03373_rna1.seq
 include nmm/test/GALNBKIG_cut.fasta
+include nmm/test/PF03373.hmm
 include nmm/test/PF03373_GALNBKIG_cut.amino.fasta
 include nmm/test/PF03373_GALNBKIG_cut.codon.fasta
 include nmm/test/PF03373_GALNBKIG_cut.gff
