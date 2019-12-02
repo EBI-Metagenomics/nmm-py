@@ -1,5 +1,6 @@
-from ._alphabet import Alphabet, CAlphabet
-from typing import Dict, Optional, Union, Type, TypeVar
+from typing import Dict, Type, TypeVar, Union, Optional
+
+from ._alphabet import CAlphabet
 from ._base import Base
 from ._ffi import ffi, lib
 
@@ -75,8 +76,7 @@ class CodonTable:
         if nmm_codont == ffi.NULL:
             raise RuntimeError("`nmm_codont` is NULL.")
         self._nmm_codont = nmm_codont
-        imm_abc = lib.nmm_codont_get_abc(self._nmm_codont)
-        self._alphabet = CAlphabet.clone_from_imm_abc(imm_abc)
+        self._alphabet: Optional[CAlphabet] = None
 
     @classmethod
     def create(cls: Type[T], alphabet: CAlphabet, lprobs: Dict[Codon, float] = {}) -> T:
@@ -86,6 +86,7 @@ class CodonTable:
             raise RuntimeError("`nmm_codont_create` failed.")
 
         codont = cls(nmm_codont)
+        cls._alphabet = alphabet
         for codon, lprob in lprobs.items():
             codont.set_lprob(codon, lprob)
 
@@ -97,11 +98,10 @@ class CodonTable:
 
     @property
     def alphabet(self) -> CAlphabet:
+        if self._alphabet is None:
+            imm_abc = lib.nmm_codont_get_abc(self._nmm_codont)
+            return CAlphabet.clone_from_imm_abc(imm_abc)
         return self._alphabet
-
-    @property
-    def imm_abc(self) -> ffi.CData:
-        return lib.nmm_codont_get_abc(self._nmm_codont)
 
     def set_lprob(self, codon: Codon, lprob: float) -> None:
         err: int = lib.nmm_codont_set_lprob(self._nmm_codont, codon.nmm_codon, lprob)

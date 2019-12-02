@@ -1,10 +1,17 @@
-from typing import Dict, Type, TypeVar, Union
+from typing import Dict, Type, TypeVar, Union, Optional
 
 from ._alphabet import CAlphabet
 from ._ffi import ffi, lib
 
 
 class Base:
+    """
+    Base is a nucleotide letter.
+
+    base : Union[bytes, str, int]
+        A single letter.
+    """
+
     def __init__(self, base: Union[bytes, str, int]):
         if isinstance(base, str):
             base = base.encode()
@@ -50,8 +57,7 @@ class BaseTable:
         if nmm_baset == ffi.NULL:
             raise RuntimeError("`nmm_baset` is NULL.")
         self._nmm_baset = nmm_baset
-        imm_abc = lib.nmm_baset_get_abc(self._nmm_baset)
-        self._alphabet = CAlphabet.clone_from_imm_abc(imm_abc)
+        self._alphabet: Optional[CAlphabet] = None
 
     @classmethod
     def create(cls: Type[T], alphabet: CAlphabet, lprobs: Dict[Base, float] = {}) -> T:
@@ -61,6 +67,7 @@ class BaseTable:
             raise RuntimeError("`nmm_baset_create` failed.")
 
         baset = cls(nmm_baset)
+        baset._alphabet = alphabet
         for letter, lprob in lprobs.items():
             baset.set_lprob(letter, lprob)
 
@@ -72,6 +79,9 @@ class BaseTable:
 
     @property
     def alphabet(self) -> CAlphabet:
+        if self._alphabet is None:
+            imm_abc = lib.nmm_baset_get_abc(self._nmm_baset)
+            return CAlphabet.clone_from_imm_abc(imm_abc)
         return self._alphabet
 
     def set_lprob(self, base: Base, lprob: float) -> None:
