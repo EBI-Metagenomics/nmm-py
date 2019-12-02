@@ -80,7 +80,7 @@ class StandardSearchResult(SearchResult):
         return self._fragments
 
     @property
-    def interval(self) -> Sequence[Interval]:
+    def intervals(self) -> Sequence[Interval]:
         return self._intervals
 
     @property

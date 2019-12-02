@@ -39,8 +39,8 @@ ctg123 . exon            7000  9000  .  +  .  ID=exon00005;Parent=mrna0001
 """
 from typing import NamedTuple, List, Union
 
-Item = NamedTuple(
-    "Item",
+GFFItem = NamedTuple(
+    "GFFItem",
     [
         ("seqid", str),
         ("source", str),
@@ -57,9 +57,9 @@ Item = NamedTuple(
 
 class GFFWriter:
     def __init__(self):
-        self._items: List[Item] = []
+        self._items: List[GFFItem] = []
 
-    def append(self, item: Item):
+    def append(self, item: GFFItem):
         self._items.append(item)
 
     def dump(self, fp):

@@ -1,10 +1,10 @@
-from typing import Iterator, List, Tuple, TypeVar, Union
+from typing import Iterator, List, Tuple, TypeVar, Union, Sequence
 
 from .._ffi import ffi
 from .._path import CPath
 from .._state import MuteState, NormalState
 from .._step import CStep
-from .result import Fragment
+from .result import Fragment, SearchResult, Interval
 
 
 class AminoAcidStep(CStep):
@@ -58,3 +58,28 @@ class AminoAcidFragment(Fragment):
     def __repr__(self):
         seq = self.sequence.decode()
         return f"<{self.__class__.__name__}:{seq}>"
+
+
+class AminoAcidSearchResult(SearchResult):
+    def __init__(
+        self,
+        score: float,
+        fragments: Sequence[AminoAcidFragment],
+        intervals: Sequence[Interval],
+    ):
+        self._score = score
+
+        self._fragments: List[AminoAcidFragment] = list(fragments)
+        self._intervals: List[Interval] = list(intervals)
+
+    @property
+    def fragments(self) -> Sequence[AminoAcidFragment]:
+        return self._fragments
+
+    @property
+    def intervals(self) -> Sequence[Interval]:
+        return self._intervals
+
+    @property
+    def score(self) -> float:
+        return self._score

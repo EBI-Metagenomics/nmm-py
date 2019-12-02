@@ -6,7 +6,7 @@ from .._log import LOG1
 from .._path import CPath
 from .._state import CodonState, FrameState, MuteState
 from .._step import CStep
-from .codon import CodonFragment, CodonPath
+from .codon import CodonFragment, CodonPath, CodonSearchResult, CodonStep
 from .result import Fragment, Interval, SearchResult
 
 
@@ -58,7 +58,7 @@ class FrameFragment(Fragment):
             yield (self.sequence[start:end], step)
             start = end
 
-    def decode_codons(self) -> CodonFragment:
+    def decode(self) -> CodonFragment:
         nseq: List[Codon] = []
         npath = CodonPath()
 
@@ -106,12 +106,29 @@ class FrameSearchResult(SearchResult):
         return self._fragments
 
     @property
-    def interval(self) -> Sequence[Interval]:
+    def intervals(self) -> Sequence[Interval]:
         return self._intervals
 
     @property
     def score(self) -> float:
         return self._score
+
+    def decode(self) -> CodonSearchResult:
+        fragments: List[CodonFragment] = []
+        intervals: List[Interval] = []
+
+        start = end = 0
+        for i, frag in enumerate(self._fragments):
+
+            codon_frag = frag.decode()
+            end += len(codon_frag.sequence)
+
+            fragments.append(codon_frag)
+            intervals.append(Interval(start, end))
+
+            start = end
+
+        return CodonSearchResult(self.score, fragments, intervals)
 
 
 def _create_path(steps: List[FrameStep]):

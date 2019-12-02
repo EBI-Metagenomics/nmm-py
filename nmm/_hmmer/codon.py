@@ -8,8 +8,8 @@ from .._log import LOG1
 from .._path import CPath
 from .._state import CodonState, MuteState, NormalState, TableState
 from .._step import CStep
-from .amino_acid import AminoAcidFragment, AminoAcidPath
-from .result import Fragment
+from .amino_acid import AminoAcidFragment, AminoAcidPath, AminoAcidSearchResult
+from .result import Fragment, Interval, SearchResult
 
 
 class CodonStep(CStep):
@@ -89,3 +89,45 @@ class CodonFragment(Fragment):
     def __repr__(self):
         seq = self.sequence.decode()
         return f"<{self.__class__.__name__}:{seq}>"
+
+
+class CodonSearchResult(SearchResult):
+    def __init__(
+        self,
+        score: float,
+        fragments: Sequence[CodonFragment],
+        intervals: Sequence[Interval],
+    ):
+        self._score = score
+
+        self._fragments: List[CodonFragment] = list(fragments)
+        self._intervals: List[Interval] = list(intervals)
+
+    @property
+    def fragments(self) -> Sequence[CodonFragment]:
+        return self._fragments
+
+    @property
+    def intervals(self) -> Sequence[Interval]:
+        return self._intervals
+
+    @property
+    def score(self) -> float:
+        return self._score
+
+    def decode(self, genetic_code: GeneticCode) -> AminoAcidSearchResult:
+        fragments: List[AminoAcidFragment] = []
+        intervals: List[Interval] = []
+
+        start = end = 0
+        for i, frag in enumerate(self._fragments):
+
+            codon_frag = frag.decode(genetic_code)
+            end += len(codon_frag.sequence)
+
+            fragments.append(codon_frag)
+            intervals.append(Interval(start, end))
+
+            start = end
+
+        return AminoAcidSearchResult(self.score, fragments, intervals)

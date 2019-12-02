@@ -127,7 +127,7 @@ def test_frame_profile_codons(PF03373):
     r = hmmer.search(rna_seq)
     assert_allclose(r.score, 175.35113397356454)
     frags = r.fragments
-    cfrags = [f.decode_codons() for f in frags]
+    cfrags = [f.decode() for f in frags]
     aafrags = [f.decode(gcode) for f in cfrags]
 
     assert_equal(len(frags), 2)

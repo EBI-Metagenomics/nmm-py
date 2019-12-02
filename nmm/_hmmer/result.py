@@ -51,13 +51,17 @@ class SearchResult(ABC):
             frag_end += step.seq_len
 
     @property
+    def sequence(self) -> bytes:
+        return b"".join(frag.sequence for frag in self.fragments)
+
+    @property
     @abstractmethod
     def fragments(self) -> Sequence[Fragment]:
         raise NotImplementedError()
 
     @property
     @abstractmethod
-    def interval(self) -> Sequence[Interval]:
+    def intervals(self) -> Sequence[Interval]:
         raise NotImplementedError()
 
     @property
