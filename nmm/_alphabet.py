@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Type, TypeVar
 
 from ._ffi import ffi, lib
 
@@ -38,6 +39,9 @@ class AlphabetBase(ABC):
         return f"{{{self.__class__.__name__}:{symbols}}}"
 
 
+T = TypeVar("T", bound="CAlphabet")
+
+
 class CAlphabet(AlphabetBase):
     """
     Wrapper around the C implementation of alphabet set.
@@ -49,6 +53,13 @@ class CAlphabet(AlphabetBase):
 
     def __init__(self, imm_abc: ffi.CData):
         self._imm_abc = imm_abc
+
+    @classmethod
+    def clone_from_imm_abc(cls: Type[T], imm_abc: ffi.CData) -> T:
+        t = lib.imm_abc_clone(imm_abc)
+        if t == ffi.NULL:
+            raise RuntimeError("`imm_abc_clone` failed.")
+        return cls(t)
 
     @property
     def imm_abc(self) -> ffi.CData:

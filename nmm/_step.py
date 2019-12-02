@@ -43,12 +43,12 @@ class CStep(StepBase):
 
     def __init__(self, imm_step: ffi.CData):
         super().__init__()
+        if imm_step == ffi.NULL:
+            raise RuntimeError("`imm_step` is NULL.")
         self._imm_step = imm_step
 
     @property
     def imm_step(self) -> ffi.CData:
-        if self._imm_step == ffi.NULL:
-            raise RuntimeError("`imm_step` is NULL.")
         return self._imm_step
 
     @property
@@ -62,26 +62,3 @@ class CStep(StepBase):
     def __repr__(self) -> str:
         name = self.state.name.decode()
         return f"<{self.__class__.__name__}:{name},{self.seq_len}>"
-
-
-# class Step(CStep):
-#     """
-#     Path step.
-
-#     A step is composed of a state and an emitted sequence length. The user should not need to
-#     directly call the constructor of this class but instead use the methods from the `Path` class.
-
-#     Parameters
-#     ----------
-#     imm_step : ffi.CData
-#         A non-null `<cdata 'struct imm_step *'>`.
-#     state : State.
-#     seq_len : Sequence length.
-#     """
-
-#     def __init__(self, imm_step: ffi.CData):
-#         super().__init__(imm_step)
-
-#     def __repr__(self) -> str:
-#         name = self.state.name.decode()
-#         return f"<{self.__class__.__name__}:{name},{self.seq_len}>"

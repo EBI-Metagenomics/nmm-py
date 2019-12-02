@@ -5,6 +5,13 @@ from ._ffi import ffi, lib
 
 
 class Codon:
+    """
+    Codon is a sequence of three bases.
+
+    codon : Union[bytes, str, ffi.CData]
+        Sequence of letters representing a codon.
+    """
+
     def __init__(self, codon: Union[bytes, str, ffi.CData]):
         if isinstance(codon, str):
             codon = codon.encode()

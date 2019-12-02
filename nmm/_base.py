@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Type, TypeVar, Union
+from typing import Dict, Type, TypeVar, Union
 
 from ._alphabet import CAlphabet
 from ._ffi import ffi, lib
@@ -47,10 +47,11 @@ class BaseTable:
     """
 
     def __init__(self, nmm_baset: ffi.CData):
-        self._nmm_baset = nmm_baset
-        self._alphabet: Optional[CAlphabet] = None
-        if self._nmm_baset == ffi.NULL:
+        if nmm_baset == ffi.NULL:
             raise RuntimeError("`nmm_baset` is NULL.")
+        self._nmm_baset = nmm_baset
+        imm_abc = lib.nmm_baset_get_abc(self._nmm_baset)
+        self._alphabet = CAlphabet.clone_from_imm_abc(imm_abc)
 
     @classmethod
     def create(cls: Type[T], alphabet: CAlphabet, lprobs: Dict[Base, float] = {}) -> T:
@@ -72,8 +73,6 @@ class BaseTable:
 
     @property
     def alphabet(self) -> CAlphabet:
-        if self._alphabet is None:
-            return CAlphabet(lib.nmm_baset_get_abc(self._nmm_baset))
         return self._alphabet
 
     def set_lprob(self, base: Base, lprob: float) -> None:

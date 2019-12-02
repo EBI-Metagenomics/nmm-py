@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Iterator, Optional, Sequence, Tuple, Type, TypeVar
 
 from ._ffi import ffi, lib
-from ._step import CStep, StepBase
 from ._state import CState
+from ._step import CStep, StepBase
 
 
 class PathBase(ABC):
@@ -62,14 +62,7 @@ class CPath(PathBase):
             lib.imm_path_destroy(self._imm_path)
 
     def __repr__(self):
-        step_repr = []
-        step = lib.imm_path_first(self._imm_path)
-        while step != ffi.NULL:
-            name = ffi.string(lib.imm_state_get_name(lib.imm_step_state(step)))
-            seq_len = lib.imm_step_seq_len(step)
-            step_repr += [f"<{name.decode()}:{seq_len}>"]
-            step = lib.imm_path_next(self._imm_path, step)
-
+        step_repr = [f"<{s.state.name.decode()}:{s.seq_len}>" for s in self.steps()]
         msg = "".join(step_repr)
         return f"<{self.__class__.__name__}:{msg}>"
 
