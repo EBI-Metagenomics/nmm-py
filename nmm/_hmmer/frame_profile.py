@@ -4,20 +4,20 @@ from typing import Any, Dict, List, Sequence, Tuple
 from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
-from .._base import BaseTable, Base
+from .._base import Base, BaseTable
 from .._codon import CodonTable
 from .._gencode import GeneticCode
 from .._log import LOG0
 from .._state import FrameState, MuteState
-from .profile import Profile
-from .frame_result import FrameSearchResult
-from .transition import Transitions
-from .frame_core import (
+from .frame import FrameSearchResult
+from .frame_model import (
     FrameAltModel,
     FrameNode,
     FrameNullModel,
     FrameSpecialNode,
+    Transitions,
 )
+from .profile import Profile
 
 
 class FrameStateFactory:

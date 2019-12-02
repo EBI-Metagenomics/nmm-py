@@ -4,15 +4,15 @@ from hmmer_reader import HMMEReader
 
 from .._alphabet import Alphabet
 from .._state import MuteState, NormalState
+from .model import Transitions
 from .profile import Profile
-from .standard_core import (
+from .standard import StandardSearchResult
+from .standard_model import (
     StandardAltModel,
     StandardNode,
     StandardNullModel,
     StandardSpecialNode,
 )
-from .standard_result import StandardSearchResult
-from .transition import Transitions
 
 
 class StandardProfile(Profile):

@@ -1,11 +1,10 @@
 from typing import Iterator, List, Tuple, TypeVar, Union
 
-from .result import Fragment
-from .._state import NormalState, MuteState
-
 from .._ffi import ffi
-from .._step import CStep
 from .._path import CPath
+from .._state import MuteState, NormalState
+from .._step import CStep
+from .result import Fragment
 
 
 class AminoAcidStep(CStep):

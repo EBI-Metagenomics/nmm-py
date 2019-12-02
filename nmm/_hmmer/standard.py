@@ -1,7 +1,39 @@
-from typing import Iterator, List, Sequence, Tuple
+from typing import Iterator, List, Sequence, Tuple, TypeVar, Union
 
+from .._ffi import ffi
+from .._path import CPath
+from .._state import MuteState, NormalState
+from .._step import CStep
 from .result import Fragment, Interval, SearchResult
-from .standard_core import StandardPath, StandardStep
+
+
+class StandardStep(CStep):
+    def __init__(self, imm_step: ffi.CData, state: Union[MuteState, NormalState]):
+        super().__init__(imm_step)
+        self._state = state
+
+    @property
+    def state(self) -> Union[MuteState, NormalState]:
+        return self._state
+
+
+T = TypeVar("T", bound="StandardPath")
+
+
+class StandardPath(CPath):
+    def __init__(self):
+        super().__init__()
+        self._steps: List[StandardStep] = []
+
+    def append_standard_step(
+        self, state: Union[MuteState, NormalState], seq_len: int
+    ) -> StandardStep:
+        cstep = self.append_cstep(state, seq_len)
+        self._steps.append(StandardStep(cstep.imm_step, state))
+        return self._steps[-1]
+
+    def steps(self) -> Iterator[StandardStep]:
+        return iter(self._steps)
 
 
 class StandardFragment(Fragment):

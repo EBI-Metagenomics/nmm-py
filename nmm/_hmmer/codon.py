@@ -1,16 +1,15 @@
-from typing import Iterator, List, Tuple, TypeVar, Union, Sequence
+from typing import Iterator, List, Sequence, Tuple, TypeVar, Union
 
+from .._alphabet import Alphabet
+from .._codon import Codon
 from .._ffi import ffi
 from .._gencode import GeneticCode
 from .._log import LOG1
 from .._path import CPath
-from .._codon import Codon
-from .._state import CodonState, MuteState, TableState, NormalState
+from .._state import CodonState, MuteState, NormalState, TableState
 from .._step import CStep
-from .._alphabet import Alphabet
-from .result import Fragment
-
 from .amino_acid import AminoAcidFragment, AminoAcidPath
+from .result import Fragment
 
 
 class CodonStep(CStep):

@@ -1,40 +1,9 @@
-from typing import Dict, Iterator, List, Sequence, Tuple, TypeVar, Union
+from typing import Dict, List, Sequence, Tuple, Union
 
 from .._ffi import ffi
-from .._path import CPath
-from .._state import MuteState, FrameState
-from .._step import CStep
-from .core import AltModel, Node, NullModel, SpecialNode
-from .transition import Transitions
-
-
-class FrameStep(CStep):
-    def __init__(self, imm_step: ffi.CData, state: Union[MuteState, FrameState]):
-        super().__init__(imm_step)
-        self._state = state
-
-    @property
-    def state(self) -> Union[MuteState, FrameState]:
-        return self._state
-
-
-T = TypeVar("T", bound="FramePath")
-
-
-class FramePath(CPath):
-    def __init__(self):
-        super().__init__()
-        self._steps: List[FrameStep] = []
-
-    def append_frame_step(
-        self, state: Union[MuteState, FrameState], seq_len: int
-    ) -> FrameStep:
-        cstep = self.append_cstep(state, seq_len)
-        self._steps.append(FrameStep(cstep.imm_step, state))
-        return self._steps[-1]
-
-    def steps(self) -> Iterator[FrameStep]:
-        return iter(self._steps)
+from .._state import FrameState, MuteState
+from .frame import FramePath
+from .model import AltModel, Node, NullModel, SpecialNode, Transitions
 
 
 class FrameNode(Node):

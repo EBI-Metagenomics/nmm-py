@@ -1,8 +1,8 @@
 from math import log
 
 from .._log import LOG0, LOG1
+from .model import AltModel, NullModel
 from .result import SearchResult
-from .core import NullModel, AltModel
 
 
 class Profile:
