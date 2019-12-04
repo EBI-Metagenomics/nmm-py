@@ -9,6 +9,7 @@ from ._log import LOG0
 from ._path import CPath
 from ._state import FrameState, MuteState, NormalState, TableState, CodonState
 from ._step import CStep
+from ._testit import test
 
 try:
     from ._ffi import ffi as _
@@ -25,10 +26,12 @@ and reinstall the package again."""
 __version__ = "0.0.1"
 
 __all__ = [
-    "Codon",
-    "Base",
     "Alphabet",
+    "Base",
     "BaseTable",
+    "CPath",
+    "CStep",
+    "Codon",
     "CodonState",
     "CodonTable",
     "FrameState",
@@ -37,12 +40,11 @@ __all__ = [
     "LOG0",
     "MuteState",
     "NormalState",
-    "CPath",
-    "CStep",
     "TableState",
     "__version__",
     "cli",
     "create_frame_profile",
     "create_standard_profile",
     "read_hmmer",
+    "test",
 ]
