@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$TRAVIS_OS_NAME" != "windows" ]; then
+if type sudo; then
     export DO_CMD=sudo
 fi
 
@@ -10,5 +10,5 @@ curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=im
 curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=nmm bash
 
 if type ldconfig; then
-    sudo ldconfig
+    $DO_CMD ldconfig
 fi
