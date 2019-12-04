@@ -1,0 +1,60 @@
+language: python
+python: 3.6
+env:
+  global:
+    - PKG_NAME=nmm
+    - CIBW_SKIP="cp27-* cp34-* cp35-*"
+    - CIBW_BEFORE_BUILD="python -m pip install numpy && python -m pip install pandas"
+    - CIBW_TEST_COMMAND="python -c \"import $PKG_NAME; import sys; sys.exit($PKG_NAME.test())\""
+    - URL=https://raw.githubusercontent.com/horta/ci/master
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      services:
+        - docker
+    - os: osx
+      osx_image: xcode11.2 # Python 3.7.4 running on macOS 10.14.4
+      language: shell # 'language: python' is an error on Travis CI macOS
+      before_install:
+        - pip3 install --upgrade pip
+        - pip3 install --upgrade virtualenv
+        - virtualenv $HOME/venv # virtualenv will use Python 3
+        - source $HOME/venv/bin/activate
+    - os: windows
+      language: shell
+      before_install:
+        - choco install python3 --version 3.6.8 --no-progress -y
+        - choco install make --no-progress -y
+      env:
+        - PATH=/c/Python36:/c/Python36/Scripts:$PATH
+addons:
+  apt:
+    packages:
+      - libffi-dev
+      - cmake
+install:
+  - curl -fsSL $URL/travis-check-readme.sh | bash
+  - curl -fsSL $URL/travis-py-min-deps.sh | bash
+  - curl -fsSL $URL/travis-py-check-style.sh | bash
+  - curl -fsSL $URL/travis-py-check-black.sh | bash
+  - curl -fsSL $URL/travis-py-dev-test.sh | bash
+  - curl -fsSL $URL/travis-py-install-test.sh | bash
+  - curl -fsSL $URL/travis-py-doctest.sh | bash
+script:
+  - curl -fsSL $URL/travis-py-sdist-test.sh | bash
+  - git clean -xdf
+  - python -m pip install git+https://github.com/joerick/cibuildwheel.git
+  - cibuildwheel --output-dir wheelhouse
+  - |
+    if [ "${TRAVIS_TAG:-}" != "" ]; then
+      python -m pip install twine
+      python -m twine upload --skip-existing wheelhouse/*
+    fi
+  - git clean -xdf
+notifications:
+  email:
+    recipients:
+      - danilo.horta@pm.me
+    on_success: never
+    on_failure: always
