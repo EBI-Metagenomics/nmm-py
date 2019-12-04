@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if type sudo; then
+if type sudo && sudo -V; then
     export DO_CMD=sudo
 fi
 
