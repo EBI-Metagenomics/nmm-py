@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$TRAVIS_OS_NAME" != "windows"]; then
+if [ "$TRAVIS_OS_NAME" != "windows" ]; then
     export DO_CMD=sudo
 fi
 
