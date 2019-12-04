@@ -28,7 +28,7 @@ addons:
       - libffi-dev
       - cmake
 install:
-  - ci/install_c_deps.sh
+  - ci/install-c-deps.sh
   - curl -fsSL $URL/travis-check-readme.sh | bash
   - curl -fsSL $URL/travis-py-min-deps.sh | bash
   - curl -fsSL $URL/travis-py-check-style.sh | bash
