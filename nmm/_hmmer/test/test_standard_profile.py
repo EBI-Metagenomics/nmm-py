@@ -135,8 +135,6 @@ def test_standard_profile_multihit_homologous1(PF03373):
     frags = r.fragments
     assert_equal(len(frags), 3)
     assert_equal(frags[0].homologous, False)
-    assert_equal(frags[0].sequence, b"PPPPGKEDNNKDDD")
     assert_equal(frags[1].homologous, True)
     assert_equal(frags[1].sequence, b"PGKEDNNK")
     assert_equal(frags[2].homologous, False)
-    assert_equal(frags[2].sequence, b"EEEE")
