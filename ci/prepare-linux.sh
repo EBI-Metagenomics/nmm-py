@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yum uninstall -y cmake
+yum remove -y cmake
 
 if [ $(uname -m) == 'x86_64' ];
 then
