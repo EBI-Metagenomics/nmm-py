@@ -6,7 +6,7 @@ from .._log import LOG1
 from .._path import CPath
 from .._state import CodonState, FrameState, MuteState
 from .._step import CStep
-from .codon import CodonFragment, CodonPath, CodonSearchResult, CodonStep
+from .codon import CodonFragment, CodonPath, CodonSearchResult
 from .result import Fragment, Interval, SearchResult
 
 
