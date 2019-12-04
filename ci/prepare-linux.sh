@@ -1,5 +1,7 @@
 #!/bin/bash
 
+yum uninstall -y cmake
+
 if [ $(uname -m) == 'x86_64' ];
 then
     TAG='x86_64';
