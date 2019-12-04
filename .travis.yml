@@ -21,13 +21,6 @@ matrix:
         - pip3 install --upgrade virtualenv
         - virtualenv $HOME/venv # virtualenv will use Python 3
         - source $HOME/venv/bin/activate
-    - os: windows
-      language: shell
-      before_install:
-        - choco install python3 --version 3.6.8 --no-progress -y
-        - choco install make --no-progress -y
-      env:
-        - PATH=/c/Python36:/c/Python36/Scripts:$PATH
 addons:
   apt:
     packages:
