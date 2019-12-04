@@ -23,7 +23,7 @@ and reinstall the package again."""
 
     raise RuntimeError(str(e) + _ffi_err)
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 __all__ = [
     "Alphabet",

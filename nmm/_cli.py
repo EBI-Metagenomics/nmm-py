@@ -100,10 +100,10 @@ def write_target(file, defline: str, sequence: str):
 def create_gffitems(
     gff: GFFWriter, result: SearchResult, seqid: str, accession: str, epsilon: float
 ):
-    hfrags = [frag for frag in result.fragments if frag.homologous]
-
     source = f"nmm:{accession}"
-    for i, frag in enumerate(hfrags):
+    for i, frag in enumerate(result.fragments):
+        if not frag.homologous:
+            continue
 
         start = result.intervals[i].start
         end = result.intervals[i].end
@@ -115,12 +115,14 @@ def create_gffitems(
 
 def show_search_result(result: SearchResult):
     frags = result.fragments
-    hfrags = [frag for frag in result.fragments if frag.homologous]
+    nhomo = sum(frag.homologous for frag in result.fragments)
 
     print()
-    print(f"Found {len(hfrags)} homologous fragments ({len(frags)} in total).")
+    print(f"Found {nhomo} homologous fragments ({len(frags)} in total).")
 
-    for i, frag in enumerate(hfrags):
+    for i, frag in enumerate(frags):
+        if not frag.homologous:
+            continue
         start = result.intervals[i].start
         end = result.intervals[i].end
         print(f"Homologous fragment={i}; Position=[{start + 1}, {end}]")
