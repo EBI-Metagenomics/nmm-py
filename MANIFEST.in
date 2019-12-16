@@ -9,7 +9,5 @@ include nmm/test/PF03373_GALNBKIG_cut.amino.fasta
 include nmm/test/PF03373_GALNBKIG_cut.codon.fasta
 include nmm/test/PF03373_GALNBKIG_cut.gff
 include version.py
-include nmm/imm.dll
-include nmm/nmm.dll
 include nmm/imm.h
 include nmm/nmm.h
