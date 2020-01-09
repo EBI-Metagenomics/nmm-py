@@ -1,7 +1,9 @@
+from typing import Any, Union
+
 import click
 from click.utils import LazyFile
-from typing import Union, Any
 
+from fasta_reader import FASTAWriter
 from nmm._gencode import GeneticCode
 from nmm._gff import GFFItem, GFFWriter
 from nmm._hmmer import SearchResult
@@ -27,8 +29,15 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
     from hmmer_reader import open_hmmer
 
     record_writer = RecordWriter(epsilon)
-    codon_writer = TargetWriter(ocodon)
-    target_writer = TargetWriter(ocodon, oamino)
+
+    codon_writer: Union[FASTAWriter, None] = None
+    if ocodon is not None:
+        codon_writer = FASTAWriter(ocodon)
+
+    amino_writer: Union[FASTAWriter, None] = None
+    if oamino is not None:
+        amino_writer = FASTAWriter(oamino)
+
     gcode = GeneticCode()
 
     with open_hmmer(profile) as hmmfile:
@@ -43,7 +52,9 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
 
             show_header1("Targets")
 
-            process_sequence(prof, target, record_writer, target_writer, gcode)
+            process_sequence(
+                prof, target, record_writer, codon_writer, amino_writer, gcode
+            )
 
             print()
 
@@ -51,11 +62,11 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
         record_writer.dump(output)
         finalize_stream(output)
 
-    if target_writer.has_ocodon:
-        finalize_stream(target_writer.ocodon)
+    if codon_writer is not None:
+        finalize_stream(ocodon)
 
-    if target_writer.has_oamino:
-        finalize_stream(target_writer.oamino)
+    if amino_writer is not None:
+        finalize_stream(oamino)
 
 
 cli.add_command(search)
@@ -129,7 +140,12 @@ class TargetWriter:
 
 
 def process_sequence(
-    prof, target, record: RecordWriter, target_writer: TargetWriter, gcode
+    prof,
+    target,
+    record: RecordWriter,
+    codon_writer: Union[FASTAWriter, None],
+    amino_writer: Union[FASTAWriter, None],
+    gcode,
 ):
     from fasta_reader import open_fasta
 
@@ -150,16 +166,18 @@ def process_sequence(
             show_search_result(frame_result)
             record.add_items(frame_result, seqid)
 
-            if target_writer.has_ocodon:
+            if codon_writer is not None:
                 show_search_result(codon_result)
-                target_writer.add_ocodon_target(seqid, codon_result.sequence.decode())
-                record.add_items(codon_result, seqid + "_codon")
+                ident = seqid + "_codon"
+                codon_writer.write_item(ident, codon_result.sequence.decode())
+                record.add_items(codon_result, ident)
 
-            if target_writer.has_oamino:
+            if amino_writer is not None:
                 amino_result = codon_result.decode(gcode)
                 show_search_result(amino_result)
-                target_writer.add_oamino_target(seqid, amino_result.sequence.decode())
-                record.add_items(amino_result, seqid + "_amino")
+                ident = seqid + "_amino"
+                amino_writer.write_item(ident, amino_result.sequence.decode())
+                record.add_items(amino_result, ident)
 
 
 def finalize_stream(stream: Union[LazyFile, Any]):
