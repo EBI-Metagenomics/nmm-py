@@ -10,20 +10,15 @@ env:
 matrix:
   include:
     - os: linux
-      # dist: bionic
-      # sudo: required
       services: docker
       env:
         - LIBRARY_PATH=/usr/local/lib
         - LD_LIBRARY_PATH=/usr/local/lib
-    # - os: osx
-    #   osx_image: xcode11.2 # Python 3.7.4 running on macOS 10.14.4
-    #   language: shell # 'language: python' is an error on Travis CI macOS
-    #   before_install:
-    #     - pip3 install --upgrade pip
-    #     - pip3 install --upgrade virtualenv
-    #     - virtualenv $HOME/venv # virtualenv will use Python 3
-    #     - source $HOME/venv/bin/activate
+    - os: osx
+      osx_image: xcode11.2 # Python 3.7.4 running on macOS 10.14.4
+      language: shell
+      before_install:
+        - python3 -m pip install --upgrade pip setuptools
 addons:
   apt:
     packages:
