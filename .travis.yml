@@ -1,4 +1,4 @@
-python: 3.8
+python: 3.8.1
 env:
   global:
     - URL=https://raw.githubusercontent.com/horta/ci/master
@@ -9,7 +9,7 @@ env:
 matrix:
   include:
     - os: linux
-      dist: bionic
+      # dist: bionic
       language: python
       services: docker
       env:
