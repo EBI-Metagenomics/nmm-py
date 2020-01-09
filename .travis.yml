@@ -1,4 +1,5 @@
-python: 3.8.1
+language: python
+python: 3.7
 env:
   global:
     - URL=https://raw.githubusercontent.com/horta/ci/master
@@ -10,7 +11,7 @@ matrix:
   include:
     - os: linux
       # dist: bionic
-      language: python
+      sudo: required
       services: docker
       env:
         - LIBRARY_PATH=/usr/local/lib
