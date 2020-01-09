@@ -3,10 +3,12 @@ from typing import Any, Union
 import click
 from click.utils import LazyFile
 
-from fasta_reader import FASTAWriter
+from fasta_reader import FASTAWriter, FASTAParser, open_fasta
+from hmmer_reader import open_hmmer
 from nmm._gencode import GeneticCode
 from nmm._gff import GFFItem, GFFWriter
 from nmm._hmmer import SearchResult
+from nmm._hmmer.frame_profile import FrameProfile
 
 
 @click.group(name="nmm", context_settings=dict(help_option_names=["-h", "--help"]))
@@ -26,7 +28,6 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
     Search nucleotide sequences against a HMMER3 Protein profile.
     """
     from nmm import create_frame_profile
-    from hmmer_reader import open_hmmer
 
     record_writer = RecordWriter(epsilon)
 
@@ -39,24 +40,25 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
         amino_writer = FASTAWriter(oamino)
 
     gcode = GeneticCode()
+    with open_fasta(target) as fasta:
+        targets = list(fasta)
 
-    with open_hmmer(profile) as hmmfile:
-        for hmmprof in hmmfile:
-            record_writer.accession = hmmprof.metadata["ACC"]
-            prof = create_frame_profile(hmmprof, epsilon=epsilon)
+    for hmmprof in open_hmmer(profile):
+        record_writer.profile = hmmprof.metadata["ACC"]
+        prof = create_frame_profile(hmmprof, epsilon=epsilon)
 
-            show_header1("Profile")
-            print()
-            print(hmmprof)
-            print()
+        show_header1("Profile")
+        print()
+        print(hmmprof)
+        print()
 
-            show_header1("Targets")
+        show_header1("Targets")
 
-            process_sequence(
-                prof, target, record_writer, codon_writer, amino_writer, gcode
-            )
+        process_sequence(
+            prof, targets, record_writer, codon_writer, amino_writer, gcode
+        )
 
-            print()
+        print()
 
     if output is not None:
         record_writer.dump(output)
@@ -75,29 +77,39 @@ cli.add_command(search)
 class RecordWriter:
     def __init__(self, epsilon: float):
         self._gff = GFFWriter()
-        self._accession = "NOTSET"
+        self._profile = "NOTSET"
         self._epsilon = epsilon
+        self._item_idx = 1
 
     @property
-    def accession(self):
-        return self._accession
+    def profile(self):
+        return self._profile
 
-    @accession.setter
-    def accession(self, accession: str):
-        self._accession = accession
+    @profile.setter
+    def profile(self, profile: str):
+        self._profile = profile
 
-    def add_items(self, result: SearchResult, seqid: str):
-        source = f"nmm:{self.accession}"
-        for i, frag in enumerate(result.fragments):
-            if not frag.homologous:
-                continue
+    # def add_items(self, result: SearchResult, seqid: str):
+    #     for i, frag in enumerate(result.fragments):
+    #         if not frag.homologous:
+    #             continue
 
-            start = result.intervals[i].start
-            end = result.intervals[i].end
+    #         start = result.intervals[i].start
+    #         end = result.intervals[i].end
 
-            att = f"Epsilon={self._epsilon}"
-            item = GFFItem(seqid, source, ".", start + 1, end, 0.0, "+", ".", att)
-            self._gff.append(item)
+    #         ID = f"item{self._item_idx}"
+    #         att = f"ID={ID};Profile={self._profile};Epsilon={self._epsilon}"
+    #         item = GFFItem(seqid, "nmm", ".", start + 1, end, 0.0, "+", ".", att)
+    #         self._gff.append(item)
+    #         self._item_idx += 1
+
+    def add_item(self, seqid: str, start: int, end: int):
+        item_id = f"item{self._item_idx}"
+        att = f"ID={item_id};Profile={self._profile};Epsilon={self._epsilon}"
+        item = GFFItem(seqid, "nmm", ".", start + 1, end, 0.0, "+", ".", att)
+        self._gff.append(item)
+        self._item_idx += 1
+        return item_id
 
     def dump(self, fp):
         self._gff.dump(fp)
@@ -140,44 +152,45 @@ class TargetWriter:
 
 
 def process_sequence(
-    prof,
-    target,
+    prof: FrameProfile,
+    fasta: FASTAParser,
     record: RecordWriter,
     codon_writer: Union[FASTAWriter, None],
     amino_writer: Union[FASTAWriter, None],
     gcode,
 ):
-    from fasta_reader import open_fasta
+    for ti, tgt in enumerate(fasta):
+        print()
+        show_header2(f"Target {ti}")
+        print()
 
-    with open_fasta(target) as fasta:
-        for ti, target in enumerate(fasta):
-            print()
-            show_header2(f"Target {ti}")
-            print()
+        print(">" + tgt.defline)
+        print(sequence_summary(tgt.sequence))
 
-            print(">" + target.defline)
-            print(sequence_summary(target.sequence))
+        seq = tgt.sequence.encode().replace(b"T", b"U")
+        frame_result = prof.search(seq)
+        # codon_result = frame_result.decode()
+        seqid = f"{tgt.defline.split()[0]}"
 
-            seq = target.sequence.encode().replace(b"T", b"U")
-            frame_result = prof.search(seq)
-            codon_result = frame_result.decode()
-            seqid = f"{target.defline.split()[0]}"
+        show_search_result(frame_result)
 
-            show_search_result(frame_result)
-            record.add_items(frame_result, seqid)
+        for i, frag in enumerate(frame_result.fragments):
+            if not frag.homologous:
+                continue
+
+            start = frame_result.intervals[i].start
+            end = frame_result.intervals[i].end
+            item_id = record.add_item(seqid, start, end)
+            codon_result = frag.decode()
 
             if codon_writer is not None:
-                show_search_result(codon_result)
-                ident = seqid + "_codon"
-                codon_writer.write_item(ident, codon_result.sequence.decode())
-                record.add_items(codon_result, ident)
+                seq = codon_result.sequence.decode()
+                codon_writer.write_item(item_id, seq)
 
             if amino_writer is not None:
                 amino_result = codon_result.decode(gcode)
-                show_search_result(amino_result)
-                ident = seqid + "_amino"
-                amino_writer.write_item(ident, amino_result.sequence.decode())
-                record.add_items(amino_result, ident)
+                seq = amino_result.sequence.decode()
+                amino_writer.write_item(item_id, seq)
 
 
 def finalize_stream(stream: LazyFile):
