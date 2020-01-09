@@ -1,0 +1,3 @@
+#!/bin/bash
+
+(cd ~/ && python -c "import nmm; import sys; sys.exit(nmm.test())")

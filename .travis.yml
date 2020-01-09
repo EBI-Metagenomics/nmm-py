@@ -1,52 +1,53 @@
-language: python
-python: 3.7
+python: 3.8
 env:
   global:
-    - PKG_NAME=nmm
-    - CIBW_SKIP="cp27-* cp34-* cp35-* cp36-* *i686*"
-    - CIBW_BEFORE_BUILD_LINUX="ci/prepare-linux.sh && ci/install-c-deps.sh"
-    - CIBW_BEFORE_BUILD=ci/install-c-deps.sh
-    - CIBW_TEST_COMMAND="python -c \"import $PKG_NAME; import sys; sys.exit($PKG_NAME.test())\""
     - URL=https://raw.githubusercontent.com/horta/ci/master
+    - CIBW_SKIP="cp27-* cp34-* cp35-* cp36-* *i686*"
+    - CIBW_BEFORE_BUILD_LINUX="{project}/ci/linux-deps"
+    - CIBW_BEFORE_BUILD_MACOS="{project}/ci/macos-deps"
+    - CIBW_TEST_COMMAND="bash {project}/ci/test"
 matrix:
   include:
     - os: linux
-      sudo: required
-      services:
-        - docker
-    - os: osx
-      osx_image: xcode11.2 # Python 3.7.4 running on macOS 10.14.4
-      language: shell # 'language: python' is an error on Travis CI macOS
-      before_install:
-        - pip3 install --upgrade pip
-        - pip3 install --upgrade virtualenv
-        - virtualenv $HOME/venv # virtualenv will use Python 3
-        - source $HOME/venv/bin/activate
+      dist: bionic
+      language: python
+      services: docker
+      env:
+        - LIBRARY_PATH=/usr/local/lib
+        - NMM_EXTRA_LINK_ARGS="-Wl,-rpath,/usr/local/lib"
+    # - os: osx
+    #   osx_image: xcode11.2 # Python 3.7.4 running on macOS 10.14.4
+    #   language: shell # 'language: python' is an error on Travis CI macOS
+    #   before_install:
+    #     - pip3 install --upgrade pip
+    #     - pip3 install --upgrade virtualenv
+    #     - virtualenv $HOME/venv # virtualenv will use Python 3
+    #     - source $HOME/venv/bin/activate
 addons:
   apt:
     packages:
       - libffi-dev
+      - libffi6
       - cmake
 install:
-  - ci/install-c-deps.sh
-  - curl -fsSL $URL/travis-check-readme.sh | bash
-  - curl -fsSL $URL/travis-py-min-deps.sh | bash
-  - curl -fsSL $URL/travis-py-check-style.sh | bash
-  - curl -fsSL $URL/travis-py-check-black.sh | bash
-  - curl -fsSL $URL/travis-py-dev-test.sh | bash
-  - curl -fsSL $URL/travis-py-install-test.sh | bash
-  - curl -fsSL $URL/travis-py-doctest.sh | bash
+  - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp bash
+  - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=imm bash
+  - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=nmm bash
+  - curl -fsSL $URL/check-readme.sh | bash
+  - curl -fsSL $URL/py-min-deps.sh | bash -s -- --numpy --scipy
+  - curl -fsSL $URL/py-check-style.sh | bash
+  - curl -fsSL $URL/py-dev-test.sh | bash
+  - curl -fsSL $URL/py-sdist-test.sh | bash
+  - python3 -m pip install cibuildwheel
 script:
-  - curl -fsSL $URL/travis-py-sdist-test.sh | bash
-  - git clean -xdf
-  - python -m pip install git+https://github.com/joerick/cibuildwheel.git
-  - cibuildwheel --output-dir wheelhouse
+  - python3 -m cibuildwheel --output-dir wheelhouse
+after_success:
   - |
     if [ "${TRAVIS_TAG:-}" != "" ]; then
-      python -m pip install twine
-      python -m twine upload --skip-existing wheelhouse/*
+      python3 -m pip install twine -U
+      python3 -m twine upload --skip-existing wheelhouse/*
     fi
-  - git clean -xdf
+  - git clean -xdfq
 notifications:
   email:
     recipients:
