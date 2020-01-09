@@ -180,10 +180,7 @@ def process_sequence(
                 record.add_items(amino_result, ident)
 
 
-def finalize_stream(stream: Union[LazyFile, Any]):
-    if not isinstance(stream, LazyFile):
-        return
-
+def finalize_stream(stream: LazyFile):
     if stream.name != "-":
         print(f"Writing to <{stream.name}> file.")
 
