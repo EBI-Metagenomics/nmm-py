@@ -27,7 +27,9 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
     from hmmer_reader import open_hmmer
 
     record_writer = RecordWriter(epsilon)
+    codon_writer = TargetWriter(ocodon)
     target_writer = TargetWriter(ocodon, oamino)
+    gcode = GeneticCode()
 
     with open_hmmer(profile) as hmmfile:
         for hmmprof in hmmfile:
@@ -41,9 +43,7 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
 
             show_header1("Targets")
 
-            gcode = GeneticCode()
-
-            process_sequence(prof, target, record_writer, gcode, target_writer)
+            process_sequence(prof, target, record_writer, target_writer, gcode)
 
             print()
 
@@ -52,10 +52,10 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
         finalize_stream(output)
 
     if target_writer.has_ocodon:
-        finalize_stream(target_writer._ocodon)
+        finalize_stream(target_writer.ocodon)
 
     if target_writer.has_oamino:
-        finalize_stream(target_writer._oamino)
+        finalize_stream(target_writer.oamino)
 
 
 cli.add_command(search)
@@ -98,6 +98,14 @@ class TargetWriter:
         self._oamino = oamino
 
     @property
+    def ocodon(self):
+        return self._ocodon
+
+    @property
+    def oamino(self):
+        return self._oamino
+
+    @property
     def has_ocodon(self):
         return self._ocodon is not None
 
@@ -121,7 +129,7 @@ class TargetWriter:
 
 
 def process_sequence(
-    prof, target, record: RecordWriter, gcode, target_writer: TargetWriter
+    prof, target, record: RecordWriter, target_writer: TargetWriter, gcode
 ):
     from fasta_reader import open_fasta
 
