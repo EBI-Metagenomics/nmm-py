@@ -1,11 +1,12 @@
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import create_frame_profile, read_hmmer, GeneticCode
+from nmm import create_frame_profile, GeneticCode
+from hmmer_reader import open_hmmer
 
 
 def test_frame_profile_frame1(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_frame_profile(reader)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_frame_profile(reader.read_profile())
 
     # most_likely_seq = b"PGKEDNNK"
     most_likely_rna_seq = b"CCU GGU AAA GAA GAU AAU AAC AAA"
@@ -22,8 +23,8 @@ def test_frame_profile_frame1(PF03373):
 
 
 def test_frame_profile_frame2(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_frame_profile(reader, epsilon=0.1)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_frame_profile(reader.read_profile(), epsilon=0.1)
 
     # seq = b"KKKPGKEDNNK"
     rna_seq = b"AAA AAA AAA CCU GGU AAA GAA GAU AAU AAC AAA"
@@ -40,8 +41,8 @@ def test_frame_profile_frame2(PF03373):
 
 
 def test_frame_profile_frame3(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_frame_profile(reader, epsilon=0.0)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_frame_profile(reader.read_profile(), epsilon=0.0)
 
     # seq = b"PGKEDNNK"
     rna_seq = b"CCU GGU AAA GAA GAU AAU AAC AAA"
@@ -55,8 +56,8 @@ def test_frame_profile_frame3(PF03373):
 
 
 def test_frame_profile_frame4(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_frame_profile(reader, epsilon=0.0)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_frame_profile(reader.read_profile(), epsilon=0.0)
 
     # seq = b"PGKEDNNK"
     rna_seq = b"CCUU GGU AAA GAA GAU AAU AAC AAA"
@@ -68,8 +69,8 @@ def test_frame_profile_frame4(PF03373):
 
 
 def test_frame_profile_frame5(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_frame_profile(reader, epsilon=0.00001)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_frame_profile(reader.read_profile(), epsilon=0.00001)
 
     # seq = b"PGKEDNNK"
     rna_seq = b"CCUU GGU AAA GAA GAU AAU AAC AAA"
@@ -83,8 +84,8 @@ def test_frame_profile_frame5(PF03373):
 
 
 def test_frame_profile_frame6(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_frame_profile(reader, epsilon=0.00001)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_frame_profile(reader.read_profile(), epsilon=0.00001)
 
     # seq = b"PGKEDNNKEEPGKEDNNKEEE"
     rna_seq = b"CCUU GGU AAA GAA GAU AAU AAC AAA GAA GAA CCU GGU AAA GAA GAU AAU AAC AAA GAA GAA GA"
@@ -116,8 +117,8 @@ def test_frame_profile_frame6(PF03373):
 
 
 def test_frame_profile_codons(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_frame_profile(reader, epsilon=0.1)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_frame_profile(reader.read_profile(), epsilon=0.1)
     gcode = GeneticCode()
 
     # seq = b"KKKPGKEDNNK"

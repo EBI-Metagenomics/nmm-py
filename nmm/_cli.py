@@ -23,60 +23,71 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
     """
     Search nucleotide sequences against a HMMER3 Protein profile.
     """
-    from nmm import create_frame_profile, read_hmmer
+    from nmm import create_frame_profile
+    from hmmer_reader import open_hmmer
     from fasta_reader import open_fasta
 
-    hmmer_reader = read_hmmer(profile)
-    acc = hmmer_reader.metadata["ACC"]
-    prof = create_frame_profile(hmmer_reader, epsilon=epsilon)
+    with open_hmmer(profile) as hmmfile:
 
-    show_header1("Profile")
-    print()
-    print(hmmer_reader)
-    print()
+        for hmmprof in hmmfile:
+            acc = hmmprof.metadata["ACC"]
+            prof = create_frame_profile(hmmprof, epsilon=epsilon)
 
-    show_header1("Targets")
-
-    gff = GFFWriter()
-    gcode = GeneticCode()
-    with open_fasta(target) as fasta:
-        for ti, target in enumerate(fasta):
+            show_header1("Profile")
             print()
-            show_header2(f"Target {ti}")
+            print(hmmprof)
             print()
 
-            print(">" + target.defline)
-            print(sequence_summary(target.sequence))
+            show_header1("Targets")
 
-            seq = target.sequence.encode().replace(b"T", b"U")
-            frame_result = prof.search(seq)
-            codon_result = frame_result.decode()
-            seqid = f"{target.defline.split()[0]}"
+            gff = GFFWriter()
+            gcode = GeneticCode()
+            with open_fasta(target) as fasta:
+                for ti, target in enumerate(fasta):
+                    print()
+                    show_header2(f"Target {ti}")
+                    print()
 
-            show_search_result(frame_result)
-            create_gffitems(gff, frame_result, seqid, acc, epsilon)
+                    print(">" + target.defline)
+                    print(sequence_summary(target.sequence))
+
+                    seq = target.sequence.encode().replace(b"T", b"U")
+                    frame_result = prof.search(seq)
+                    codon_result = frame_result.decode()
+                    seqid = f"{target.defline.split()[0]}"
+
+                    show_search_result(frame_result)
+                    create_gffitems(gff, frame_result, seqid, acc, epsilon)
+
+                    if ocodon is not None:
+                        show_search_result(codon_result)
+                        write_target(
+                            ocodon, seqid + "_codon", codon_result.sequence.decode()
+                        )
+                        create_gffitems(
+                            gff, codon_result, seqid + "_codon", acc, epsilon
+                        )
+
+                    if oamino is not None:
+                        amino_result = codon_result.decode(gcode)
+                        show_search_result(amino_result)
+                        write_target(
+                            oamino, seqid + "_amino", amino_result.sequence.decode()
+                        )
+                        create_gffitems(
+                            gff, amino_result, seqid + "_amino", acc, epsilon
+                        )
+
+            print()
+            if output is not None:
+                gff.dump(output)
+                finalize_stream(output)
 
             if ocodon is not None:
-                show_search_result(codon_result)
-                write_target(ocodon, seqid + "_codon", codon_result.sequence.decode())
-                create_gffitems(gff, codon_result, seqid + "_codon", acc, epsilon)
+                finalize_stream(ocodon)
 
             if oamino is not None:
-                amino_result = codon_result.decode(gcode)
-                show_search_result(amino_result)
-                write_target(oamino, seqid + "_amino", amino_result.sequence.decode())
-                create_gffitems(gff, amino_result, seqid + "_amino", acc, epsilon)
-
-    print()
-    if output is not None:
-        gff.dump(output)
-        finalize_stream(output)
-
-    if ocodon is not None:
-        finalize_stream(ocodon)
-
-    if oamino is not None:
-        finalize_stream(oamino)
+                finalize_stream(oamino)
 
 
 cli.add_command(search)

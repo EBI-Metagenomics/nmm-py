@@ -1,11 +1,12 @@
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import create_standard_profile, read_hmmer
+from hmmer_reader import open_hmmer
+from nmm import create_standard_profile
 
 
 def test_standard_profile_unihit_homologous_1(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_standard_profile(reader)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_standard_profile(reader.read_profile())
     most_likely_seq = b"PGKEDNNK"
     r = hmmer.search(most_likely_seq)
     assert_allclose(r.score, 11.867796719423442)
@@ -26,8 +27,8 @@ def test_standard_profile_unihit_homologous_1(PF03373):
 
 
 def test_standard_profile_unihit_homologous_2(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_standard_profile(reader)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_standard_profile(reader.read_profile())
     seq = b"PGKENNK"
     r = hmmer.search(seq)
     assert_allclose(r.score, 3.299501501364073)
@@ -40,8 +41,8 @@ def test_standard_profile_unihit_homologous_2(PF03373):
 
 
 def test_standard_profile_unihit_homologous_3(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_standard_profile(reader)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_standard_profile(reader.read_profile())
     seq = b"PGKEPNNK"
     r = hmmer.search(seq)
     assert_allclose(r.score, 6.883636719423446)
@@ -53,8 +54,8 @@ def test_standard_profile_unihit_homologous_3(PF03373):
 
 
 def test_standard_profile_nonhomo_and_homologous(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_standard_profile(reader)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_standard_profile(reader.read_profile())
     seq = b"KKKPGKEDNNK"
     assert_equal(hmmer.multiple_hits, True)
     r = hmmer.search(seq)
@@ -79,8 +80,8 @@ def test_standard_profile_nonhomo_and_homologous(PF03373):
 
 
 def test_standard_profile_multihit_homologous1(PF03373):
-    reader = read_hmmer(PF03373)
-    hmmer = create_standard_profile(reader)
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_standard_profile(reader.read_profile())
     seq = b"PPPPGKEDNNKDDDPGKEDNNKEEEE"
     r = hmmer.search(seq)
     assert_allclose(r.score, 20.329227532144742)

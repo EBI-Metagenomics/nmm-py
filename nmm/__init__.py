@@ -4,7 +4,7 @@ from ._cli import cli
 from ._codon import CodonTable, Codon
 from ._gencode import GeneticCode
 from ._hmm import HMM
-from ._hmmer import create_frame_profile, create_standard_profile, read_hmmer
+from ._hmmer import create_frame_profile, create_standard_profile
 from ._log import LOG0
 from ._path import CPath
 from ._state import FrameState, MuteState, NormalState, TableState, CodonState
@@ -45,6 +45,5 @@ __all__ = [
     "cli",
     "create_frame_profile",
     "create_standard_profile",
-    "read_hmmer",
     "test",
 ]

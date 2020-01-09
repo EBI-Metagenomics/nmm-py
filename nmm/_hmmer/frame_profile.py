@@ -1,7 +1,7 @@
 from math import log
 from typing import Any, Dict, List, Sequence, Tuple
 
-from hmmer_reader import HMMEReader
+from hmmer_reader import HMMERProfile
 
 from .._alphabet import Alphabet
 from .._base import Base, BaseTable
@@ -89,7 +89,7 @@ class FrameProfile(Profile):
         return FrameSearchResult(score, seq, path)
 
 
-def create_frame_profile(reader: HMMEReader, epsilon: float = 0.1) -> FrameProfile:
+def create_frame_profile(reader: HMMERProfile, epsilon: float = 0.1) -> FrameProfile:
 
     bases = Alphabet(b"ACGU")
     null_lprobs = _dict(reader.insert(0))

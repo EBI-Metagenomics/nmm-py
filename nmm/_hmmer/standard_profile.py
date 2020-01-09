@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Sequence, Tuple
 
-from hmmer_reader import HMMEReader
+from hmmer_reader import HMMERProfile
 
 from .._alphabet import Alphabet
 from .._state import MuteState, NormalState
@@ -58,7 +58,7 @@ class StandardProfile(Profile):
         return StandardSearchResult(score, seq, path)
 
 
-def create_standard_profile(reader: HMMEReader) -> StandardProfile:
+def create_standard_profile(reader: HMMERProfile) -> StandardProfile:
 
     alphabet = Alphabet(reader.alphabet.encode())
     null_lprobs = _dict(reader.insert(0))
