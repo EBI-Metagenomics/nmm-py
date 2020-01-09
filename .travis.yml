@@ -14,7 +14,7 @@ matrix:
       services: docker
       env:
         - LIBRARY_PATH=/usr/local/lib
-        - NMM_EXTRA_LINK_ARGS="-Wl,-rpath,/usr/local/lib"
+        - LD_LIBRARY_PATH=/usr/local/lib
     # - os: osx
     #   osx_image: xcode11.2 # Python 3.7.4 running on macOS 10.14.4
     #   language: shell # 'language: python' is an error on Travis CI macOS
