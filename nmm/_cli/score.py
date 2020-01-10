@@ -49,25 +49,38 @@ class HMMSearch:
     def update_gff_file(self, filepath, scores):
         import fileinput
         import re
+        from collections import OrderedDict
 
         for row in fileinput.input(filepath, inplace=True, backup=".bak"):
-
-            if row.startswith("#"):
-                print(row, end="")
-                continue
-
-            match = re.search(r"ID=([^;]+);", row)
-            if match is None:
-                print(row, end="")
-                continue
-
-            item_id = match.group(1)
-            if item_id not in scores:
-                print(row, end="")
-                continue
-
             row = row.rstrip()
-            print(row + ";E-value={}".format(scores[item_id]))
+            if row.startswith("#"):
+                print(row)
+                continue
+
+            match = re.match(r"^(.+\t)([^\t]+)$", row)
+            if match is None:
+                print(row)
+                continue
+
+            left = match.group(1)
+            right = match.group(2)
+
+            if right == ".":
+                print(row)
+                continue
+
+            attr = OrderedDict(v.split("=") for v in right.split(";"))
+            if "ID" not in attr:
+                print(row)
+                continue
+
+            if attr["ID"] not in scores:
+                if "E-value" in attr:
+                    del attr["E-value"]
+            else:
+                attr["E-value"] = scores[attr["ID"]]
+
+            print(left + ";".join(k + "=" + v for k, v in attr.items()))
 
 
 @contextmanager
