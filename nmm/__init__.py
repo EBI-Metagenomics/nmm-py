@@ -5,6 +5,7 @@ from ._codon import CodonTable, Codon
 from ._gencode import GeneticCode
 from ._hmm import HMM
 from ._hmmer import create_frame_profile, create_standard_profile
+from ._hmmer.io import tblout_reader
 from ._log import LOG0
 from ._path import CPath
 from ._state import FrameState, MuteState, NormalState, TableState, CodonState
@@ -46,4 +47,5 @@ __all__ = [
     "create_frame_profile",
     "create_standard_profile",
     "test",
+    "tblout_reader",
 ]

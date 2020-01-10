@@ -3,6 +3,7 @@ include README.md
 include build_ext.py
 include libpath.py
 include nmm/_hmmer/test/PF03373.hmm
+include nmm/_hmmer/io/test/tblout
 include nmm/test/GALNBKIG_cut.fasta
 include nmm/test/PF03373.hmm
 include nmm/test/PF03373_GALNBKIG_cut.amino.fasta
