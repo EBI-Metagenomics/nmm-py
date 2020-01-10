@@ -161,9 +161,6 @@ def process_sequence(
 ):
     for ti, tgt in enumerate(fasta):
         print()
-        show_header2(f"Target {ti+1}")
-        print()
-
         print(">" + tgt.defline)
         print(sequence_summary(tgt.sequence))
 
