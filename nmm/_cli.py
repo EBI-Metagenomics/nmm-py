@@ -4,7 +4,7 @@ import click
 from click.utils import LazyFile
 
 from fasta_reader import FASTAWriter, FASTAParser, open_fasta
-from hmmer_reader import open_hmmer
+from hmmer_reader import open_hmmer, HMMERProfile
 from nmm._gencode import GeneticCode
 from nmm._gff import GFFItem, GFFWriter
 from nmm._hmmer import SearchResult
@@ -49,7 +49,7 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
 
         show_header1("Profile")
         print()
-        print(hmmprof)
+        show_profile(hmmprof)
         print()
 
         show_header1("Targets")
@@ -161,7 +161,7 @@ def process_sequence(
 ):
     for ti, tgt in enumerate(fasta):
         print()
-        show_header2(f"Target {ti}")
+        show_header2(f"Target {ti+1}")
         print()
 
         print(">" + tgt.defline)
@@ -203,6 +203,17 @@ def finalize_stream(stream: LazyFile):
 def write_target(file, defline: str, sequence: str):
     file.write(">" + defline + "\n")
     file.write(sequence + "\n")
+
+
+def show_profile(hmmprof: HMMERProfile):
+    name = hmmprof.metadata["NAME"]
+    acc = hmmprof.metadata["ACC"]
+
+    print(f"Header       {hmmprof.header}")
+    print(f"Alphabet     {hmmprof.alphabet}")
+    print(f"Model length {hmmprof.M}")
+    print(f"Name         {name}")
+    print(f"Accession    {acc}")
 
 
 def show_search_result(result: SearchResult):
