@@ -11,11 +11,6 @@ from nmm._hmmer import SearchResult
 from nmm._hmmer.frame_profile import FrameProfile
 
 
-@click.group(name="nmm", context_settings=dict(help_option_names=["-h", "--help"]))
-def cli():
-    pass
-
-
 @click.command()
 @click.argument("profile", type=click.File("r"))
 @click.argument("target", type=click.File("r"))
@@ -25,7 +20,7 @@ def cli():
 @click.option("--oamino", type=click.File("w"))
 def search(profile, target, epsilon: float, output, ocodon, oamino):
     """
-    Search nucleotide sequences against a HMMER3 Protein profile.
+    Search nucleotide sequences against a database of HMMER3 protein profiles.
     """
     from nmm import create_frame_profile
 
@@ -71,9 +66,6 @@ def search(profile, target, epsilon: float, output, ocodon, oamino):
         finalize_stream(oamino)
 
 
-cli.add_command(search)
-
-
 class RecordWriter:
     def __init__(self, epsilon: float):
         self._gff = GFFWriter()
@@ -88,20 +80,6 @@ class RecordWriter:
     @profile.setter
     def profile(self, profile: str):
         self._profile = profile
-
-    # def add_items(self, result: SearchResult, seqid: str):
-    #     for i, frag in enumerate(result.fragments):
-    #         if not frag.homologous:
-    #             continue
-
-    #         start = result.intervals[i].start
-    #         end = result.intervals[i].end
-
-    #         ID = f"item{self._item_idx}"
-    #         att = f"ID={ID};Profile={self._profile};Epsilon={self._epsilon}"
-    #         item = GFFItem(seqid, "nmm", ".", start + 1, end, 0.0, "+", ".", att)
-    #         self._gff.append(item)
-    #         self._item_idx += 1
 
     def add_item(self, seqid: str, start: int, end: int):
         item_id = f"item{self._item_idx}"
@@ -166,7 +144,6 @@ def process_sequence(
 
         seq = tgt.sequence.encode().replace(b"T", b"U")
         frame_result = prof.search(seq)
-        # codon_result = frame_result.decode()
         seqid = f"{tgt.defline.split()[0]}"
 
         show_search_result(frame_result)
