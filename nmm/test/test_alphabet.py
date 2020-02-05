@@ -26,7 +26,7 @@ def test_alphabet():
     assert_equal(abc.symbols, b"ACGT")
 
     assert_equal(str(abc), "{ACGT}")
-    assert_equal(repr(abc), "{Alphabet:ACGT}")
+    assert_equal(repr(abc), "<Alphabet:{ACGT}>")
 
     with pytest.raises(TypeError):
         Alphabet("ACGTç")

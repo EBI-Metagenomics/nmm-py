@@ -1,48 +1,7 @@
-from abc import ABC, abstractmethod
-from typing import Type, TypeVar
-
 from ._ffi import ffi, lib
 
 
-class AlphabetABC(ABC):
-    @property
-    @abstractmethod
-    def length(self) -> int:
-        raise NotImplementedError()
-
-    @property
-    @abstractmethod
-    def symbols(self) -> bytes:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def has_symbol(self, symbol_id: int) -> bool:
-        del symbol_id
-        raise NotImplementedError()
-
-    @abstractmethod
-    def symbol_idx(self, symbol_id: bytes) -> int:
-        del symbol_id
-        raise NotImplementedError()
-
-    @abstractmethod
-    def symbol_id(self, symbol_idx: int) -> int:
-        del symbol_idx
-        raise NotImplementedError()
-
-    def __str__(self) -> str:
-        symbols = self.symbols.decode()
-        return f"{{{symbols}}}"
-
-    def __repr__(self) -> str:
-        symbols = self.symbols.decode()
-        return f"{{{self.__class__.__name__}:{symbols}}}"
-
-
-T = TypeVar("T", bound="CAlphabet")
-
-
-class CAlphabet(AlphabetABC):
+class CAlphabet:
     """
     Wrapper around the C implementation of alphabet set.
 
@@ -56,13 +15,6 @@ class CAlphabet(AlphabetABC):
         if imm_abc == ffi.NULL:
             raise RuntimeError("`imm_abc` is NULL.")
         self._imm_abc = imm_abc
-
-    @classmethod
-    def clone_from_imm_abc(cls: Type[T], imm_abc: ffi.CData) -> T:
-        t = lib.imm_abc_clone(imm_abc)
-        if t == ffi.NULL:
-            raise RuntimeError("`imm_abc_clone` failed.")
-        return cls(t)
 
     @property
     def imm_abc(self) -> ffi.CData:
@@ -89,9 +41,12 @@ class CAlphabet(AlphabetABC):
         if self._imm_abc != ffi.NULL:
             lib.imm_abc_destroy(self._imm_abc)
 
+    def __str__(self) -> str:
+        seq = self.symbols.decode()
+        return f"{{{seq}}}"
+
     def __repr__(self) -> str:
-        symbols = self.symbols.decode()
-        return f"{{{self.__class__.__name__}:{symbols}}}"
+        return f"<{self.__class__.__name__}:{str(self)}>"
 
 
 class Alphabet(CAlphabet):
@@ -115,5 +70,4 @@ class Alphabet(CAlphabet):
         super().__init__(imm_abc)
 
     def __repr__(self) -> str:
-        symbols = self.symbols.decode()
-        return f"{{{self.__class__.__name__}:{symbols}}}"
+        return f"<{self.__class__.__name__}:{str(self)}>"

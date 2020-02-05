@@ -1,15 +1,17 @@
 from ._alphabet import Alphabet
-from ._base import BaseTable, Base
-from ._cli import cli
-from ._codon import CodonTable, Codon
-from ._gencode import GeneticCode
-from ._hmm import HMM
-from ._hmmer import create_frame_profile, create_standard_profile
-from ._hmmer.io import tblout_reader
-from ._log import LOG0
-from ._path import CPath
-from ._state import FrameState, MuteState, NormalState, TableState, CodonState
-from ._step import CStep
+from ._sequence import Sequence
+from ._base import Base
+# from ._base import BaseTable, Base
+# from ._cli import cli
+# from ._codon import CodonTable, Codon
+# from ._gencode import GeneticCode
+# from ._hmm import HMM
+# from ._hmmer import create_frame_profile, create_standard_profile
+# from ._hmmer.io import tblout_reader
+# from ._log import LOG0
+# from ._path import CPath
+# from ._state import FrameState, MuteState, NormalState, TableState, CodonState
+# from ._step import CStep
 from ._testit import test
 
 try:
@@ -27,6 +29,7 @@ and reinstall the package again."""
 __version__ = "0.0.3"
 
 __all__ = [
+    "Sequence",
     "Alphabet",
     "Base",
     "BaseTable",
