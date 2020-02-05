@@ -4,7 +4,7 @@ from typing import Type, TypeVar
 from ._ffi import ffi, lib
 
 
-class AlphabetBase(ABC):
+class AlphabetABC(ABC):
     @property
     @abstractmethod
     def length(self) -> int:
@@ -16,7 +16,7 @@ class AlphabetBase(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def has_symbol(self, symbol_id: bytes) -> bool:
+    def has_symbol(self, symbol_id: int) -> bool:
         del symbol_id
         raise NotImplementedError()
 
@@ -26,7 +26,7 @@ class AlphabetBase(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def symbol_id(self, symbol_idx: int) -> bytes:
+    def symbol_id(self, symbol_idx: int) -> int:
         del symbol_idx
         raise NotImplementedError()
 
@@ -42,7 +42,7 @@ class AlphabetBase(ABC):
 T = TypeVar("T", bound="CAlphabet")
 
 
-class CAlphabet(AlphabetBase):
+class CAlphabet(AlphabetABC):
     """
     Wrapper around the C implementation of alphabet set.
 
@@ -52,6 +52,9 @@ class CAlphabet(AlphabetBase):
     """
 
     def __init__(self, imm_abc: ffi.CData):
+        super().__init__()
+        if imm_abc == ffi.NULL:
+            raise RuntimeError("`imm_abc` is NULL.")
         self._imm_abc = imm_abc
 
     @classmethod

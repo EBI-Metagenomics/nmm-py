@@ -1,46 +1,73 @@
-from typing import Dict, Type, TypeVar, Union, Optional
+from abc import ABC, abstractmethod
+from typing import Tuple
 
-from ._alphabet import CAlphabet
 from ._base import Base
 from ._ffi import ffi, lib
 
 
-class Codon:
-    """
-    Codon is a sequence of three bases.
+class CodonABC(ABC):
+    @abstractmethod
+    def get(self) -> Tuple[int, int, int]:
+        raise NotImplementedError()
 
-    codon : Union[bytes, str, ffi.CData]
-        Sequence of letters representing a codon.
-    """
+    @abstractmethod
+    def set(self, codon: Tuple[int, int, int]):
+        del codon
+        raise NotImplementedError()
 
-    def __init__(self, codon: Union[bytes, str, ffi.CData]):
-        if isinstance(codon, str):
-            codon = codon.encode()
+    # @property
+    # @abstractmethod
+    # def nmm_base(self) -> ffi.CData:
+    #     raise NotImplementedError()
 
-        if isinstance(codon, bytes):
-            if len(codon) != 3:
-                raise ValueError("Codon must have three letters.")
+    @property
+    @abstractmethod
+    def nmm_codon(self) -> ffi.CData:
+        raise NotImplementedError()
 
-            nmm_codon = ffi.new("struct nmm_codon *")
-            nmm_codon.a = bytes(codon)[0:1]
-            nmm_codon.b = bytes(codon)[1:2]
-            nmm_codon.c = bytes(codon)[2:3]
-            self._nmm_codon = nmm_codon
-        else:
-            self._nmm_codon = codon
+
+class CCodon(CodonABC):
+    def __init__(self, nmm_codon: ffi.CData):
+        super().__init__()
+        if nmm_codon == ffi.NULL:
+            raise RuntimeError("`nmm_codon` is NULL.")
+        self._nmm_codon = nmm_codon
+
+    def get(self) -> Tuple[int, int, int]:
+        triplet = lib.nmm_codon_get(self._nmm_codon)
+        return (triplet.a, triplet.b, triplet.c)
+
+    def set(self, codon: Tuple[int, int, int]):
+        triplet = ffi.new("struct nmm_triplet *")
+        triplet.a = codon[0]
+        triplet.b = codon[1]
+        triplet.c = codon[2]
+        e: int = lib.nmm_codon_set(self._nmm_codon, triplet)
+        if e != 0:
+            raise ValueError("Could not set codon")
+
+    # @property
+    # def nmm_base(self) -> ffi.CData:
+    #     return lib.nmm_codon_get_base(self._nmm_codon)
 
     @property
     def nmm_codon(self) -> ffi.CData:
         return self._nmm_codon
 
-    def base(self, idx: int) -> Base:
-        if idx == 0:
-            return Base(self._nmm_codon.a)
-        elif idx == 1:
-            return Base(self._nmm_codon.b)
-        elif idx == 2:
-            return Base(self._nmm_codon.c)
-        raise ValueError("Index must be 0, 1, or 2.")
+    def __del__(self):
+        if self._nmm_codon != ffi.NULL:
+            lib.nmm_codon_destroy(self._nmm_codon)
+
+
+class Codon(CCodon):
+    """
+    Codon is a sequence of three bases.
+    """
+
+    def __init__(self, codon: Tuple[int, int, int], base: Base):
+        super().__init__(lib.nmm_codon_create(base.nmm_base))
+        self.set(codon)
+        self._base = base
 
     def __eq__(self, another):
         return bytes(self) == bytes(another)
@@ -49,7 +76,11 @@ class Codon:
         return hash(bytes(self))
 
     def __bytes__(self) -> bytes:
-        return self._nmm_codon.a + self._nmm_codon.b + self._nmm_codon.c
+        triplet = self.get()
+        a = chr(triplet[0]).encode()
+        b = chr(triplet[1]).encode()
+        c = chr(triplet[2]).encode()
+        return a + b + c
 
     def __str__(self) -> str:
         return bytes(self).decode()
@@ -57,65 +88,3 @@ class Codon:
     def __repr__(self) -> str:
         codon = bytes(self)
         return f"<{self.__class__.__name__}:{codon.decode()}>"
-
-
-T = TypeVar("T", bound="CodonTable")
-
-
-class CodonTable:
-    """
-    Wrapper around the C implementation of a codon table.
-
-    Parameters
-    ----------
-    nmm_codont : CData
-        Codon table.
-    """
-
-    def __init__(self, nmm_codont: ffi.CData):
-        if nmm_codont == ffi.NULL:
-            raise RuntimeError("`nmm_codont` is NULL.")
-        self._nmm_codont = nmm_codont
-        self._alphabet: Optional[CAlphabet] = None
-
-    @classmethod
-    def create(cls: Type[T], alphabet: CAlphabet, lprobs: Dict[Codon, float] = {}) -> T:
-
-        nmm_codont = lib.nmm_codont_create(alphabet.imm_abc)
-        if nmm_codont == ffi.NULL:
-            raise RuntimeError("`nmm_codont_create` failed.")
-
-        codont = cls(nmm_codont)
-        cls._alphabet = alphabet
-        for codon, lprob in lprobs.items():
-            codont.set_lprob(codon, lprob)
-
-        return codont
-
-    @property
-    def nmm_codont(self) -> ffi.CData:
-        return self._nmm_codont
-
-    @property
-    def alphabet(self) -> CAlphabet:
-        if self._alphabet is None:
-            imm_abc = lib.nmm_codont_get_abc(self._nmm_codont)
-            return CAlphabet.clone_from_imm_abc(imm_abc)
-        return self._alphabet
-
-    def set_lprob(self, codon: Codon, lprob: float) -> None:
-        err: int = lib.nmm_codont_set_lprob(self._nmm_codont, codon.nmm_codon, lprob)
-        if err != 0:
-            raise ValueError(f"Could not set a probability for `{str(codon)}`.")
-
-    def get_lprob(self, codon: Codon) -> float:
-        return lib.nmm_codont_get_lprob(self._nmm_codont, codon.nmm_codon)
-
-    def normalize(self) -> None:
-        err: int = lib.nmm_codont_normalize(self._nmm_codont)
-        if err != 0:
-            raise RuntimeError("Normalization error.")
-
-    def __del__(self):
-        if self._nmm_codont != ffi.NULL:
-            lib.nmm_codont_destroy(self._nmm_codont)
