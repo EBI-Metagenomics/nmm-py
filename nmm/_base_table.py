@@ -13,7 +13,6 @@ class CBaseTable:
     """
 
     def __init__(self, nmm_baset: ffi.CData):
-        super().__init__()
         if nmm_baset == ffi.NULL:
             raise RuntimeError("`nmm_baset` is NULL.")
         self._nmm_baset = nmm_baset

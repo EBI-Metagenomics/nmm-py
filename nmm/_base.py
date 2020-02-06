@@ -12,7 +12,6 @@ class CBase:
     """
 
     def __init__(self, nmm_base: ffi.CData):
-        super().__init__()
         if nmm_base == ffi.NULL:
             raise RuntimeError("`nmm_base` is NULL.")
         self._nmm_base = nmm_base

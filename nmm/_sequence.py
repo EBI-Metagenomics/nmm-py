@@ -12,7 +12,6 @@ class CSequence:
     """
 
     def __init__(self, imm_seq: ffi.CData):
-        super().__init__()
         if imm_seq == ffi.NULL:
             raise RuntimeError("`imm_seq` is NULL.")
         self._imm_seq = imm_seq
@@ -53,7 +52,7 @@ class Sequence(CSequence):
     """
 
     def __init__(self, seq: bytes, alphabet: CAlphabet):
-        self._calphabet = alphabet
+        self._alphabet = alphabet
         super().__init__(lib.imm_seq_create(seq, alphabet.imm_abc))
 
     def __repr__(self) -> str:

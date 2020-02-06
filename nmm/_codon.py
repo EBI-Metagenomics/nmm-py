@@ -14,7 +14,6 @@ class CCodon:
     """
 
     def __init__(self, nmm_codon: ffi.CData):
-        super().__init__()
         if nmm_codon == ffi.NULL:
             raise RuntimeError("`nmm_codon` is NULL.")
         self._nmm_codon = nmm_codon

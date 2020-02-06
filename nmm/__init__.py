@@ -2,9 +2,14 @@ from ._alphabet import Alphabet
 from ._base import Base
 from ._codon import Codon
 from ._sequence import Sequence
+from ._sequence_table import SequenceTable
 from ._base_table import BaseTable
 from ._codon_prob import CodonProb
+from ._codon_table import CodonTable
 from ._lprob import lprob_is_zero, lprob_is_valid, LPROB_ZERO, LPROB_INVALID
+from ._state import MuteState, NormalState
+
+# from ._state import FrameState, MuteState, NormalState, TableState, CodonState
 
 # from ._base import BaseTable, Base
 # from ._cli import cli
@@ -15,7 +20,6 @@ from ._lprob import lprob_is_zero, lprob_is_valid, LPROB_ZERO, LPROB_INVALID
 # from ._hmmer.io import tblout_reader
 # from ._log import LOG0
 # from ._path import CPath
-# from ._state import FrameState, MuteState, NormalState, TableState, CodonState
 # from ._step import CStep
 from ._testit import test
 
@@ -31,20 +35,27 @@ and reinstall the package again."""
 
     raise RuntimeError(str(e) + _ffi_err)
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 __all__ = [
-    "Sequence",
     "Alphabet",
     "Base",
-    "Codon",
     "BaseTable",
+    "Codon",
+    "CodonProb",
+    "CodonTable",
+    "LPROB_INVALID",
+    "LPROB_ZERO",
+    "Sequence",
     "__version__",
     "cli",
-    "test",
-    "CodonProb",
-    "lprob_is_zero",
     "lprob_is_valid",
-    "LPROB_ZERO",
-    "LPROB_INVALID",
+    "lprob_is_zero",
+    "test",
+    "FrameState",
+    "MuteState",
+    "NormalState",
+    "TableState",
+    "CodonState",
+    "SequenceTable",
 ]

@@ -14,7 +14,6 @@ class CCodonProb:
     """
 
     def __init__(self, nmm_codonp: ffi.CData):
-        super().__init__()
         if nmm_codonp == ffi.NULL:
             raise RuntimeError("`nmm_codonp` is NULL.")
         self._nmm_codonp = nmm_codonp
@@ -53,6 +52,5 @@ class CodonProb(CCodonProb):
     """
 
     def __init__(self, base: CBase):
-        self._calphabet = base
-        nmm_codonp = lib.nmm_codonp_create(base.nmm_base)
-        super().__init__(nmm_codonp)
+        self._cbase = base
+        super().__init__(lib.nmm_codonp_create(base.nmm_base))
