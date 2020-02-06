@@ -3,6 +3,8 @@ from ._base import Base
 from ._codon import Codon
 from ._sequence import Sequence
 from ._base_table import BaseTable
+from ._codon_prob import CodonProb
+from ._lprob import lprob_is_zero, lprob_is_valid, LPROB_ZERO, LPROB_INVALID
 
 # from ._base import BaseTable, Base
 # from ._cli import cli
@@ -40,4 +42,9 @@ __all__ = [
     "__version__",
     "cli",
     "test",
+    "CodonProb",
+    "lprob_is_zero",
+    "lprob_is_valid",
+    "LPROB_ZERO",
+    "LPROB_INVALID",
 ]

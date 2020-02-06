@@ -28,8 +28,8 @@ struct nmm_base const * nmm_baset_get_base(struct nmm_baset const *baset);
 struct nmm_codon *     nmm_codon_create(struct nmm_base const *base);
 void                   nmm_codon_destroy(struct nmm_codon const *codon);
 struct nmm_base const *nmm_codon_get_base(struct nmm_codon const *codon);
-int                    nmm_codon_set(struct nmm_codon *codon, struct nmm_triplet triplet);
-struct nmm_triplet     nmm_codon_get(struct nmm_codon const *codon);
+int                    nmm_codon_set_triplet(struct nmm_codon *codon, struct nmm_triplet triplet);
+struct nmm_triplet     nmm_codon_get_triplet(struct nmm_codon const *codon);
 
 /* Codon table */
 struct nmm_codont const *nmm_codont_create(struct nmm_codonp const *codonp);
@@ -39,8 +39,8 @@ struct nmm_base const *nmm_codont_get_base(struct nmm_codont const *codont);
 
 /* Codon probability */
 struct nmm_codonp *nmm_codonp_create(struct nmm_base const *base);
-int    nmm_codonp_set(struct nmm_codonp *codonp, struct nmm_codon const *codon, double lprob);
-double nmm_codonp_get(struct nmm_codonp const *codonp, struct nmm_codon const *codon);
+int    nmm_codonp_set_lprob(struct nmm_codonp *codonp, struct nmm_codon const *codon, double lprob);
+double nmm_codonp_get_lprob(struct nmm_codonp const *codonp, struct nmm_codon const *codon);
 int    nmm_codonp_normalize(struct nmm_codonp *codonp);
 void   nmm_codonp_destroy(struct nmm_codonp const *codonp);
 struct nmm_base const *nmm_codonp_get_base(struct nmm_codonp const *codonp);

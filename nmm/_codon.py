@@ -21,7 +21,7 @@ class CCodon:
 
     @property
     def symbols(self) -> bytes:
-        triplet = lib.nmm_codon_get(self._nmm_codon)
+        triplet = lib.nmm_codon_get_triplet(self._nmm_codon)
         return triplet.a + triplet.b + triplet.c
 
     @symbols.setter
@@ -30,7 +30,7 @@ class CCodon:
             raise ValueError("Symbols length must be three.")
 
         triplet = {"a": symbols[0:1], "b": symbols[1:2], "c": symbols[2:3]}
-        if lib.nmm_codon_set(self._nmm_codon, triplet) != 0:
+        if lib.nmm_codon_set_triplet(self._nmm_codon, triplet) != 0:
             raise ValueError("Could not set codon.")
 
     @property
