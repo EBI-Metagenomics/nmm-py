@@ -2,6 +2,7 @@ from ._alphabet import Alphabet
 from ._base import Base
 from ._codon import Codon
 from ._sequence import Sequence
+from ._base_table import BaseTable
 
 # from ._base import BaseTable, Base
 # from ._cli import cli
@@ -35,6 +36,7 @@ __all__ = [
     "Alphabet",
     "Base",
     "Codon",
+    "BaseTable",
     "__version__",
     "cli",
     "test",
