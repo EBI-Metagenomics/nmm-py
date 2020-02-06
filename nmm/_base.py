@@ -3,6 +3,14 @@ from ._ffi import ffi, lib
 
 
 class CBase:
+    """
+    Wrapper around the C implementation of a base (4 nucleotides alphabet).
+
+    Parameters
+    ----------
+    nmm_base : `<cdata 'struct nmm_base *'>`.
+    """
+
     def __init__(self, nmm_base: ffi.CData):
         super().__init__()
         if nmm_base == ffi.NULL:
@@ -22,8 +30,7 @@ class CBase:
             lib.nmm_base_destroy(self._nmm_base)
 
     def __str__(self) -> str:
-        symbols = self.symbols.decode()
-        return f"{{{symbols}}}"
+        return f"{{{self.symbols.decode()}}}"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
@@ -31,16 +38,18 @@ class CBase:
 
 class Base(CBase):
     """
-    Base is a nucleotide letter.
+    Base is a four-nucleotides alphabet.
 
-    base : Union[bytes, str, int]
-        A single letter.
+    Parameters
+    ----------
+    alphabet : `CAlphabet`
+        Four-nucleotides alphabet.
     """
 
-    def __init__(self, calphabet: CAlphabet):
-        self._calphabet = calphabet
+    def __init__(self, alphabet: CAlphabet):
+        self._calphabet = alphabet
 
-        nmm_base = lib.nmm_base_create(calphabet.imm_abc)
+        nmm_base = lib.nmm_base_create(alphabet.imm_abc)
         if nmm_base == ffi.NULL:
             raise RuntimeError("`nmm_base_create` failed.")
 

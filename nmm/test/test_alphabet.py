@@ -5,7 +5,7 @@ from nmm import Alphabet
 
 
 def test_alphabet():
-    abc = Alphabet(b"ACGT")
+    abc = Alphabet(b"ACGT", b"X")
     assert_equal(abc.length, 4)
 
     assert_equal(abc.has_symbol(b"A"), True)
@@ -29,7 +29,7 @@ def test_alphabet():
     assert_equal(repr(abc), "<Alphabet:{ACGT}>")
 
     with pytest.raises(TypeError):
-        Alphabet("ACGTç")
+        Alphabet("ACGTç", b"X")
 
     with pytest.raises(RuntimeError):
-        Alphabet("ACGTç".encode())
+        Alphabet("ACGTç".encode(), b"X")

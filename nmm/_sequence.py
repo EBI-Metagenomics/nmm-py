@@ -34,8 +34,7 @@ class CSequence:
             lib.imm_seq_destroy(self._imm_seq)
 
     def __str__(self) -> str:
-        seq = self.symbols.decode()
-        return f"[{seq}]"
+        return f"[{self.symbols.decode()}]"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
@@ -43,18 +42,20 @@ class CSequence:
 
 class Sequence(CSequence):
     """
-    Seq set for Markov models.
+    Sequence of symbols from a given alphabet.
 
     Parameters
     ----------
-    symbols : bytes
-        Set of symbols as an array of bytes.
+    seq : bytes
+        Sequence of symbols.
+    alphabet : `CAlphabet`
+        Alphabet.
     """
 
-    def __init__(self, seq: bytes, calphabet: CAlphabet):
-        self._calphabet = calphabet
+    def __init__(self, seq: bytes, alphabet: CAlphabet):
+        self._calphabet = alphabet
 
-        imm_seq = lib.imm_seq_create(seq, calphabet.imm_abc)
+        imm_seq = lib.imm_seq_create(seq, alphabet.imm_abc)
         if imm_seq == ffi.NULL:
             raise RuntimeError("`imm_seq_create` failed.")
 

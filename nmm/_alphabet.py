@@ -3,7 +3,7 @@ from ._ffi import ffi, lib
 
 class CAlphabet:
     """
-    Wrapper around the C implementation of alphabet set.
+    Wrapper around the C implementation of alphabet.
 
     Parameters
     ----------
@@ -29,7 +29,7 @@ class CAlphabet:
         return ffi.string(lib.imm_abc_symbols(self._imm_abc))
 
     def has_symbol(self, symbol_id: bytes) -> bool:
-        return lib.imm_abc_has_symbol(self._imm_abc, symbol_id) == 1
+        return lib.imm_abc_has_symbol(self._imm_abc, symbol_id)
 
     def symbol_idx(self, symbol_id: bytes) -> int:
         return lib.imm_abc_symbol_idx(self._imm_abc, symbol_id)
@@ -42,8 +42,7 @@ class CAlphabet:
             lib.imm_abc_destroy(self._imm_abc)
 
     def __str__(self) -> str:
-        seq = self.symbols.decode()
-        return f"{{{seq}}}"
+        return f"{{{self.symbols.decode()}}}"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
@@ -59,7 +58,7 @@ class Alphabet(CAlphabet):
         Set of symbols as an array of bytes.
     """
 
-    def __init__(self, symbols: bytes, any_symbol: bytes = b"X"):
+    def __init__(self, symbols: bytes, any_symbol: bytes):
         if len(any_symbol) != 1:
             raise ValueError("`any_symbol` has length different than 1.")
 
