@@ -4,7 +4,7 @@ from ._ffi import ffi, lib
 
 class CBase:
     """
-    Wrapper around the C implementation of a base (4 nucleotides alphabet).
+    Wrapper around the C implementation of a base (four-nucleotides alphabet).
 
     Parameters
     ----------
@@ -48,12 +48,7 @@ class Base(CBase):
 
     def __init__(self, alphabet: CAlphabet):
         self._calphabet = alphabet
-
-        nmm_base = lib.nmm_base_create(alphabet.imm_abc)
-        if nmm_base == ffi.NULL:
-            raise RuntimeError("`nmm_base_create` failed.")
-
-        super().__init__(nmm_base)
+        super().__init__(lib.nmm_base_create(alphabet.imm_abc))
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

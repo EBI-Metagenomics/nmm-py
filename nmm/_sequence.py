@@ -54,12 +54,7 @@ class Sequence(CSequence):
 
     def __init__(self, seq: bytes, alphabet: CAlphabet):
         self._calphabet = alphabet
-
-        imm_seq = lib.imm_seq_create(seq, alphabet.imm_abc)
-        if imm_seq == ffi.NULL:
-            raise RuntimeError("`imm_seq_create` failed.")
-
-        super().__init__(imm_seq)
+        super().__init__(lib.imm_seq_create(seq, alphabet.imm_abc))
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

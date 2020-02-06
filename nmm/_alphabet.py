@@ -61,12 +61,7 @@ class Alphabet(CAlphabet):
     def __init__(self, symbols: bytes, any_symbol: bytes):
         if len(any_symbol) != 1:
             raise ValueError("`any_symbol` has length different than 1.")
-
-        imm_abc = lib.imm_abc_create(symbols, any_symbol)
-        if imm_abc == ffi.NULL:
-            raise RuntimeError("`imm_abc_create` failed.")
-
-        super().__init__(imm_abc)
+        super().__init__(lib.imm_abc_create(symbols, any_symbol))
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
