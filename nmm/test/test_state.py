@@ -3,7 +3,15 @@ from math import log
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import Alphabet, MuteState, NormalState, Sequence, lprob_is_zero
+from nmm import (
+    Alphabet,
+    MuteState,
+    NormalState,
+    Sequence,
+    lprob_is_zero,
+    SequenceTable,
+    TableState,
+)
 
 
 def test_normal_state():
@@ -40,24 +48,18 @@ def test_mute_state():
     assert_equal(repr(state), "<MuteState:S>")
 
 
-# def test_table_state():
-#     alphabet = Alphabet(b"ACGU")
-#     state = TableState(b"M2", alphabet, {b"AUG": log(0.8), b"AUU": log(0.4)})
-#     assert_equal(state.name, b"M2")
-#     assert_equal(set(state.alphabet.symbols), set(b"ACGU"))
-#     assert_allclose(state.lprob(b"AUG"), log(0.8))
-#     assert_allclose(state.lprob(b"AUU"), log(0.4))
-#     assert_equal(state.lprob(b"AGU"), LOG0)
-#     assert_equal(str(state), "<M2>")
-#     assert_equal(repr(state), "<TableState:M2>")
-#     state.normalize()
-#     assert_allclose(state.lprob(b"AUG"), log(0.8) - log(1.2))
-#     assert_allclose(state.lprob(b"AUU"), log(0.4) - log(1.2))
-#     assert_equal(state.lprob(b"AGU"), LOG0)
+def test_table_state():
+    alphabet = Alphabet(b"ACGU", b"X")
+    seqt = SequenceTable(alphabet)
+    seqt.add(Sequence(b"AUG", alphabet), log(0.8))
+    seqt.add(Sequence(b"AUU", alphabet), log(0.4))
 
-#     state = TableState(b"M", alphabet, {b"A": LOG0})
-#     with pytest.raises(RuntimeError):
-#         state.normalize()
+    state = TableState(b"M2", seqt)
+    assert_equal(state.name, b"M2")
+    assert_allclose(state.lprob(Sequence(b"AUG", alphabet)), log(0.8))
+    assert_allclose(state.lprob(Sequence(b"AUU", alphabet)), log(0.4))
+    assert_equal(str(state), "M2")
+    assert_equal(repr(state), "<TableState:M2>")
 
 
 # def test_frame_state():

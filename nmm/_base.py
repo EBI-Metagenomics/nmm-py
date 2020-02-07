@@ -46,7 +46,7 @@ class Base(CBase):
     """
 
     def __init__(self, alphabet: CAlphabet):
-        self._calphabet = alphabet
+        self._alphabet = alphabet
         super().__init__(lib.nmm_base_create(alphabet.imm_abc))
 
     def __repr__(self) -> str:

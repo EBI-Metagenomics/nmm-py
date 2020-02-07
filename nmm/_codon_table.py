@@ -46,5 +46,5 @@ class CodonTable(CCodonTable):
     """
 
     def __init__(self, codonp: CCodonProb):
-        self._ccodonp = codonp
+        self._codonp = codonp
         super().__init__(lib.nmm_codont_create(codonp.nmm_codonp))

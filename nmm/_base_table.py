@@ -31,6 +31,6 @@ class CBaseTable:
 
 class BaseTable(CBaseTable):
     def __init__(self, base: CBase, lprobs: Tuple[float, float, float, float]):
-        self._calphabet = base
+        self._base = base
         nmm_baset = lib.nmm_baset_create(base.nmm_base, *lprobs)
         super().__init__(nmm_baset)

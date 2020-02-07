@@ -60,7 +60,7 @@ class Codon(CCodon):
     """
 
     def __init__(self, symbols: bytes, base: CBase):
-        self._cbase = base
+        self._base = base
         super().__init__(lib.nmm_codon_create(base.nmm_base))
         self.symbols = symbols
 

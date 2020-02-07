@@ -52,5 +52,5 @@ class CodonProb(CCodonProb):
     """
 
     def __init__(self, base: CBase):
-        self._cbase = base
+        self._base = base
         super().__init__(lib.nmm_codonp_create(base.nmm_base))

@@ -1,5 +1,6 @@
 from typing import Sequence
 
+from ._sequence_table import SequenceTable
 from ._sequence import CSequence
 from ._alphabet import CAlphabet
 from ._lprob import lprob_is_valid
@@ -74,11 +75,11 @@ class MuteState(CState):
             raise RuntimeError("`imm_mute_state_create` failed.")
 
         super().__init__(lib.imm_state_cast_c(self._imm_mute_state))
-        self._alphabet = alphabet
+        # self._alphabet = alphabet
 
-    @property
-    def alphabet(self) -> CAlphabet:
-        return self._alphabet
+    # @property
+    # def alphabet(self) -> CAlphabet:
+    #     return self._alphabet
 
     def __del__(self):
         if self._imm_mute_state != ffi.NULL:
@@ -108,11 +109,11 @@ class NormalState(CState):
 
         self._imm_normal_state = state
         super().__init__(lib.imm_state_cast_c(self._imm_normal_state))
-        self._alphabet = alphabet
+        # self._alphabet = alphabet
 
-    @property
-    def alphabet(self) -> CAlphabet:
-        return self._alphabet
+    # @property
+    # def alphabet(self) -> CAlphabet:
+    #     return self._alphabet
 
     def __del__(self):
         if self._imm_normal_state != ffi.NULL:
@@ -122,24 +123,30 @@ class NormalState(CState):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-# class TableState(CState):
-#     def __init__(self, name: bytes, alphabet: CAlphabet, emission: Dict[bytes, float]):
-#         """
-#         Parameters
-#         ----------
-#         name : Name.
-#         alphabet : CAlphabet.
-#         emission : Emission probabilities in log-space.
-#         """
-#         self._imm_table_state = lib.imm_table_state_create(name, alphabet.imm_abc)
-#         if self._imm_table_state == ffi.NULL:
-#             raise RuntimeError("`imm_table_state_create` failed.")
+class TableState(CState):
+    def __init__(self, name: bytes, sequence_table: SequenceTable):
+        """
+        Parameters
+        ----------
+        name : bytes
+            State name.
+        sequence_table : `SequenceTable`
+            Table of sequence probabilities.
+        """
+        state = lib.imm_table_state_create(name, sequence_table.imm_seq_table)
+        if state == ffi.NULL:
+            raise RuntimeError("`imm_table_state_create` failed.")
 
-#         for seq, lprob in emission.items():
-#             lib.imm_table_state_add(self._imm_table_state, seq, lprob)
+        self._imm_table_state = state
+        super().__init__(lib.imm_state_cast_c(self._imm_table_state))
 
-#         super().__init__(lib.imm_state_cast_c(self._imm_table_state))
-#         self._alphabet = alphabet
+    def __del__(self):
+        if self._imm_table_state != ffi.NULL:
+            lib.imm_table_state_destroy(self._imm_table_state)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{str(self)}>"
+
 
 #     @property
 #     def alphabet(self) -> CAlphabet:
@@ -152,10 +159,6 @@ class NormalState(CState):
 
 #     def __repr__(self):
 #         return f"<{self.__class__.__name__}:{self.name.decode()}>"
-
-#     def __del__(self):
-#         if self._imm_table_state != ffi.NULL:
-#             lib.imm_table_state_destroy(self._imm_table_state)
 
 
 # class CodonState(TableState):

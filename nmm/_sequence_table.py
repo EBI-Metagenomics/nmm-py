@@ -71,5 +71,9 @@ class SequenceTable(CSequenceTable):
         self._alphabet = alphabet
         super().__init__(lib.imm_seq_table_create(alphabet.imm_abc))
 
+    @property
+    def alphabet(self) -> CAlphabet:
+        return self._alphabet
+
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
