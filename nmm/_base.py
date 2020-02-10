@@ -1,4 +1,4 @@
-from ._alphabet import CAlphabet
+from ._alphabet import Alphabet
 from ._ffi import ffi, lib
 
 
@@ -41,13 +41,17 @@ class Base(CBase):
 
     Parameters
     ----------
-    alphabet : `CAlphabet`
+    alphabet : `Alphabet`
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, alphabet: CAlphabet):
+    def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
         super().__init__(lib.nmm_base_create(alphabet.imm_abc))
+
+    @property
+    def alphabet(self) -> Alphabet:
+        return self._alphabet
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

@@ -1,6 +1,6 @@
-from typing import Sequence
+from typing import Sequence, Dict
 
-from ._alphabet import CAlphabet
+from ._alphabet import CAlphabet, Alphabet
 from ._base_table import BaseTable
 from ._codon_table import CodonTable
 from ._codon import Codon
@@ -171,6 +171,30 @@ class FrameState(CState):
     def __del__(self):
         if self._nmm_frame_state != ffi.NULL:
             lib.nmm_frame_state_destroy(self._nmm_frame_state)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+class CodonState(TableState):
+    def __init__(self, name: bytes, alphabet: Alphabet, emission: Dict[Codon, float]):
+        """
+        Parameters
+        ----------
+        name : bytes
+            State name.
+        alphabet : `Alphabet`
+            Alphabet.
+        emission : `Dict[Codon, float]`
+            Codon probabilities.
+        """
+        from ._sequence import Sequence as Seq
+
+        seqt = SequenceTable(alphabet)
+        for k, v in emission.items():
+            seqt.add(Seq(k.symbols, k.base.alphabet), v)
+
+        super().__init__(name, seqt)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{str(self)}>"

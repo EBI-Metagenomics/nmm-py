@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Iterator, NamedTuple, Sequence, Tuple
 
-from .._path import PathBase
-from .._step import StepBase
+from .._path import CPath
+from .._step import CStep
 
 Interval = NamedTuple("Interval", [("start", int), ("end", int)])
 
@@ -17,7 +17,7 @@ class Fragment(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def items(self) -> Iterator[Tuple[bytes, StepBase]]:
+    def items(self) -> Iterator[Tuple[bytes, CStep]]:
         raise NotImplementedError()
 
     @property
@@ -26,7 +26,7 @@ class Fragment(ABC):
 
 
 class SearchResult(ABC):
-    def _create_fragments(self, path: PathBase):
+    def _create_fragments(self, path: CPath):
 
         frag_start = frag_end = 0
         step_start = step_end = 0

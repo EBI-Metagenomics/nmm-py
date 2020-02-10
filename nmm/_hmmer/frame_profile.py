@@ -4,8 +4,9 @@ from typing import Any, Dict, List, Sequence, Tuple
 from hmmer_reader import HMMERProfile
 
 from .._alphabet import Alphabet
-from .._base import Base, BaseTable
-from .._codon import CodonTable
+from .._base_table import BaseTable
+from .._codon_table import CodonTable
+
 from .._gencode import GeneticCode
 from .._log import LOG0
 from .._state import FrameState, MuteState

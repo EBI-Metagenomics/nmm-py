@@ -1,4 +1,4 @@
-from ._base import CBase
+from ._base import Base
 from ._ffi import ffi, lib
 
 
@@ -55,14 +55,18 @@ class Codon(CCodon):
     ----------
     symbols : bytes
         Sequence of four symbols.
-    base : `CBase`
+    base : `Base`
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, symbols: bytes, base: CBase):
+    def __init__(self, symbols: bytes, base: Base):
         self._base = base
         super().__init__(lib.nmm_codon_create(base.nmm_base))
         self.symbols = symbols
+
+    @property
+    def base(self) -> Base:
+        return self._base
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
