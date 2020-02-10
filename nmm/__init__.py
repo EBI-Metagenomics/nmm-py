@@ -7,9 +7,9 @@ from ._base_table import BaseTable
 from ._codon_prob import CodonProb
 from ._codon_table import CodonTable
 from ._lprob import lprob_is_zero, lprob_is_valid, LPROB_ZERO, LPROB_INVALID
-from ._state import MuteState, NormalState, TableState
+from ._state import MuteState, NormalState, TableState, FrameState
 
-# from ._state import FrameState, MuteState, NormalState, TableState, CodonState
+# MuteState, NormalState, TableState, CodonState
 
 # from ._base import BaseTable, Base
 # from ._cli import cli
@@ -52,11 +52,11 @@ __all__ = [
     "lprob_is_valid",
     "lprob_is_zero",
     "test",
-    "FrameState",
     "MuteState",
     "NormalState",
     "TableState",
     "CodonState",
     "SequenceTable",
     "TableState",
+    "FrameState",
 ]

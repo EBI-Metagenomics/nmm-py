@@ -1,15 +1,13 @@
 from typing import Sequence
 
-from ._sequence_table import SequenceTable
-from ._sequence import CSequence
 from ._alphabet import CAlphabet
-from ._lprob import lprob_is_valid
-
-# from ._base import BaseTable
-# from ._codon import Codon, CodonTable
+from ._base_table import BaseTable
+from ._codon_table import CodonTable
+from ._codon import Codon
 from ._ffi import ffi, lib
-
-# from ._log import LOG0
+from ._lprob import lprob_is_valid
+from ._sequence import CSequence
+from ._sequence_table import SequenceTable
 
 
 class CState:
@@ -75,11 +73,6 @@ class MuteState(CState):
             raise RuntimeError("`imm_mute_state_create` failed.")
 
         super().__init__(lib.imm_state_cast_c(self._imm_mute_state))
-        # self._alphabet = alphabet
-
-    # @property
-    # def alphabet(self) -> CAlphabet:
-    #     return self._alphabet
 
     def __del__(self):
         if self._imm_mute_state != ffi.NULL:
@@ -109,11 +102,6 @@ class NormalState(CState):
 
         self._imm_normal_state = state
         super().__init__(lib.imm_state_cast_c(self._imm_normal_state))
-        # self._alphabet = alphabet
-
-    # @property
-    # def alphabet(self) -> CAlphabet:
-    #     return self._alphabet
 
     def __del__(self):
         if self._imm_normal_state != ffi.NULL:
@@ -148,79 +136,41 @@ class TableState(CState):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-#     @property
-#     def alphabet(self) -> CAlphabet:
-#         return self._alphabet
+class FrameState(CState):
+    def __init__(
+        self, name: bytes, baset: BaseTable, codont: CodonTable, epsilon: float
+    ):
+        """
+        Parameters
+        ----------
+        name : bytes
+            State name.
+        baset : `BaseTable`
+            Base table of probabilities.
+        codont : `CodonTable`
+            Codon table of probabilities.
+        epsilon : float
+            Epsilon.
+        """
+        state = lib.nmm_frame_state_create(
+            name, baset.nmm_baset, codont.nmm_codont, epsilon
+        )
+        if state == ffi.NULL:
+            raise RuntimeError("`nmm_frame_state_create` failed.")
 
-#     def normalize(self) -> None:
-#         err = lib.imm_table_state_normalize(self._imm_table_state)
-#         if err != 0:
-#             raise RuntimeError("Normalization error.")
+        self._baset = baset
+        self._codont = codont
+        self._epsilon = epsilon
+        self._nmm_frame_state = state
+        super().__init__(lib.imm_state_cast_c(self._nmm_frame_state))
 
-#     def __repr__(self):
-#         return f"<{self.__class__.__name__}:{self.name.decode()}>"
+    def decode(self, seq: CSequence, codon: Codon) -> float:
+        state = self._nmm_frame_state
+        return lib.nmm_frame_state_decode(state, seq.imm_seq, codon.nmm_codon)
 
+    def __del__(self):
+        if self._nmm_frame_state != ffi.NULL:
+            lib.nmm_frame_state_destroy(self._nmm_frame_state)
 
-# class CodonState(TableState):
-#     def __init__(self, name: bytes, alphabet: CAlphabet, emission: Dict[Codon, float]):
-#         super().__init__(name, alphabet, {bytes(k): v for k, v in emission.items()})
-
-#     def __repr__(self):
-#         return f"<{self.__class__.__name__}:{self.name.decode()}>"
-
-
-# class FrameState(CState):
-#     def __init__(
-#         self, name: bytes, baset: BaseTable, codont: CodonTable, epsilon: float
-#     ):
-#         """
-#         Parameters
-#         ----------
-#         name : Name.
-#         baset : Base table.
-#         codont : Codon table.
-#         epsilon : Epsilon.
-#         """
-#         if set(baset.alphabet.symbols) != set(codont.alphabet.symbols):
-#             raise ValueError("Alphabet symbols of `base` and `codon` are not equal.")
-
-#         self._baset = baset
-#         self._codont = codont
-#         self._epsilon = epsilon
-
-#         self._imm_frame_state = lib.nmm_frame_state_create(
-#             name, baset.nmm_baset, codont.nmm_codont, epsilon
-#         )
-#         if self._imm_frame_state == ffi.NULL:
-#             raise RuntimeError("Could not create state.")
-
-#         super().__init__(lib.imm_state_cast_c(self._imm_frame_state))
-
-#     @property
-#     def alphabet(self) -> CAlphabet:
-#         return self._baset.alphabet
-
-#     @property
-#     def base(self) -> BaseTable:
-#         return self._baset
-
-#     @property
-#     def codon(self) -> CodonTable:
-#         return self._codont
-
-#     @property
-#     def epsilon(self):
-#         return self._epsilon
-
-#     def decode(self, seq: bytes) -> Tuple[Codon, float]:
-#         codon = Codon("XXX")
-#         st = self._imm_frame_state
-#         lprob: float = lib.nmm_frame_state_decode(st, seq, len(seq), codon.nmm_codon)
-#         return (codon, lprob)
-
-#     def __repr__(self):
-#         return f"<{self.__class__.__name__}:{self.name.decode()}>"
-
-#     def __del__(self):
-#         if self._imm_frame_state != ffi.NULL:
-#             lib.nmm_frame_state_destroy(self._imm_frame_state)
+    def __repr__(self):
+        return f"<{self.__class__.__name__}:{str(self)}>"

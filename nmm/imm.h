@@ -31,11 +31,12 @@ struct imm_seq const *imm_seq_create(char const *seq, struct imm_abc const *abc)
 struct imm_abc const *imm_seq_get_abc(struct imm_seq const *seq);
 unsigned              imm_seq_length(struct imm_seq const *seq);
 char const *          imm_seq_string(struct imm_seq const *seq);
-struct imm_seq const *imm_seq_duplicate(struct imm_seq const *seq);
+struct imm_seq const *imm_seq_clone(struct imm_seq const *seq);
 void                  imm_seq_destroy(struct imm_seq const *seq);
 
 /* Squence table */
 struct imm_seq_table *imm_seq_table_create(struct imm_abc const *abc);
+struct imm_seq_table *imm_seq_table_clone(struct imm_seq_table const *table);
 void                  imm_seq_table_destroy(struct imm_seq_table const *table);
 int    imm_seq_table_add(struct imm_seq_table *table, struct imm_seq const *seq, double lprob);
 int    imm_seq_table_normalize(struct imm_seq_table *table);
