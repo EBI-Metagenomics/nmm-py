@@ -290,61 +290,68 @@ def test_hmm_viterbi_2():
     assert_allclose(score, log(0.32))
 
 
-# def test_hmm_viterbi_3():
-#     alphabet = Alphabet(b"AC")
+def test_hmm_viterbi_3():
+    alphabet = Alphabet(b"AC", b"X")
+    hmm = HMM(alphabet)
 
-#     hmm = HMM(alphabet)
-#     assert_equal(alphabet, hmm.alphabet)
+    S = MuteState(b"S", alphabet)
+    hmm.add_state(S, log(1.0))
 
-#     S = MuteState(b"S", alphabet)
-#     hmm.add_state(S, log(1.0))
+    E = MuteState(b"E", alphabet)
+    hmm.add_state(E, LPROB_ZERO)
 
-#     E = MuteState(b"E", alphabet)
-#     hmm.add_state(E, LPROB_ZERO)
+    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2)])
+    hmm.add_state(M1, LPROB_ZERO)
 
-#     M1 = NormalState(b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2)})
-#     hmm.add_state(M1, LPROB_ZERO)
+    D1 = MuteState(b"D1", alphabet)
+    hmm.add_state(D1, LPROB_ZERO)
 
-#     D1 = MuteState(b"D1", alphabet)
-#     hmm.add_state(D1, LPROB_ZERO)
+    M2 = NormalState(b"M2", alphabet, [log(0.4), log(0.6)])
+    hmm.add_state(M2, LPROB_ZERO)
 
-#     M2 = NormalState(b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6)})
-#     hmm.add_state(M2, LPROB_ZERO)
+    D2 = MuteState(b"D2", alphabet)
+    hmm.add_state(D2, LPROB_ZERO)
 
-#     D2 = MuteState(b"D2", alphabet)
-#     hmm.add_state(D2, LPROB_ZERO)
+    hmm.set_transition(S, M1, log(0.8))
+    hmm.set_transition(S, D1, log(0.2))
 
-#     hmm.set_transition(S, M1, log(0.8))
-#     hmm.set_transition(S, D1, log(0.2))
+    hmm.set_transition(M1, M2, log(0.8))
+    hmm.set_transition(M1, D2, log(0.2))
 
-#     hmm.set_transition(M1, M2, log(0.8))
-#     hmm.set_transition(M1, D2, log(0.2))
+    hmm.set_transition(D1, D2, log(0.2))
+    hmm.set_transition(D1, M2, log(0.8))
 
-#     hmm.set_transition(D1, D2, log(0.2))
-#     hmm.set_transition(D1, M2, log(0.8))
+    hmm.set_transition(D2, E, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
+    hmm.normalize()
+    hmm.set_transition(E, E, LPROB_ZERO)
 
-#     hmm.set_transition(D2, E, log(1.0))
-#     hmm.set_transition(M2, E, log(1.0))
-#     hmm.set_transition(E, E, log(1.0))
-#     hmm.normalize()
-#     hmm.set_transition(E, E, LPROB_ZERO)
+    results = hmm.viterbi(Sequence(b"AC", alphabet), E)
+    score = results[0].loglikelihood
+    assert_equal(results[0].sequence.symbols, b"AC")
+    path = results[0].path
+    steps = list(path.steps())
+    assert_equal(steps[0].seq_len, 0)
+    assert_equal(steps[1].seq_len, 1)
+    assert_equal(steps[2].seq_len, 1)
+    assert_equal(steps[3].seq_len, 0)
 
-#     score = hmm.viterbi(b"AC", E)[0]
-#     assert_allclose(score, log(0.3072))
+    assert_allclose(score, log(0.3072))
 
-#     score = hmm.viterbi(b"AA", E)[0]
-#     assert_allclose(score, log(0.2048))
+    score = hmm.viterbi(Sequence(b"AA", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.2048))
 
-#     score = hmm.viterbi(b"A", E)[0]
-#     assert_allclose(score, log(0.128))
+    score = hmm.viterbi(Sequence(b"A", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.128))
 
-#     score = hmm.viterbi(b"AC", E)[0]
-#     assert_allclose(score, log(0.3072))
+    score = hmm.viterbi(Sequence(b"AC", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.3072))
 
-#     score = hmm.viterbi(b"AC", M2)[0]
-#     assert_allclose(score, log(0.3072))
+    score = hmm.viterbi(Sequence(b"AC", alphabet), M2)[0].loglikelihood
+    assert_allclose(score, log(0.3072))
 
-#     hmm.del_state(E)
+    hmm.del_state(E)
 
-#     score = hmm.viterbi(b"AC", M2)[0]
-#     assert_allclose(score, log(0.3072))
+    score = hmm.viterbi(Sequence(b"AC", alphabet), M2)[0].loglikelihood
+    assert_allclose(score, log(0.3072))
