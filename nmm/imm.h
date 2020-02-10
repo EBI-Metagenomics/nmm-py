@@ -72,11 +72,13 @@ struct imm_results *     imm_results_create(struct imm_seq const *seq, unsigned 
 struct imm_result const *imm_results_get(struct imm_results const *results, unsigned idx);
 unsigned                 imm_results_size(struct imm_results const *results);
 void                     imm_results_destroy(struct imm_results const *results);
+void                     imm_results_free(struct imm_results const *results);
 
 /* Result */
 double                 imm_result_loglik(struct imm_result const *result);
 struct imm_path const *imm_result_path(struct imm_result const *result);
 struct imm_seq const * imm_result_sequence(struct imm_result const *result);
+void                   imm_result_free(struct imm_result const *result);
 
 /* HMM */
 struct imm_hmm *imm_hmm_create(struct imm_abc const *abc);
@@ -98,6 +100,7 @@ int                       imm_hmm_normalize_trans(struct imm_hmm *hmm, struct im
 /* Path */
 struct imm_path *imm_path_create(void);
 struct imm_path *imm_path_clone(struct imm_path const *path);
+void             imm_path_free(struct imm_path const *path);
 void             imm_path_destroy(struct imm_path const *path);
 int imm_path_append(struct imm_path *path, struct imm_state const *state, unsigned seq_len);
 int imm_path_prepend(struct imm_path *path, struct imm_state const *state, unsigned seq_len);
@@ -108,3 +111,4 @@ struct imm_step const *imm_path_next(struct imm_path const *path, struct imm_ste
 /* Step */
 struct imm_state const *imm_step_state(struct imm_step const *step);
 unsigned                imm_step_seq_len(struct imm_step const *step);
+void                    imm_step_destroy(struct imm_step const *step);

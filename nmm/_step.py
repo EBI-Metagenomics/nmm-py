@@ -11,6 +11,7 @@ class CStep:
     Parameters
     ----------
     imm_step : `<cdata 'struct imm_step *'>`
+        Step pointer.
     """
 
     def __init__(self, imm_step: ffi.CData):
@@ -25,6 +26,10 @@ class CStep:
     @property
     def seq_len(self) -> int:
         return lib.imm_step_seq_len(self.imm_step)
+
+    def __del__(self):
+        if self._imm_step != ffi.NULL:
+            lib.imm_step_destroy(self._imm_step)
 
     def __str__(self) -> str:
         state = lib.imm_step_state(self._imm_step)

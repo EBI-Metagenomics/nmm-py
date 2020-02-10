@@ -331,7 +331,7 @@ def test_hmm_viterbi_3():
     score = results[0].loglikelihood
     assert_equal(results[0].sequence.symbols, b"AC")
     path = results[0].path
-    steps = list(path.steps())
+    steps = list(path)
     assert_equal(steps[0].seq_len, 0)
     assert_equal(steps[1].seq_len, 1)
     assert_equal(steps[2].seq_len, 1)
