@@ -1,21 +1,19 @@
 from ._alphabet import Alphabet
 from ._base import Base
-from ._codon import Codon
-from ._sequence import Sequence
-from ._sequence_table import SequenceTable
 from ._base_table import BaseTable
+from ._codon import Codon
 from ._codon_prob import CodonProb
 from ._codon_table import CodonTable
-from ._lprob import lprob_is_zero, lprob_is_valid, LPROB_ZERO, LPROB_INVALID
-from ._state import MuteState, NormalState, TableState, FrameState
 
-# MuteState, NormalState, TableState, CodonState
-
-# from ._base import BaseTable, Base
 # from ._cli import cli
 # from ._codon import CodonTable, Codon
 # from ._gencode import GeneticCode
-# from ._hmm import HMM
+from ._hmm import HMM
+from ._lprob import LPROB_INVALID, LPROB_ZERO, lprob_is_valid, lprob_is_zero
+from ._sequence import Sequence
+from ._sequence_table import SequenceTable
+from ._state import FrameState, MuteState, NormalState, TableState
+
 # from ._hmmer import create_frame_profile, create_standard_profile
 # from ._hmmer.io import tblout_reader
 # from ._log import LOG0
@@ -59,4 +57,5 @@ __all__ = [
     "SequenceTable",
     "TableState",
     "FrameState",
+    "HMM",
 ]

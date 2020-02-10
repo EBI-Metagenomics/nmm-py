@@ -3,6 +3,7 @@ from ._path import CPath
 from ._log import LOG0
 from ._state import CState
 from ._alphabet import CAlphabet
+from ._lprob import LPROB_ZERO
 from typing import Dict, Tuple
 
 
@@ -15,7 +16,7 @@ class HMM:
 
     Parameters
     ----------
-    alphabet : CAlphabet
+    alphabet : `CAlphabet`
         Alphabet.
     """
 
@@ -30,8 +31,7 @@ class HMM:
         return self._states
 
     def set_start_lprob(self, state: CState, lprob: float):
-        err: int = lib.imm_hmm_set_start(self._hmm, state.imm_state, lprob)
-        if err != 0:
+        if lib.imm_hmm_set_start(self._hmm, state.imm_state, lprob) != 0:
             raise RuntimeError("Could not set start probability.")
 
     def transition(self, a: CState, b: CState):
@@ -73,18 +73,17 @@ class HMM:
     def alphabet(self) -> CAlphabet:
         return self._alphabet
 
-    def add_state(self, state: CState, start_lprob: float = LOG0):
+    def add_state(self, state: CState, start_lprob: float = LPROB_ZERO):
         """
         Parameters
         ----------
-        state
+        state :  `CState`
             Add state.
-        start_lprob : bool
+        start_lprob : float
             Log-space probability of being the initial state.
         """
-        err: int = lib.imm_hmm_add_state(self._hmm, state.imm_state, start_lprob)
-        if err != 0:
-            raise ValueError("Could not add state %s.", state)
+        if lib.imm_hmm_add_state(self._hmm, state.imm_state, start_lprob) != 0:
+            raise ValueError(f"Could not add state {str(state.name)}.")
         self._states[state.imm_state] = state
 
     def del_state(self, state: CState):
@@ -98,8 +97,7 @@ class HMM:
         del self._states[state.imm_state]
 
     def normalize(self):
-        err: int = lib.imm_hmm_normalize(self._hmm)
-        if err != 0:
+        if lib.imm_hmm_normalize(self._hmm) != 0:
             raise ValueError("Normalization error.")
 
     def normalize_transitions(self, state: CState):
