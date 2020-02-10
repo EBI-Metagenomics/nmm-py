@@ -10,6 +10,8 @@ from ._codon_table import CodonTable
 # from ._gencode import GeneticCode
 from ._hmm import HMM
 from ._lprob import LPROB_INVALID, LPROB_ZERO, lprob_is_valid, lprob_is_zero
+from ._path import Path
+from ._results import CResult, CResults
 from ._sequence import Sequence
 from ._sequence_table import SequenceTable
 from ._state import FrameState, MuteState, NormalState, TableState
@@ -17,8 +19,6 @@ from ._state import FrameState, MuteState, NormalState, TableState
 # from ._hmmer import create_frame_profile, create_standard_profile
 # from ._hmmer.io import tblout_reader
 # from ._log import LOG0
-# from ._path import CPath
-# from ._step import CStep
 from ._testit import test
 
 try:
@@ -39,23 +39,26 @@ __all__ = [
     "Alphabet",
     "Base",
     "BaseTable",
+    "CResult",
+    "CResults",
     "Codon",
     "CodonProb",
+    "CodonState",
     "CodonTable",
+    "FrameState",
+    "HMM",
     "LPROB_INVALID",
     "LPROB_ZERO",
+    "MuteState",
+    "NormalState",
+    "Path",
     "Sequence",
+    "SequenceTable",
+    "TableState",
+    "TableState",
     "__version__",
     "cli",
     "lprob_is_valid",
     "lprob_is_zero",
     "test",
-    "MuteState",
-    "NormalState",
-    "TableState",
-    "CodonState",
-    "SequenceTable",
-    "TableState",
-    "FrameState",
-    "HMM",
 ]

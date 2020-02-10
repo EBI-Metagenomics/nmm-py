@@ -1,8 +1,8 @@
-from typing import Iterator
+from typing import Iterator, Sequence, Tuple
 
 from ._ffi import ffi, lib
 
-# from ._state import CState
+from ._state import CState
 from ._step import CStep
 
 
@@ -64,6 +64,15 @@ class CPath:
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+class Path(CPath):
+    def __init__(self, steps: Sequence[Tuple[CState, int]] = []):
+        super().__init__(lib.imm_path_create())
+
+        for step in steps:
+            if lib.imm_path_append(self._imm_path, step[0].imm_state, step[1]) != 0:
+                raise RuntimeError("Could not add step.")
 
 
 # def _create_imm_path():

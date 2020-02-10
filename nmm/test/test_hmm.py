@@ -13,6 +13,7 @@ from nmm import (
     Sequence,
     LPROB_ZERO,
     LPROB_INVALID,
+    Path,
 )
 
 
@@ -93,259 +94,200 @@ def test_hmm_trans_prob():
     assert_allclose(hmm.transition(E, E), log(1.0))
 
 
-# def test_hmm_lik_1():
-#     alphabet = Alphabet(b"ACGU")
-#     hmm = HMM(alphabet)
+def test_hmm_likelihood():
+    alphabet = Alphabet(b"ACGU", b"X")
+    hmm = HMM(alphabet)
+
+    S = MuteState(b"S", alphabet)
+    hmm.add_state(S, log(1.0))
+
+    E = MuteState(b"E", alphabet)
+    hmm.add_state(E, LPROB_ZERO)
+
+    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), LPROB_ZERO, LPROB_ZERO],)
+    hmm.add_state(M1, LPROB_ZERO)
+
+    M2 = NormalState(
+        b"M2", alphabet, [log(0.4 / 1.6), log(0.6 / 1.6), LPROB_ZERO, log(0.6 / 1.6)]
+    )
+    hmm.add_state(M2, LPROB_ZERO)
+
+    hmm.set_transition(S, M1, log(1.0))
+    hmm.set_transition(M1, M2, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
+    hmm.normalize()
+
+    p = hmm.likelihood(
+        Sequence(b"AC", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, log(0.3))
+
+    p = hmm.likelihood(
+        Sequence(b"AA", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, log(0.2))
+
+    p = hmm.likelihood(
+        Sequence(b"AG", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"AU", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, log(0.3))
+
+    p = hmm.likelihood(
+        Sequence(b"CC", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, log(0.075))
+
+    p = hmm.likelihood(
+        Sequence(b"CA", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, log(0.05))
+
+    p = hmm.likelihood(
+        Sequence(b"CG", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"CG", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"CU", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, log(0.075))
+
+    p = hmm.likelihood(
+        Sequence(b"GC", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"GA", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"GG", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"GU", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"UC", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"UA", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
+
+    p = hmm.likelihood(
+        Sequence(b"UG", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
 
-#     S = MuteState(b"S", alphabet)
-#     hmm.add_state(S, log(1.0))
+    p = hmm.likelihood(
+        Sequence(b"UU", alphabet), Path([(S, 0), (M1, 1), (M2, 1), (E, 0)])
+    )
+    assert_allclose(p, LPROB_ZERO)
 
-#     E = MuteState(b"E", alphabet)
-#     hmm.add_state(E, LPROB_ZERO)
+    M3 = NormalState(b"M2", alphabet, [log(0.4), log(0.6), LPROB_ZERO, log(0.6)],)
 
-#     M1 = NormalState(
-#         b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2), b"G": LPROB_ZERO, b"U": LPROB_ZERO}
-#     )
-#     hmm.add_state(M1, LPROB_ZERO)
+    with pytest.raises(ValueError):
+        hmm.likelihood(
+            Sequence(b"UU", alphabet), Path([(S, 0), (M1, 1), (M3, 1), (E, 0)])
+        )
 
-#     M2 = NormalState(
-#         b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6), b"G": LPROB_ZERO, b"U": log(0.6)}
-#     )
-#     M2.normalize()
-#     hmm.add_state(M2, LPROB_ZERO)
 
-#     hmm.set_transition(S, M1, log(1.0))
-#     hmm.set_transition(M1, M2, log(1.0))
-#     hmm.set_transition(M2, E, log(1.0))
-#     hmm.set_transition(E, E, log(1.0))
-#     hmm.normalize()
+def test_hmm_viterbi_1():
+    alphabet = Alphabet(b"ACGU", b"X")
+    hmm = HMM(alphabet)
 
-#     p = hmm.likelihood(b"AC", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.3))
+    S = MuteState(b"S", alphabet)
+    hmm.add_state(S, log(1.0))
 
-#     p = hmm.likelihood(b"AA", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.2))
+    E = MuteState(b"E", alphabet)
+    hmm.add_state(E, LPROB_ZERO)
 
-#     p = hmm.likelihood(b"AG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), LPROB_ZERO, LPROB_ZERO],)
+    hmm.add_state(M1, LPROB_ZERO)
 
-#     p = hmm.likelihood(b"AU", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.3))
+    M2 = NormalState(
+        b"M2", alphabet, [log(0.4 / 1.6), log(0.6 / 1.6), LPROB_ZERO, log(0.6 / 1.6)],
+    )
+    hmm.add_state(M2, LPROB_ZERO)
 
-#     p = hmm.likelihood(b"CC", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.075))
+    hmm.set_transition(S, M1, log(1.0))
+    hmm.set_transition(M1, M2, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
+    hmm.normalize()
 
-#     p = hmm.likelihood(b"CA", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.05))
+    hmm.set_transition(E, E, LPROB_ZERO)
+    assert_allclose(hmm.transition(E, E), LPROB_ZERO)
+    assert_allclose(hmm.transition(S, S), LPROB_ZERO)
+    assert_allclose(hmm.transition(S, E), LPROB_ZERO)
+    assert_allclose(hmm.transition(E, S), LPROB_ZERO)
 
-#     p = hmm.likelihood(b"CG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    results = hmm.viterbi(Sequence(b"AC", alphabet), E)
+    assert_equal(len(results), 1)
+    assert_allclose(results[0].loglikelihood, log(0.3))
 
-#     p = hmm.likelihood(b"CG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
 
-#     p = hmm.likelihood(b"CU", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.075))
+def test_hmm_viterbi_2():
+    alphabet = Alphabet(b"AC", b"X")
+    hmm = HMM(alphabet)
 
-#     p = hmm.likelihood(b"GC", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    S = MuteState(b"S", alphabet)
+    hmm.add_state(S, log(1.0))
 
-#     p = hmm.likelihood(b"GA", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    E = MuteState(b"E", alphabet)
+    hmm.add_state(E, LPROB_ZERO)
 
-#     p = hmm.likelihood(b"GG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2)])
+    hmm.add_state(M1, LPROB_ZERO)
 
-#     p = hmm.likelihood(b"GU", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    M2 = NormalState(b"M2", alphabet, [log(0.4), log(0.6)])
+    hmm.add_state(M2, LPROB_ZERO)
 
-#     p = hmm.likelihood(b"UC", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    hmm.set_transition(S, M1, log(1.0))
+    hmm.set_transition(M1, M2, log(1.0))
+    hmm.set_transition(M2, E, log(1.0))
+    hmm.set_transition(E, E, log(1.0))
+    hmm.normalize()
+    hmm.set_transition(E, E, LPROB_ZERO)
 
-#     p = hmm.likelihood(b"UA", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    score = hmm.viterbi(Sequence(b"AC", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.48))
 
-#     p = hmm.likelihood(b"UG", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    score = hmm.viterbi(Sequence(b"AA", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.32))
 
-#     p = hmm.likelihood(b"UU", CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)]))
-#     assert_allclose(p, LPROB_ZERO)
+    score = hmm.viterbi(Sequence(b"CA", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.08))
 
-#     M3 = NormalState(
-#         b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6), b"G": LPROB_ZERO, b"U": log(0.6)}
-#     )
-#     with pytest.raises(ValueError):
-#         hmm.likelihood(b"UU", CPath.create_cpath([(S, 0), (M1, 1), (M3, 1), (E, 0)]))
+    score = hmm.viterbi(Sequence(b"CC", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.12))
 
+    hmm.set_transition(M1, E, log(1.0))
 
-# def test_hmm_lik_2():
-#     alphabet = Alphabet(b"ACGU")
-#     hmm = HMM(alphabet)
+    score = hmm.viterbi(Sequence(b"AC", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.48))
 
-#     S = NormalState(
-#         b"S", alphabet, {b"A": log(0.8), b"C": log(0.2), b"G": LPROB_ZERO, b"U": LPROB_ZERO}
-#     )
-#     hmm.add_state(S, log(1.0))
-
-#     E = MuteState(b"E", alphabet)
-#     hmm.add_state(E, LPROB_ZERO)
-
-#     hmm.set_transition(S, E, log(1.0))
-
-#     p = hmm.likelihood(b"A", CPath.create_cpath([(S, 1), (E, 0)]))
-#     assert_allclose(p, log(0.8))
-
-#     p = hmm.likelihood(b"C", CPath.create_cpath([(S, 1), (E, 0)]))
-#     assert_allclose(p, log(0.2))
-
-#     p = hmm.likelihood(b"A", CPath.create_cpath([(S, 1)]))
-#     assert_allclose(p, log(0.8))
-
-#     p = hmm.likelihood(b"C", CPath.create_cpath([(S, 1)]))
-#     assert_allclose(p, log(0.2))
-
-#     with pytest.raises(RuntimeError):
-#         CPath.create_cpath([(S, 2)])
-
-#     with pytest.raises(RuntimeError):
-#         CPath.create_cpath([(S, 0)])
-
-#     with pytest.raises(RuntimeError):
-#         CPath.create_cpath([(E, 1)])
-
-#     with pytest.raises(ValueError):
-#         hmm.likelihood(b"", CPath.create_cpath([]))
-
-#     with pytest.raises(ValueError):
-#         hmm.likelihood(b"A", CPath.create_cpath([]))
-
-
-# def test_hmm_lik_3():
-#     alphabet = Alphabet(b"AC")
-#     hmm = HMM(alphabet)
-
-#     S = MuteState(b"S", alphabet)
-#     hmm.add_state(S, log(1.0))
-
-#     M1 = MuteState(b"M1", alphabet)
-#     hmm.add_state(M1, LPROB_ZERO)
-
-#     M2 = NormalState(b"M2", alphabet, {b"A": log(0.8), b"C": log(0.2)})
-#     hmm.add_state(M2, LPROB_ZERO)
-
-#     E = MuteState(b"E", alphabet)
-#     hmm.add_state(E, LPROB_ZERO)
-
-#     hmm.set_transition(S, M1, log(1.0))
-#     hmm.set_transition(M1, M2, log(1.0))
-#     hmm.set_transition(M2, E, log(1.0))
-#     hmm.set_transition(E, E, log(1.0))
-#     hmm.normalize()
-
-#     with pytest.raises(RuntimeError):
-#         CPath.create_cpath([(S, 1), (E, 0)])
-
-#     p = hmm.likelihood(b"A", CPath.create_cpath([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.8))
-
-#     p = hmm.likelihood(b"C", CPath.create_cpath([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.2))
-
-#     with pytest.raises(RuntimeError):
-#         CPath.create_cpath([(S, 0), (M1, 1), (M2, 1), (E, 0)])
-
-#     hmm.set_transition(M1, E, log(1.0))
-#     hmm.normalize()
-
-#     p = hmm.likelihood(b"A", CPath.create_cpath([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.4))
-
-#     p = hmm.likelihood(b"C", CPath.create_cpath([(S, 0), (M1, 0), (M2, 1), (E, 0)]))
-#     assert_allclose(p, log(0.1))
-
-#     p = hmm.likelihood(b"", CPath.create_cpath([(S, 0), (M1, 0), (E, 0)]))
-#     assert_allclose(p, log(0.5))
-
-
-# def test_hmm_viterbi_1():
-#     alphabet = Alphabet(b"ACGU")
-#     hmm = HMM(alphabet)
-
-#     S = MuteState(b"S", alphabet)
-#     hmm.add_state(S, log(1.0))
-
-#     E = MuteState(b"E", alphabet)
-#     hmm.add_state(E, LPROB_ZERO)
-
-#     M1 = NormalState(
-#         b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2), b"G": LPROB_ZERO, b"U": LPROB_ZERO}
-#     )
-#     hmm.add_state(M1, LPROB_ZERO)
-
-#     M2 = NormalState(
-#         b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6), b"G": LPROB_ZERO, b"U": log(0.6)}
-#     )
-#     M2.normalize()
-#     hmm.add_state(M2, LPROB_ZERO)
-
-#     hmm.set_transition(S, M1, log(1.0))
-#     hmm.set_transition(M1, M2, log(1.0))
-#     hmm.set_transition(M2, E, log(1.0))
-#     hmm.set_transition(E, E, log(1.0))
-#     hmm.normalize()
-
-#     hmm.set_transition(E, E, LPROB_ZERO)
-#     assert_allclose(hmm.transition(E, E), LPROB_ZERO)
-#     assert_allclose(hmm.transition(S, S), LPROB_ZERO)
-#     assert_allclose(hmm.transition(S, E), LPROB_ZERO)
-#     assert_allclose(hmm.transition(E, S), LPROB_ZERO)
-
-#     score = hmm.viterbi(b"AC", E)[0]
-#     assert_allclose(score, log(0.3))
-
-
-# def test_hmm_viterbi_2():
-#     alphabet = Alphabet(b"AC")
-
-#     hmm = HMM(alphabet)
-#     S = MuteState(b"S", alphabet)
-#     hmm.add_state(S, log(1.0))
-
-#     E = MuteState(b"E", alphabet)
-#     hmm.add_state(E, LPROB_ZERO)
-
-#     M1 = NormalState(b"M1", alphabet, {b"A": log(0.8), b"C": log(0.2)})
-#     hmm.add_state(M1, LPROB_ZERO)
-
-#     M2 = NormalState(b"M2", alphabet, {b"A": log(0.4), b"C": log(0.6)})
-#     hmm.add_state(M2, LPROB_ZERO)
-
-#     hmm.set_transition(S, M1, log(1.0))
-#     hmm.set_transition(M1, M2, log(1.0))
-#     hmm.set_transition(M2, E, log(1.0))
-#     hmm.set_transition(E, E, log(1.0))
-#     hmm.normalize()
-#     hmm.set_transition(E, E, LPROB_ZERO)
-
-#     score = hmm.viterbi(b"AC", E)[0]
-#     assert_allclose(score, log(0.48))
-
-#     score = hmm.viterbi(b"AA", E)[0]
-#     assert_allclose(score, log(0.32))
-
-#     score = hmm.viterbi(b"CA", E)[0]
-#     assert_allclose(score, log(0.08))
-
-#     score = hmm.viterbi(b"CC", E)[0]
-#     assert_allclose(score, log(0.12))
-
-#     hmm.set_transition(M1, E, log(1.0))
-
-#     score = hmm.viterbi(b"AC", E)[0]
-#     assert_allclose(score, log(0.48))
-
-#     score = hmm.viterbi(b"AA", E)[0]
-#     assert_allclose(score, log(0.32))
+    score = hmm.viterbi(Sequence(b"AA", alphabet), E)[0].loglikelihood
+    assert_allclose(score, log(0.32))
 
 
 # def test_hmm_viterbi_3():

@@ -1,9 +1,9 @@
-from math import isnan
+from ._sequence import CSequence
 from ._path import CPath
-from ._log import LOG0
 from ._state import CState
 from ._alphabet import CAlphabet
-from ._lprob import LPROB_ZERO
+from ._lprob import LPROB_ZERO, lprob_is_valid
+from ._results import CResults
 from typing import Dict, Tuple
 
 
@@ -44,7 +44,7 @@ class HMM:
             Destination state.
         """
         lprob: float = lib.imm_hmm_get_trans(self._hmm, a.imm_state, b.imm_state)
-        if isnan(lprob):
+        if not lprob_is_valid(lprob):
             raise RuntimeError("Could not retrieve transition probability.")
         return lprob
 
@@ -105,28 +105,16 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def likelihood(self, seq: bytes, path: CPath):
-        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq, path.imm_path)
-        if isnan(lprob):
+    def likelihood(self, seq: CSequence, path: CPath):
+        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq.imm_seq, path.imm_path)
+        if not lprob_is_valid(lprob):
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
-    def viterbi(self, seq: bytes, end_state: CState) -> Tuple[float, CPath]:
-        imm_path = lib.imm_path_create()
-        if imm_path == ffi.NULL:
-            raise RuntimeError("Could not create `imm_path`.")
-        try:
-            imm_state = end_state.imm_state
-            lprob: float = lib.imm_hmm_viterbi(self._hmm, seq, imm_state, imm_path)
-        except Exception as e:
-            lib.imm_path_destroy(imm_path)
-            raise e
-
-        path = CPath.create_cpath()
-        for step in CPath(imm_path).steps():
-            path.append_cstep(self._states[step.state.imm_state], step.seq_len)
-
-        return (lprob, path)
+    def viterbi(self, seq: CSequence, end_state: CState, window_length: int = 0):
+        state = end_state.imm_state
+        r = lib.imm_hmm_viterbi(self._hmm, seq.imm_seq, state, window_length)
+        return CResults(r, seq)
 
     def __del__(self):
         if self._hmm != ffi.NULL:
