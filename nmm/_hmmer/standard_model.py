@@ -2,6 +2,8 @@ from typing import Dict, List, Sequence, Tuple, Union
 
 from .._ffi import ffi
 from .._state import MuteState, NormalState
+from .._sequence import CSequence
+from .._results import CResults
 from .model import AltModel, Node, NullModel, SpecialNode, Transitions
 from .standard import StandardPath
 
@@ -119,11 +121,20 @@ class StandardAltModel(AltModel):
     def special_node(self) -> StandardSpecialNode:
         return self._special_node
 
-    def viterbi(self, seq: bytes) -> Tuple[float, StandardPath]:
-        score, path = super().viterbi(seq)
+    def viterbi(
+        self, seq: CSequence, window_length: int = 0
+    ) -> Tuple[float, StandardPath]:
+        # score, path = super().viterbi(seq)
+        breakpoint()
+        results = super().viterbi(seq, window_length)
+        # TODO: implement multiple windows
+        assert len(results) == 1
+
+        path = results[0].path
+        score = results[0].loglikelihood
 
         spath = StandardPath()
-        for step in path.steps():
+        for step in path:
             imm_state = step.state.imm_state
             spath.append_standard_step(self._states[imm_state], step.seq_len)
 

@@ -1,4 +1,4 @@
-from ._alphabet import Alphabet
+from ._alphabet import CAlphabet
 from ._ffi import ffi, lib
 
 
@@ -11,10 +11,15 @@ class CBase:
     nmm_base : `<cdata 'struct nmm_base *'>`.
     """
 
-    def __init__(self, nmm_base: ffi.CData):
+    def __init__(self, nmm_base: ffi.CData, alphabet: CAlphabet):
         if nmm_base == ffi.NULL:
             raise RuntimeError("`nmm_base` is NULL.")
         self._nmm_base = nmm_base
+        self._alphabet = alphabet
+
+    @property
+    def alphabet(self):
+        return self._alphabet
 
     @property
     def nmm_base(self) -> ffi.CData:
@@ -45,13 +50,8 @@ class Base(CBase):
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, alphabet: Alphabet):
-        self._alphabet = alphabet
-        super().__init__(lib.nmm_base_create(alphabet.imm_abc))
-
-    @property
-    def alphabet(self) -> Alphabet:
-        return self._alphabet
+    def __init__(self, alphabet: CAlphabet):
+        super().__init__(lib.nmm_base_create(alphabet.imm_abc), alphabet)
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

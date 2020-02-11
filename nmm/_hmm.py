@@ -111,7 +111,9 @@ class HMM:
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
-    def viterbi(self, seq: CSequence, end_state: CState, window_length: int = 0):
+    def viterbi(
+        self, seq: CSequence, end_state: CState, window_length: int = 0
+    ) -> CResults:
         state = end_state.imm_state
         r = lib.imm_hmm_viterbi(self._hmm, seq.imm_seq, state, window_length)
         return CResults(r, seq)

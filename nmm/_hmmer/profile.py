@@ -3,11 +3,17 @@ from math import log
 from .._log import LOG0, LOG1
 from .model import AltModel, NullModel
 from .result import SearchResult
+from .._alphabet import CAlphabet
 
 
 class Profile:
-    def __init__(self):
+    def __init__(self, alphabet: CAlphabet):
+        self._alphabet = alphabet
         self._multiple_hits: bool = True
+
+    @property
+    def alphabet(self):
+        return self._alphabet
 
     @property
     def null_model(self) -> NullModel:

@@ -1,6 +1,6 @@
 from typing import Sequence, Dict
 
-from ._alphabet import CAlphabet, Alphabet
+from ._alphabet import CAlphabet
 from ._base_table import BaseTable
 from ._codon_table import CodonTable
 from ._codon import Codon
@@ -11,10 +11,15 @@ from ._sequence_table import SequenceTable
 
 
 class CState:
-    def __init__(self, imm_state: ffi.CData):
+    def __init__(self, imm_state: ffi.CData, alphabet: CAlphabet):
         if imm_state == ffi.NULL:
             raise RuntimeError("`imm_state` is NULL.")
         self._imm_state = imm_state
+        self._alphabet = alphabet
+
+    @property
+    def alphabet(self) -> CAlphabet:
+        return self._alphabet
 
     @property
     def imm_state(self) -> ffi.CData:
@@ -72,7 +77,7 @@ class MuteState(CState):
         if self._imm_mute_state == ffi.NULL:
             raise RuntimeError("`imm_mute_state_create` failed.")
 
-        super().__init__(lib.imm_state_cast_c(self._imm_mute_state))
+        super().__init__(lib.imm_state_cast_c(self._imm_mute_state), alphabet)
 
     def __del__(self):
         if self._imm_mute_state != ffi.NULL:
@@ -101,7 +106,7 @@ class NormalState(CState):
             raise RuntimeError("`imm_normal_state_create` failed.")
 
         self._imm_normal_state = state
-        super().__init__(lib.imm_state_cast_c(self._imm_normal_state))
+        super().__init__(lib.imm_state_cast_c(self._imm_normal_state), alphabet)
 
     def __del__(self):
         if self._imm_normal_state != ffi.NULL:
@@ -126,7 +131,8 @@ class TableState(CState):
             raise RuntimeError("`imm_table_state_create` failed.")
 
         self._imm_table_state = state
-        super().__init__(lib.imm_state_cast_c(self._imm_table_state))
+        alphabet = sequence_table.alphabet
+        super().__init__(lib.imm_state_cast_c(self._imm_table_state), alphabet)
 
     def __del__(self):
         if self._imm_table_state != ffi.NULL:
@@ -162,7 +168,8 @@ class FrameState(CState):
         self._codont = codont
         self._epsilon = epsilon
         self._nmm_frame_state = state
-        super().__init__(lib.imm_state_cast_c(self._nmm_frame_state))
+        alphabet = baset.base.alphabet
+        super().__init__(lib.imm_state_cast_c(self._nmm_frame_state), alphabet)
 
     def decode(self, seq: CSequence, codon: Codon) -> float:
         state = self._nmm_frame_state
@@ -177,13 +184,13 @@ class FrameState(CState):
 
 
 class CodonState(TableState):
-    def __init__(self, name: bytes, alphabet: Alphabet, emission: Dict[Codon, float]):
+    def __init__(self, name: bytes, alphabet: CAlphabet, emission: Dict[Codon, float]):
         """
         Parameters
         ----------
         name : bytes
             State name.
-        alphabet : `Alphabet`
+        alphabet : `CAlphabet`
             Alphabet.
         emission : `Dict[Codon, float]`
             Codon probabilities.

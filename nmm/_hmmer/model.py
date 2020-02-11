@@ -2,21 +2,23 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 
+from .._results import CResults
+from .._sequence import CSequence
+from .._lprob import LPROB_ZERO
 from .._hmm import HMM
-from .._log import LOG0, LOG1
-from .._path import CPath
+from .._path import CPath, Path
 from .._state import CState, MuteState
 
 
 @dataclass
 class Transitions:
-    MM: float = LOG0
-    MI: float = LOG0
-    MD: float = LOG0
-    IM: float = LOG0
-    II: float = LOG0
-    DM: float = LOG0
-    DD: float = LOG0
+    MM: float = LPROB_ZERO
+    MI: float = LPROB_ZERO
+    MD: float = LPROB_ZERO
+    IM: float = LPROB_ZERO
+    II: float = LPROB_ZERO
+    DM: float = LPROB_ZERO
+    DD: float = LPROB_ZERO
 
     def normalize(self):
         from numpy import logaddexp
@@ -107,7 +109,7 @@ class SpecialNode(ABC):
 class NullModel(ABC):
     def __init__(self, state: CState):
         self._hmm = HMM(state.alphabet)
-        self._hmm.add_state(state, LOG1)
+        self._hmm.add_state(state, 0.0)
 
     @property
     @abstractmethod
@@ -117,10 +119,11 @@ class NullModel(ABC):
     def set_transition(self, lprob: float):
         self._hmm.set_transition(self.state, self.state, lprob)
 
-    def likelihood(self, seq: bytes):
-        path = CPath.create_cpath()
-        for i in range(len(seq)):
-            path.append_cstep(self.state, 1)
+    def likelihood(self, seq: CSequence):
+        path = Path([(self.state, 1) for i in range(seq.length)])
+        # path = CPath.create_cpath()
+        # for i in range(len(seq)):
+        #     path.append_cstep(self.state, 1)
         return self._hmm.likelihood(seq, path)
 
 
@@ -131,7 +134,7 @@ class AltModel(ABC):
         core_nodes_trans: Sequence[Tuple[Node, Transitions]],
     ):
         hmm = HMM(special_node.S.alphabet)
-        hmm.add_state(special_node.S, LOG1)
+        hmm.add_state(special_node.S, 0.0)
         hmm.add_state(special_node.N)
         hmm.add_state(special_node.B)
         hmm.add_state(special_node.E)
@@ -185,5 +188,5 @@ class AltModel(ABC):
     def length(self) -> int:
         raise NotImplementedError()
 
-    def viterbi(self, seq: bytes) -> Tuple[float, CPath]:
-        return self._hmm.viterbi(seq, self.special_node.T)
+    def viterbi(self, seq: CSequence, window_length: int = 0) -> CResults:
+        return self._hmm.viterbi(seq, self.special_node.T, window_length)

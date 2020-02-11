@@ -8,7 +8,13 @@ from ._gencode import GeneticCode
 from ._hmm import HMM
 from ._hmmer import create_frame_profile, create_standard_profile
 from ._hmmer.io import tblout_reader
-from ._lprob import LPROB_INVALID, LPROB_ZERO, lprob_is_valid, lprob_is_zero
+from ._lprob import (
+    LPROB_INVALID,
+    LPROB_ZERO,
+    lprob_is_valid,
+    lprob_is_zero,
+    lprob_normalize,
+)
 from ._path import Path
 from ._results import CResult, CResults
 from ._sequence import Sequence
@@ -62,4 +68,5 @@ __all__ = [
     "test",
     "tblout_reader",
     "GeneticCode",
+    "lprob_normalize",
 ]

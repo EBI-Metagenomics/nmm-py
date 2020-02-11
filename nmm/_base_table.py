@@ -12,10 +12,15 @@ class CBaseTable:
     nmm_baset : `<cdata 'struct nmm_baset *'>`.
     """
 
-    def __init__(self, nmm_baset: ffi.CData):
+    def __init__(self, nmm_baset: ffi.CData, base: CBase):
         if nmm_baset == ffi.NULL:
             raise RuntimeError("`nmm_baset` is NULL.")
         self._nmm_baset = nmm_baset
+        self._base = base
+
+    @property
+    def base(self) -> CBase:
+        return self._base
 
     @property
     def nmm_baset(self) -> ffi.CData:
@@ -31,6 +36,5 @@ class CBaseTable:
 
 class BaseTable(CBaseTable):
     def __init__(self, base: CBase, lprobs: Tuple[float, float, float, float]):
-        self._base = base
         nmm_baset = lib.nmm_baset_create(base.nmm_base, *lprobs)
-        super().__init__(nmm_baset)
+        super().__init__(nmm_baset, base)
