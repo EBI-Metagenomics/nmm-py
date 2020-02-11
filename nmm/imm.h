@@ -98,17 +98,18 @@ int                       imm_hmm_normalize(struct imm_hmm *hmm);
 int                       imm_hmm_normalize_trans(struct imm_hmm *hmm, struct imm_state const *src);
 
 /* Path */
-struct imm_path *imm_path_create(void);
-struct imm_path *imm_path_clone(struct imm_path const *path);
-void             imm_path_free(struct imm_path const *path);
-void             imm_path_destroy(struct imm_path const *path);
-int imm_path_append(struct imm_path *path, struct imm_state const *state, unsigned seq_len);
-int imm_path_prepend(struct imm_path *path, struct imm_state const *state, unsigned seq_len);
+struct imm_path *      imm_path_create(void);
+struct imm_path *      imm_path_clone(struct imm_path const *path);
+void                   imm_path_free(struct imm_path const *path);
+void                   imm_path_destroy(struct imm_path const *path);
+void                   imm_path_append(struct imm_path *path, struct imm_step *step);
+void                   imm_path_prepend(struct imm_path *path, struct imm_step *step);
 struct imm_step const *imm_path_first(struct imm_path const *path);
-struct imm_step const *imm_path_last(struct imm_path const *path);
 struct imm_step const *imm_path_next(struct imm_path const *path, struct imm_step const *step);
 
 /* Step */
+struct imm_step *       imm_step_create(struct imm_state const *state, unsigned seq_len);
 struct imm_state const *imm_step_state(struct imm_step const *step);
 unsigned                imm_step_seq_len(struct imm_step const *step);
 void                    imm_step_destroy(struct imm_step const *step);
+struct imm_step *       imm_step_clone(struct imm_step const *step);
