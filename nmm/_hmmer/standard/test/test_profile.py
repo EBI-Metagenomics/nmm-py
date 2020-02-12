@@ -2,12 +2,13 @@ from numpy.testing import assert_allclose, assert_equal
 
 from hmmer_reader import open_hmmer
 
-# from nmm import create_standard_profile, Sequence
+from nmm import create_standard_profile, Sequence
 
 
-# def test_standard_profile_unihit_homologous_1(PF03373):
-#     with open_hmmer(PF03373) as reader:
-#         hmmer = create_standard_profile(reader.read_profile())
+def test_standard_profile_unihit_homologous_1(PF03373):
+    with open_hmmer(PF03373) as reader:
+        hmmer = create_standard_profile(reader.read_profile())
+
 
 #     alphabet = hmmer.alphabet
 #     most_likely_seq = Sequence(b"PGKEDNNK", alphabet)

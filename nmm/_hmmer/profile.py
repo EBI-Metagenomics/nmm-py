@@ -1,9 +1,9 @@
 from math import log
 
-from .._log import LOG0, LOG1
+from .._alphabet import CAlphabet
+from .._lprob import LPROB_ZERO
 from .model import AltModel, NullModel
 from .result import SearchResult
-from .._alphabet import CAlphabet
 
 
 class Profile:
@@ -63,8 +63,8 @@ class Profile:
         if self._multiple_hits:
             l1q = lq = -log(2)
         else:
-            lq = LOG0
-            l1q = LOG1
+            lq = LPROB_ZERO
+            l1q = log(1.0)
 
         q = exp(lq)
         lp = log(L) - log(L + 2 + q / (1 - q))

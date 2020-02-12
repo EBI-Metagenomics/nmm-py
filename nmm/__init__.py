@@ -8,6 +8,8 @@ from ._gencode import GeneticCode
 from ._hmm import HMM
 
 # from ._hmmer import create_frame_profile, create_standard_profile
+from ._hmmer.standard import create_standard_profile
+
 # from ._hmmer.io import tblout_reader
 from ._lprob import LPROB_INVALID, LPROB_ZERO, lprob_is_valid, lprob_is_zero
 from ._path import Path
@@ -58,7 +60,7 @@ __all__ = [
     "__version__",
     "cli",
     # "create_frame_profile",
-    # "create_standard_profile",
+    "create_standard_profile",
     "lprob_is_valid",
     "lprob_is_zero",
     "test",
