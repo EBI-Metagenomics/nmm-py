@@ -1,5 +1,5 @@
-from ._sequence import CSequence
 from ._ffi import ffi, lib
+from ._sequence import CSequence
 
 
 class CSubSequence:
@@ -31,3 +31,13 @@ class CSubSequence:
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+class SubSequence(CSubSequence):
+    def __init__(self, sequence: CSequence, start: int, stop: int):
+        length = stop - start
+        if start < 0 or start > stop or length > self.length:
+            raise ValueError("Out-of-range slice.")
+
+        imm_subseq = lib.imm_subseq_slice(sequence.imm_seq, start, stop - start)
+        super().__init__(imm_subseq, sequence)

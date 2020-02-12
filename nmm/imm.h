@@ -49,8 +49,7 @@ struct imm_seq const *imm_seq_clone(struct imm_seq const *seq);
 void                  imm_seq_destroy(struct imm_seq const *seq);
 
 /* Subsequence */
-struct imm_subseq     imm_subseq_init(struct imm_subseq *subseq, struct imm_seq const *seq,
-                                      unsigned start, unsigned length);
+struct imm_subseq     imm_subseq_slice(struct imm_seq const *seq, unsigned start, unsigned length);
 struct imm_seq const *imm_subseq_cast(struct imm_subseq const *subseq);
 void                  imm_subseq_set(struct imm_subseq *subseq, unsigned start, unsigned length);
 unsigned              imm_subseq_start(struct imm_subseq const *subseq);

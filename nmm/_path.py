@@ -1,4 +1,4 @@
-from typing import List, Sequence, Tuple, Dict
+from typing import Dict, List, Sequence, Tuple
 
 from ._ffi import ffi, lib
 from ._state import CState
@@ -49,7 +49,16 @@ class CPath:
 
 
 class Path(CPath):
-    def __init__(self, steps: Sequence[Tuple[CState, int]] = []):
+    """
+    Path.
+
+    Parameters
+    ----------
+    steps : `Sequence[Tuple[CState, int]]`
+        Steps.
+    """
+
+    def __init__(self, steps: Sequence[Tuple[CState, int]]):
         imm_path = lib.imm_path_create()
         self.__steps = [Step(step[0], step[1]) for step in steps]
         for step in self.__steps:

@@ -1,58 +1,39 @@
 from abc import ABC, abstractmethod
-from typing import Iterator, NamedTuple, Sequence, Tuple
+from typing import Sequence
 
+from .._interval import Interval
 from .._path import CPath
-from .._step import CStep
-
-Interval = NamedTuple("Interval", [("start", int), ("end", int)])
-
-
-class Fragment(ABC):
-    def __init__(self, homologous: bool):
-        self._homologous = homologous
-
-    @property
-    @abstractmethod
-    def sequence(self) -> bytes:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def items(self) -> Iterator[Tuple[bytes, CStep]]:
-        raise NotImplementedError()
-
-    @property
-    def homologous(self) -> bool:
-        return self._homologous
+from .fragment import Fragment
 
 
 class SearchResult(ABC):
     def _create_fragments(self, path: CPath):
 
-        frag_start = frag_end = 0
-        step_start = step_end = 0
+        frag_start = frag_stop = 0
+        step_start = step_stop = 0
         homologous = False
 
-        for step_end, step in enumerate(path.steps()):
+        for step_stop, step in enumerate(path):
 
             change = not homologous and step.state.name.startswith(b"M")
             change = change or homologous and step.state.name.startswith(b"E")
             change = change or not homologous and step.state.name.startswith(b"T")
 
             if change:
-                if frag_start < frag_end:
-                    fragi = Interval(frag_start, frag_end)
-                    stepi = Interval(step_start, step_end)
+                if frag_start < frag_stop:
+                    fragi = Interval(frag_start, frag_stop)
+                    stepi = Interval(step_start, step_stop)
                     yield (fragi, stepi, homologous)
 
-                frag_start = frag_end
-                step_start = step_end
+                frag_start = frag_stop
+                step_start = step_stop
                 homologous = not homologous
 
-            frag_end += step.seq_len
+            frag_stop += step.seq_len
 
     @property
-    def sequence(self) -> bytes:
-        return b"".join(frag.sequence for frag in self.fragments)
+    def symbols(self) -> bytes:
+        return b"".join(frag.subsequence.symbols for frag in self.fragments)
 
     @property
     @abstractmethod
@@ -66,5 +47,5 @@ class SearchResult(ABC):
 
     @property
     @abstractmethod
-    def score(self) -> float:
+    def loglikelihood(self) -> float:
         raise NotImplementedError()

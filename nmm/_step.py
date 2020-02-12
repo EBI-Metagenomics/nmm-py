@@ -49,6 +49,17 @@ class CStep:
 
 
 class Step(CStep):
+    """
+    Path step.
+
+    Parameters
+    ----------
+    state : `CState`
+        State.
+    seq_len : `int`
+        Sequence length.
+    """
+
     def __init__(self, state: CState, seq_len: int):
         imm_step = lib.imm_step_create(state.imm_state, seq_len)
         if imm_step == ffi.NULL:
