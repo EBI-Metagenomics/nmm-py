@@ -4,7 +4,7 @@ from ._state import CState
 from ._alphabet import CAlphabet
 from ._lprob import LPROB_ZERO, lprob_is_valid
 from ._results import CResults
-from typing import Dict, Tuple
+from typing import Dict
 
 
 from ._ffi import ffi, lib

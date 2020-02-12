@@ -9,11 +9,16 @@ class CBase:
     Parameters
     ----------
     nmm_base : `<cdata 'struct nmm_base *'>`.
+        Four-nucleotides alphabet pointer.
+    alphabet : `CAlphabet`
+        Alphabet.
     """
 
     def __init__(self, nmm_base: ffi.CData, alphabet: CAlphabet):
         if nmm_base == ffi.NULL:
             raise RuntimeError("`nmm_base` is NULL.")
+        if lib.nmm_base_get_abc(nmm_base) != alphabet.imm_abc:
+            raise ValueError("Alphabets must be the same.")
         self._nmm_base = nmm_base
         self._alphabet = alphabet
 

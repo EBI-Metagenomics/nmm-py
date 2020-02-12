@@ -1,4 +1,4 @@
-from ._base import Base
+from ._base import CBase
 from ._ffi import ffi, lib
 
 
@@ -11,12 +11,20 @@ class CCodon:
     Parameters
     ----------
     nmm_codon : `<cdata 'struct nmm_codon *'>`.
+        Codon pointer.
+    base : `CBase`
+        Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codon: ffi.CData):
+    def __init__(self, nmm_codon: ffi.CData, base: CBase):
         if nmm_codon == ffi.NULL:
             raise RuntimeError("`nmm_codon` is NULL.")
         self._nmm_codon = nmm_codon
+        self._base = base
+
+    @property
+    def base(self) -> CBase:
+        return self._base
 
     @property
     def symbols(self) -> bytes:
@@ -55,18 +63,13 @@ class Codon(CCodon):
     ----------
     symbols : bytes
         Sequence of four symbols.
-    base : `Base`
+    base : `CBase`
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, symbols: bytes, base: Base):
-        self._base = base
-        super().__init__(lib.nmm_codon_create(base.nmm_base))
+    def __init__(self, symbols: bytes, base: CBase):
+        super().__init__(lib.nmm_codon_create(base.nmm_base), base)
         self.symbols = symbols
-
-    @property
-    def base(self) -> Base:
-        return self._base
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

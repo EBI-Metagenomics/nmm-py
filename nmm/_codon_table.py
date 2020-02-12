@@ -1,3 +1,4 @@
+from ._base import CBase
 from ._codon import CCodon
 from ._codon_prob import CCodonProb
 from ._ffi import ffi, lib
@@ -11,12 +12,20 @@ class CCodonTable:
     Parameters
     ----------
     nmm_codont : `<cdata 'struct nmm_codont *'>`.
+        Codon table.
+    base : `CBase`
+        Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codont: ffi.CData):
+    def __init__(self, nmm_codont: ffi.CData, base: CBase):
         if nmm_codont == ffi.NULL:
             raise RuntimeError("`nmm_codont` is NULL.")
         self._nmm_codont = nmm_codont
+        self._base = base
+
+    @property
+    def base(self) -> CBase:
+        return self._base
 
     @property
     def nmm_codont(self) -> ffi.CData:
@@ -46,5 +55,4 @@ class CodonTable(CCodonTable):
     """
 
     def __init__(self, codonp: CCodonProb):
-        self._codonp = codonp
-        super().__init__(lib.nmm_codont_create(codonp.nmm_codonp))
+        super().__init__(lib.nmm_codont_create(codonp.nmm_codonp), codonp.base)

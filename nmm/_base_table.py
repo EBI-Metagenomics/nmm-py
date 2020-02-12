@@ -10,6 +10,9 @@ class CBaseTable:
     Parameters
     ----------
     nmm_baset : `<cdata 'struct nmm_baset *'>`.
+        Base table.
+    base : `CBase`
+        Four-nucleotides alphabet.
     """
 
     def __init__(self, nmm_baset: ffi.CData, base: CBase):
@@ -35,6 +38,17 @@ class CBaseTable:
 
 
 class BaseTable(CBaseTable):
+    """
+    Base table of probabilities.
+
+    Parameters
+    ----------
+    base : `CBase`
+        Four-nucleotides alphabet.
+    lprobs : `Tuple[float, float, float, float]`
+        Log probability of each nucleotide.
+    """
+
     def __init__(self, base: CBase, lprobs: Tuple[float, float, float, float]):
         nmm_baset = lib.nmm_baset_create(base.nmm_base, *lprobs)
         super().__init__(nmm_baset, base)

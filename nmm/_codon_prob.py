@@ -6,17 +6,25 @@ from ._lprob import lprob_is_valid
 
 class CCodonProb:
     """
-    Wrapper around the C implementation of a codon probability.
+    Wrapper around the C implementation of codon probabilities.
 
     Parameters
     ----------
     nmm_codonp : `<cdata 'struct nmm_codonp *'>`.
+        Codon probabilities pointer.
+    base : `CBase`
+        Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codonp: ffi.CData):
+    def __init__(self, nmm_codonp: ffi.CData, base: CBase):
         if nmm_codonp == ffi.NULL:
             raise RuntimeError("`nmm_codonp` is NULL.")
         self._nmm_codonp = nmm_codonp
+        self._base = base
+
+    @property
+    def base(self) -> CBase:
+        return self._base
 
     @property
     def nmm_codonp(self) -> ffi.CData:
@@ -52,5 +60,4 @@ class CodonProb(CCodonProb):
     """
 
     def __init__(self, base: CBase):
-        self._base = base
-        super().__init__(lib.nmm_codonp_create(base.nmm_base))
+        super().__init__(lib.nmm_codonp_create(base.nmm_base), base)
