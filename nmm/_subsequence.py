@@ -1,8 +1,20 @@
 from ._ffi import ffi, lib
 from ._sequence import CSequence
+from ._interval import Interval
 
 
 class CSubSequence:
+    """
+    Wrapper around the C implementation of subsequence.
+
+    Parameters
+    ----------
+    imm_subseq : `<cdata 'struct imm_subseq *'>`.
+        Subsequence pointer.
+    sequence : `CSequence`
+        Sequence.
+    """
+
     def __init__(self, imm_subseq: ffi.CData, sequence: CSequence):
         if ffi.getctype(ffi.typeof(imm_subseq)) != "struct imm_subseq":
             raise TypeError("Wrong `imm_subseq` type.")
@@ -34,10 +46,21 @@ class CSubSequence:
 
 
 class SubSequence(CSubSequence):
-    def __init__(self, sequence: CSequence, start: int, stop: int):
-        length = stop - start
-        if start < 0 or start > stop or length > self.length:
-            raise ValueError("Out-of-range slice.")
+    """
+    Subsequence of symbols of a given sequence.
 
-        imm_subseq = lib.imm_subseq_slice(sequence.imm_seq, start, stop - start)
+    Parameters
+    ----------
+    sequence : `CSequence`
+        Sequence.
+    interval : `Interval`
+        Interval.
+    """
+
+    def __init_(self, sequence: CSequence, interval: Interval):
+        length = interval.stop - interval.start
+        if interval.start < 0 or interval.start > interval.stop or length > self.length:
+            raise ValueError("Out-of-range interval.")
+
+        imm_subseq = lib.imm_subseq_slice(sequence.imm_seq, interval.start, length)
         super().__init__(imm_subseq, sequence)

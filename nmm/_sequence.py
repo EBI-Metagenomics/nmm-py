@@ -1,14 +1,29 @@
+from abc import ABC, abstractmethod
+
 from ._alphabet import CAlphabet
 from ._ffi import ffi, lib
 
 
-class CSequence:
+class SequenceABC(ABC):
+    @property
+    @abstractmethod
+    def length(self) -> int:
+        raise NotImplementedError()
+
+    @property
+    @abstractmethod
+    def symbols(self) -> bytes:
+        raise NotImplementedError()
+
+
+class CSequence(SequenceABC):
     """
     Wrapper around the C implementation of sequence.
 
     Parameters
     ----------
     imm_seq : `<cdata 'struct imm_seq *'>`.
+        Sequence pointer.
     """
 
     def __init__(self, imm_seq: ffi.CData):
