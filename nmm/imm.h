@@ -5,7 +5,6 @@ struct imm_normal_state;
 struct imm_path;
 struct imm_result;
 struct imm_results;
-struct imm_seq;
 struct imm_seq_table;
 struct imm_state;
 struct imm_step;
@@ -16,6 +15,19 @@ enum imm_symbol_type
     IMM_SYMBOL_UNKNOWN = 0,
     IMM_SYMBOL_NORMAL = 1,
     IMM_SYMBOL_ANY = 2,
+};
+
+struct imm_seq
+{
+    struct imm_abc const *abc;
+    char const *          string;
+    unsigned              length;
+};
+
+struct imm_subseq
+{
+    struct imm_seq const *seq;
+    struct imm_seq        subseq;
 };
 
 /* Alphabet */
@@ -36,7 +48,15 @@ char const *          imm_seq_string(struct imm_seq const *seq);
 struct imm_seq const *imm_seq_clone(struct imm_seq const *seq);
 void                  imm_seq_destroy(struct imm_seq const *seq);
 
-/* Squence table */
+/* Subsequence */
+struct imm_subseq     imm_subseq_init(struct imm_subseq *subseq, struct imm_seq const *seq,
+                                      unsigned start, unsigned length);
+struct imm_seq const *imm_subseq_cast(struct imm_subseq const *subseq);
+void                  imm_subseq_set(struct imm_subseq *subseq, unsigned start, unsigned length);
+unsigned              imm_subseq_start(struct imm_subseq const *subseq);
+unsigned              imm_subseq_length(struct imm_subseq const *subseq);
+
+/* Sequence table */
 struct imm_seq_table *imm_seq_table_create(struct imm_abc const *abc);
 struct imm_seq_table *imm_seq_table_clone(struct imm_seq_table const *table);
 void                  imm_seq_table_destroy(struct imm_seq_table const *table);
@@ -77,7 +97,7 @@ void                     imm_results_free(struct imm_results const *results);
 /* Result */
 double                 imm_result_loglik(struct imm_result const *result);
 struct imm_path const *imm_result_path(struct imm_result const *result);
-struct imm_seq const * imm_result_sequence(struct imm_result const *result);
+struct imm_subseq      imm_result_subseq(struct imm_result const *result);
 void                   imm_result_free(struct imm_result const *result);
 
 /* HMM */

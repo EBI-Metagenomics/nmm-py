@@ -1,8 +1,8 @@
-from typing import List, Sequence, Tuple
+from typing import List, Sequence, Tuple, Dict
 
 from ._ffi import ffi, lib
 from ._state import CState
-from ._step import CStep
+from ._step import CStep, Step
 
 
 class CPath:
@@ -13,28 +13,25 @@ class CPath:
     ----------
     imm_path : `<cdata 'struct imm_path *'>`
         Path pointer.
+    steps : `Sequence[CStep]`
+        List of steps.
     """
 
-    def __init__(self, imm_path: ffi.CData):
+    def __init__(self, imm_path: ffi.CData, steps: Sequence[CStep]):
         if imm_path == ffi.NULL:
             raise RuntimeError("`imm_path` is NULL.")
         self._imm_path = imm_path
-
-        self._steps: List[CStep] = []
-        step = lib.imm_path_first(imm_path)
-        while step != ffi.NULL:
-            self._steps.append(CStep(step))
-            step = lib.imm_path_next(imm_path, step)
+        self.__steps = list(steps)
 
     @property
     def imm_path(self) -> ffi.CData:
         return self._imm_path
 
     def __len__(self) -> int:
-        return len(self._steps)
+        return len(self.__steps)
 
     def __getitem__(self, i) -> CStep:
-        return self._steps[i]
+        return self.__steps[i]
 
     def __iter__(self):
         for i in range(len(self)):
@@ -54,13 +51,24 @@ class CPath:
 class Path(CPath):
     def __init__(self, steps: Sequence[Tuple[CState, int]] = []):
         imm_path = lib.imm_path_create()
+        self.__steps = [Step(step[0], step[1]) for step in steps]
+        for step in self.__steps:
+            lib.imm_path_append(imm_path, step.imm_step)
+        super().__init__(imm_path, self.__steps)
 
-        for step in steps:
-            if lib.imm_path_append(imm_path, step[0].imm_state, step[1]) != 0:
-                lib.imm_path_destroy(imm_path)
-                raise RuntimeError("Could not add step.")
-
-        super().__init__(imm_path)
+    def __getitem__(self, i) -> CStep:
+        return self.__steps[i]
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+def wrap_imm_path(imm_path: ffi.CData, states: Dict[ffi.CData, CState]) -> CPath:
+    steps: List[CStep] = []
+    imm_step = lib.imm_path_first(imm_path)
+    while imm_step != ffi.NULL:
+        imm_state = lib.imm_step_state(imm_step)
+        steps.append(CStep(imm_step, states[imm_state]))
+        imm_step = lib.imm_path_next(imm_path, imm_step)
+
+    return CPath(imm_path, steps)

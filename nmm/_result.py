@@ -1,17 +1,19 @@
-from ._path import CPath
-from ._sequence import CSequence
+from typing import Dict
+
 from ._ffi import ffi, lib
+from ._path import CPath, wrap_imm_path
+from ._sequence import CSequence
+from ._state import CState
+from ._subsequence import CSubSequence
 
 
 class CResult:
-    def __init__(self, imm_result: ffi.CData):
+    def __init__(self, imm_result: ffi.CData, path: CPath, subseq: CSubSequence):
         if imm_result == ffi.NULL:
             raise RuntimeError("`imm_result` is NULL.")
         self._imm_result = imm_result
-
-        self._path = CPath(lib.imm_path_clone(lib.imm_result_path(imm_result)))
-        imm_seq = lib.imm_seq_clone(lib.imm_result_sequence(imm_result))
-        self._sequence = CSequence(imm_seq)
+        self._path = path
+        self._subseq = subseq
 
     @property
     def loglikelihood(self) -> float:
@@ -22,8 +24,8 @@ class CResult:
         return self._path
 
     @property
-    def sequence(self) -> CSequence:
-        return self._sequence
+    def subseq(self) -> CSubSequence:
+        return self._subseq
 
     def __del__(self):
         if self._imm_result != ffi.NULL:
@@ -31,3 +33,12 @@ class CResult:
 
     def __repr__(self) -> str:
         return str(self.loglikelihood)
+
+
+def wrap_imm_result(
+    imm_result: ffi.CData, sequence: CSequence, states: Dict[ffi.CData, CState]
+):
+    path = wrap_imm_path(lib.imm_result_path(imm_result), states)
+    imm_subseq = lib.imm_result_subseq(imm_result)
+    subseq = CSubSequence(imm_subseq, sequence)
+    return CResult(imm_result, path, subseq)

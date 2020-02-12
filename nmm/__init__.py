@@ -6,15 +6,16 @@ from ._codon_prob import CodonProb
 from ._codon_table import CodonTable
 from ._gencode import GeneticCode
 from ._hmm import HMM
-from ._hmmer import create_frame_profile, create_standard_profile
-from ._hmmer.io import tblout_reader
+
+# from ._hmmer import create_frame_profile, create_standard_profile
+# from ._hmmer.io import tblout_reader
 from ._lprob import (
     LPROB_INVALID,
     LPROB_ZERO,
     lprob_is_valid,
     lprob_is_zero,
-    lprob_normalize,
 )
+
 from ._path import Path
 from ._results import CResult, CResults
 from ._sequence import Sequence
@@ -61,12 +62,12 @@ __all__ = [
     "TableState",
     "__version__",
     "cli",
-    "create_frame_profile",
-    "create_standard_profile",
+    # "create_frame_profile",
+    # "create_standard_profile",
     "lprob_is_valid",
     "lprob_is_zero",
     "test",
-    "tblout_reader",
+    # "tblout_reader",
     "GeneticCode",
     "lprob_normalize",
 ]

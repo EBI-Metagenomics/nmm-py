@@ -114,9 +114,16 @@ class HMM:
     def viterbi(
         self, seq: CSequence, end_state: CState, window_length: int = 0
     ) -> CResults:
-        state = end_state.imm_state
-        r = lib.imm_hmm_viterbi(self._hmm, seq.imm_seq, state, window_length)
-        return CResults(r, seq)
+        from ._results import wrap_imm_results
+
+        imm_seq = seq.imm_seq
+        imm_state = end_state.imm_state
+
+        imm_results = lib.imm_hmm_viterbi(self._hmm, imm_seq, imm_state, window_length)
+        if imm_results == ffi.NULL:
+            raise RuntimeError("Could not run viterbi.")
+
+        return wrap_imm_results(imm_results, seq, self._states)
 
     def __del__(self):
         if self._hmm != ffi.NULL:

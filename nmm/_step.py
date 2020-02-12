@@ -1,3 +1,4 @@
+from ._state import CState
 from ._ffi import ffi, lib
 
 
@@ -12,16 +13,23 @@ class CStep:
     ----------
     imm_step : `<cdata 'struct imm_step *'>`
         Step pointer.
+    state : `CState`
+        State.
     """
 
-    def __init__(self, imm_step: ffi.CData):
+    def __init__(self, imm_step: ffi.CData, state: CState):
         if imm_step == ffi.NULL:
             raise RuntimeError("`imm_step` is NULL.")
         self._imm_step = imm_step
+        self.__state = state
 
     @property
     def imm_step(self) -> ffi.CData:
         return self._imm_step
+
+    @property
+    def state(self) -> CState:
+        return self.__state
 
     @property
     def seq_len(self) -> int:
@@ -35,6 +43,17 @@ class CStep:
         state = lib.imm_step_state(self._imm_step)
         name: str = ffi.string(lib.imm_state_get_name(state))
         return f"{name},{self.seq_len}"
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+class Step(CStep):
+    def __init__(self, state: CState, seq_len: int):
+        imm_step = lib.imm_step_create(state.imm_state, seq_len)
+        if imm_step == ffi.NULL:
+            raise RuntimeError("Could not create step.")
+        super().__init__(imm_step, state)
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
