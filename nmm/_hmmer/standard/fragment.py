@@ -1,9 +1,10 @@
-from typing import Iterator, Tuple
+# from typing import Iterator, Tuple
 
-from ..._subsequence import CSubSequence
+from ..._sequence import SequenceABC
 from ..fragment import Fragment
 from .path import StandardPath
-from .step import StandardStep
+
+# from .step import StandardStep
 
 
 class StandardFragment(Fragment):
@@ -12,7 +13,7 @@ class StandardFragment(Fragment):
 
     Parameters
     ----------
-    subsequence : `CSubSequence`
+    sequence : `SequenceABC`
         Sequence.
     path : `StandardPath`
         Path of the standard profile.
@@ -21,23 +22,22 @@ class StandardFragment(Fragment):
     """
 
     def __init__(
-        self, subsequence: CSubSequence, path: StandardPath, homologous: bool,
+        self, sequence: SequenceABC, path: StandardPath, homologous: bool,
     ):
         super().__init__(homologous)
-        self._subsequence = subsequence
+        self._sequence = sequence
         self._path = path
 
     @property
-    def subsequence(self) -> CSubSequence:
-        return self._subsequence
+    def sequence(self) -> SequenceABC:
+        return self._sequence
 
-    def items(self) -> Iterator[Tuple[bytes, StandardStep]]:
-        start = end = 0
-        for step in self._path:
-            end += step.seq_len
-            yield (self._subsequence.symbols[start:end], step)
-            start = end
+    # def items(self) -> Iterator[Tuple[bytes, StandardStep]]:
+    #     start = end = 0
+    #     for step in self._path:
+    #         end += step.seq_len
+    #         yield (self._sequence.symbols[start:end], step)
+    #         start = end
 
-    def __repr__(self):
-        seq = self.sequence.decode()
-        return f"<{self.__class__.__name__}:{seq}>"
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}:{str(self)}>"

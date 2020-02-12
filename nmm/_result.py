@@ -2,9 +2,8 @@ from typing import Dict
 
 from ._ffi import ffi, lib
 from ._path import CPath, wrap_imm_path
-from ._sequence import CSequence
+from ._sequence import CSequence, CSubSequence
 from ._state import CState
-from ._subsequence import CSubSequence
 
 
 class CResult:

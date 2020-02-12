@@ -2,11 +2,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 
+from .._hmm import HMM
+from .._lprob import LPROB_ZERO
+from .._path import Path
 from .._results import CResults
 from .._sequence import CSequence
-from .._lprob import LPROB_ZERO
-from .._hmm import HMM
-from .._path import CPath, Path
 from .._state import CState, MuteState
 
 
@@ -119,12 +119,9 @@ class NullModel(ABC):
     def set_transition(self, lprob: float):
         self._hmm.set_transition(self.state, self.state, lprob)
 
-    def likelihood(self, seq: CSequence):
-        path = Path([(self.state, 1) for i in range(seq.length)])
-        # path = CPath.create_cpath()
-        # for i in range(len(seq)):
-        #     path.append_cstep(self.state, 1)
-        return self._hmm.likelihood(seq, path)
+    def likelihood(self, sequence: CSequence):
+        path = Path([(self.state, 1) for i in range(sequence.length)])
+        return self._hmm.likelihood(sequence, path)
 
 
 class AltModel(ABC):
