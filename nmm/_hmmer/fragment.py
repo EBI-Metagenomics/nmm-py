@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-# from typing import Iterator, Tuple
+from typing import Iterator, Tuple
 
-# from .._step import CStep
+from .._step import CStep
 from .._sequence import SequenceABC
 
 
@@ -26,9 +26,9 @@ class Fragment(ABC):
     def sequence(self) -> SequenceABC:
         raise NotImplementedError()
 
-    # @abstractmethod
-    # def items(self) -> Iterator[Tuple[bytes, CStep]]:
-    #     raise NotImplementedError()
+    @abstractmethod
+    def items(self) -> Iterator[Tuple[bytes, CStep]]:
+        raise NotImplementedError()
 
     @property
     def homologous(self) -> bool:

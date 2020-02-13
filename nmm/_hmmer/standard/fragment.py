@@ -1,10 +1,9 @@
-# from typing import Iterator, Tuple
+from typing import Iterator, Tuple
 
 from ..._sequence import SequenceABC
 from ..fragment import Fragment
 from .path import StandardPath
-
-# from .step import StandardStep
+from .step import StandardStep
 
 
 class StandardFragment(Fragment):
@@ -32,12 +31,12 @@ class StandardFragment(Fragment):
     def sequence(self) -> SequenceABC:
         return self._sequence
 
-    # def items(self) -> Iterator[Tuple[bytes, StandardStep]]:
-    #     start = end = 0
-    #     for step in self._path:
-    #         end += step.seq_len
-    #         yield (self._sequence.symbols[start:end], step)
-    #         start = end
+    def items(self) -> Iterator[Tuple[bytes, StandardStep]]:
+        start = end = 0
+        for step in self._path:
+            end += step.seq_len
+            yield (self._sequence.symbols[start:end], step)
+            start = end
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

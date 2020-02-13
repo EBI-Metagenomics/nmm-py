@@ -41,8 +41,8 @@ class CStep:
 
     def __str__(self) -> str:
         state = lib.imm_step_state(self._imm_step)
-        name: str = ffi.string(lib.imm_state_get_name(state))
-        return f"{name},{self.seq_len}"
+        name: str = ffi.string(lib.imm_state_get_name(state)).decode()
+        return f"<{name},{self.seq_len}>"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
