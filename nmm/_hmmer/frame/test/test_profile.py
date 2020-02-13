@@ -1,7 +1,7 @@
-# from numpy.testing import assert_allclose, assert_equal
+from numpy.testing import assert_allclose, assert_equal
 
-# from nmm import create_frame_profile, GeneticCode
-# from hmmer_reader import open_hmmer
+from nmm import create_frame_profile, GeneticCode
+from hmmer_reader import open_hmmer
 
 
 # def test_frame_profile_frame1(PF03373):

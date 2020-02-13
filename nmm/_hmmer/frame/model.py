@@ -1,9 +1,10 @@
 from typing import Dict, List, Sequence, Tuple, Union
 
-from .._ffi import ffi
-from .._state import FrameState, MuteState
-from .frame import FramePath
-from .model import AltModel, Node, NullModel, SpecialNode, Transitions
+from ..._ffi import ffi
+from ..._state import MuteState, FrameState
+from ..._sequence import CSequence
+from ..model import AltModel, Node, NullModel, SpecialNode, Transitions
+from .path import FramePath
 
 
 class FrameNode(Node):
@@ -119,12 +120,18 @@ class FrameAltModel(AltModel):
     def special_node(self) -> FrameSpecialNode:
         return self._special_node
 
-    def viterbi(self, seq: bytes) -> Tuple[float, FramePath]:
-        score, path = super().viterbi(seq)
+    def viterbi(
+        self, seq: CSequence, window_length: int = 0
+    ) -> Tuple[float, FramePath]:
+        # score, path = super().viterbi(seq)
+        results = super().viterbi(seq, window_length)
+        # TODO: implement multiple windows
+        assert len(results) == 1
 
-        spath = FramePath()
-        for step in path.steps():
-            imm_state = step.state.imm_state
-            spath.append_frame_step(self._states[imm_state], step.seq_len)
+        path = results[0].path
+        score = results[0].loglikelihood
 
-        return (score, spath)
+        steps = [(self._states[step.state.imm_state], step.seq_len) for step in path]
+        new_path = FramePath(steps)
+
+        return (score, new_path)

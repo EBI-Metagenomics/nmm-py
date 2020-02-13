@@ -3,42 +3,43 @@ from typing import Any, Dict, List, Sequence, Tuple
 
 from hmmer_reader import HMMERProfile
 
-from .._alphabet import Alphabet
-from .._base_table import BaseTable
-from .._codon_table import CodonTable
+from ..._alphabet import Alphabet
+from ..._base import Base
+from ..._base_table import BaseTable
+from ..._codon_table import CodonTable
 
-from .._gencode import GeneticCode
-from .._log import LOG0
-from .._state import FrameState, MuteState
-from .frame import FrameSearchResult
-from .frame_model import (
+from ..._gencode import GeneticCode
+from ..._lprob import LPROB_ZERO
+from ..._state import FrameState, MuteState
+from .result import FrameSearchResult
+from .model import (
     FrameAltModel,
     FrameNode,
     FrameNullModel,
     FrameSpecialNode,
     Transitions,
 )
-from .profile import Profile
+from ..profile import Profile
 
 
 class FrameStateFactory:
     def __init__(
-        self, bases: Alphabet, gcode: GeneticCode, epsilon: float,
+        self, base: Base, gcode: GeneticCode, epsilon: float,
     ):
-        self._bases = bases
+        self._base = base
         self._gcode = gcode
         self._epsilon = epsilon
 
     def create(self, name: bytes, aa_lprobs: Dict[bytes, float]) -> FrameState:
         codon_lprobs = _infer_codon_lprobs(aa_lprobs, self._gcode)
-        base_lprobs = _infer_base_lprobs(codon_lprobs, self._bases)
-        base_table = BaseTable.create(self._bases, base_lprobs)
-        codon_table = CodonTable.create(self._bases, codon_lprobs)
+        base_lprobs = _infer_base_lprobs(codon_lprobs, self._alphabet)
+        base_table = BaseTable.create(self._alphabet, base_lprobs)
+        codon_table = CodonTable.create(self._alphabet, codon_lprobs)
         return FrameState(name, base_table, codon_table, self._epsilon)
 
     @property
     def bases(self) -> Alphabet:
-        return self._bases
+        return self._alphabet
 
     @property
     def genetic_code(self) -> GeneticCode:
@@ -92,9 +93,11 @@ class FrameProfile(Profile):
 
 def create_frame_profile(reader: HMMERProfile, epsilon: float = 0.1) -> FrameProfile:
 
-    bases = Alphabet(b"ACGU")
+    breakpoint()
+    alphabet = Alphabet(b"ACGU", b"X")
+    base = Base(alphabet)
     null_lprobs = _dict(reader.insert(0))
-    ffact = FrameStateFactory(bases, GeneticCode(), epsilon)
+    ffact = FrameStateFactory(base, GeneticCode(), epsilon)
 
     nodes_trans: List[Tuple[FrameNode, Transitions]] = []
 
@@ -117,7 +120,7 @@ def _infer_codon_lprobs(aa_lprobs: Dict[bytes, float], gencode: GeneticCode):
     from numpy import logaddexp
 
     codon_lprobs = []
-    lprob_norm = LOG0
+    lprob_norm = LPROB_ZERO
     for aa, lprob in aa_lprobs.items():
 
         codons = gencode.codons(aa)
