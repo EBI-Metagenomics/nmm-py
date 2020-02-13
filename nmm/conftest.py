@@ -48,7 +48,7 @@ def output1_evalue(tmp_path):
 
 def _write_file(path, filename):
     import importlib_resources as pkg_resources
-    import nmm
+    import nmm._data
 
     text = pkg_resources.read_text(nmm._data, filename)
 

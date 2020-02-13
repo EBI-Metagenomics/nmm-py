@@ -124,7 +124,6 @@ class StandardAltModel(AltModel):
         self, seq: CSequence, window_length: int = 0
     ) -> Tuple[float, StandardPath]:
         # score, path = super().viterbi(seq)
-        breakpoint()
         results = super().viterbi(seq, window_length)
         # TODO: implement multiple windows
         assert len(results) == 1
@@ -132,9 +131,7 @@ class StandardAltModel(AltModel):
         path = results[0].path
         score = results[0].loglikelihood
 
-        spath = StandardPath()
-        for step in path:
-            imm_state = step.state.imm_state
-            spath.append_standard_step(self._states[imm_state], step.seq_len)
+        steps = [(self._states[step.state.imm_state], step.seq_len) for step in path]
+        new_path = StandardPath(steps)
 
-        return (score, spath)
+        return (score, new_path)

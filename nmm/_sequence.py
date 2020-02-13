@@ -150,7 +150,7 @@ class SubSequence(CSubSequence):
 
     def __init__(self, sequence: CSequence, interval: Interval):
         length = interval.stop - interval.start
-        if interval.start < 0 or interval.start > interval.stop or length > self.length:
+        if interval.start < 0 or length < 0 or length > sequence.length:
             raise ValueError("Out-of-range interval.")
 
         imm_subseq = lib.imm_subseq_slice(sequence.imm_seq, interval.start, length)

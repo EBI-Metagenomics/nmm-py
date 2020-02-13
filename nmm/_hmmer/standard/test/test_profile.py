@@ -9,25 +9,25 @@ def test_standard_profile_unihit_homologous_1(PF03373):
     with open_hmmer(PF03373) as reader:
         hmmer = create_standard_profile(reader.read_profile())
 
+    alphabet = hmmer.alphabet
+    most_likely_seq = Sequence(b"PGKEDNNK", alphabet)
+    r = hmmer.search(most_likely_seq)
 
-#     alphabet = hmmer.alphabet
-#     most_likely_seq = Sequence(b"PGKEDNNK", alphabet)
-#     r = hmmer.search(most_likely_seq)
-#     assert_allclose(r.score, 11.867796719423442)
-#     frags = r.fragments
-#     assert_equal(len(frags), 1)
-#     frag = frags[0]
-#     assert_equal(frag.homologous, True)
-#     assert_equal(frag.sequence, most_likely_seq)
+    assert_allclose(r.loglikelihood, 11.867796719423442)
+    frags = r.fragments
+    assert_equal(len(frags), 1)
+    frag = frags[0]
+    assert_equal(frag.homologous, True)
+    assert_equal(frag.sequence.symbols, most_likely_seq.symbols)
 
-#     hmmer.multiple_hits = False
-#     r = hmmer.search(most_likely_seq)
-#     assert_allclose(r.score, 11.94063404337571)
-#     frags = r.fragments
-#     assert_equal(len(frags), 1)
-#     frag = frags[0]
-#     assert_equal(frag.homologous, True)
-#     assert_equal(frag.sequence, most_likely_seq)
+    hmmer.multiple_hits = False
+    r = hmmer.search(most_likely_seq)
+    assert_allclose(r.loglikelihood, 11.94063404337571)
+    frags = r.fragments
+    assert_equal(len(frags), 1)
+    frag = frags[0]
+    assert_equal(frag.homologous, True)
+    assert_equal(frag.sequence.symbols, most_likely_seq.symbols)
 
 
 # def test_standard_profile_unihit_homologous_2(PF03373):
@@ -35,7 +35,7 @@ def test_standard_profile_unihit_homologous_1(PF03373):
 #         hmmer = create_standard_profile(reader.read_profile())
 #     seq = b"PGKENNK"
 #     r = hmmer.search(seq)
-#     assert_allclose(r.score, 3.299501501364073)
+#     assert_allclose(r.loglikelihood, 3.299501501364073)
 #     frags = r.fragments
 #     assert_equal(len(frags), 1)
 #     frag = frags[0]
@@ -49,7 +49,7 @@ def test_standard_profile_unihit_homologous_1(PF03373):
 #         hmmer = create_standard_profile(reader.read_profile())
 #     seq = b"PGKEPNNK"
 #     r = hmmer.search(seq)
-#     assert_allclose(r.score, 6.883636719423446)
+#     assert_allclose(r.loglikelihood, 6.883636719423446)
 #     frags = r.fragments
 #     assert_equal(len(frags), 1)
 #     frag = frags[0]
@@ -63,7 +63,7 @@ def test_standard_profile_unihit_homologous_1(PF03373):
 #     seq = b"KKKPGKEDNNK"
 #     assert_equal(hmmer.multiple_hits, True)
 #     r = hmmer.search(seq)
-#     assert_allclose(r.score, 10.707618955640605)
+#     assert_allclose(r.loglikelihood, 10.707618955640605)
 #     frags = r.fragments
 #     assert_equal(len(frags), 2)
 #     assert_equal(frags[0].homologous, False)
@@ -74,7 +74,7 @@ def test_standard_profile_unihit_homologous_1(PF03373):
 #     hmmer.multiple_hits = False
 #     assert_equal(hmmer.multiple_hits, False)
 #     r = hmmer.search(seq)
-#     assert_allclose(r.score, 10.96037578075283)
+#     assert_allclose(r.loglikelihood, 10.96037578075283)
 #     frags = r.fragments
 #     assert_equal(len(frags), 2)
 #     assert_equal(frags[0].homologous, False)
@@ -88,7 +88,7 @@ def test_standard_profile_unihit_homologous_1(PF03373):
 #         hmmer = create_standard_profile(reader.read_profile())
 #     seq = b"PPPPGKEDNNKDDDPGKEDNNKEEEE"
 #     r = hmmer.search(seq)
-#     assert_allclose(r.score, 20.329227532144742)
+#     assert_allclose(r.loglikelihood, 20.329227532144742)
 #     frags = r.fragments
 #     assert_equal(len(frags), 5)
 #     assert_equal(frags[0].homologous, False)
@@ -136,7 +136,7 @@ def test_standard_profile_unihit_homologous_1(PF03373):
 
 #     hmmer.multiple_hits = False
 #     r = hmmer.search(seq)
-#     assert_allclose(r.score, 8.666478660222928)
+#     assert_allclose(r.loglikelihood, 8.666478660222928)
 #     frags = r.fragments
 #     assert_equal(len(frags), 3)
 #     assert_equal(frags[0].homologous, False)

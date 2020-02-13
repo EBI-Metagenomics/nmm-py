@@ -15,10 +15,9 @@ class StandardSearchResult(SearchResult):
 
         steps = list(path)
         for fragi, stepi, homologous in self._create_fragments(path):
-            # fragment_path = _create_path(steps[stepi.start : stepi.stop])
             substeps = steps[stepi.start : stepi.stop]
             fragment_path = StandardPath([(s.state, s.seq_len) for s in substeps])
-            seq = sequence.slice(fragi.start)
+            seq = sequence.slice(fragi)
             frag = StandardFragment(seq, fragment_path, homologous)
             self._fragments.append(frag)
             self._intervals.append(fragi)

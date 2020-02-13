@@ -50,7 +50,6 @@ class StandardProfile(Profile):
         return self._alt_model
 
     def search(self, seq: CSequence) -> StandardSearchResult:
-        breakpoint()
         self._set_target_length(seq.length)
         score0 = self.null_model.likelihood(seq)
         score1, path = self.alt_model.viterbi(seq)
@@ -69,9 +68,7 @@ def create_standard_profile(reader: HMMERProfile) -> StandardProfile:
 
     for m in range(1, reader.M + 1):
         M = NormalState(f"M{m}".encode(), alphabet, prob_list(reader.match(m)))
-
         I = NormalState(f"I{m}".encode(), alphabet, prob_list(reader.insert(m)))
-
         D = MuteState(f"D{m}".encode(), alphabet)
 
         node = StandardNode(M, I, D)
