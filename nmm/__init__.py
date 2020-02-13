@@ -1,23 +1,37 @@
-from ._alphabet import Alphabet
-from ._base import Base
-from ._base_table import BaseTable
-from ._codon import Codon
-from ._codon_prob import CodonProb
-from ._codon_table import CodonTable
 from ._gencode import GeneticCode
-from ._hmm import HMM
-
-from ._hmmer.standard import create_standard_profile
-from ._hmmer.frame import create_frame_profile
-
-# from ._hmmer.io import tblout_reader
-from ._lprob import LPROB_INVALID, LPROB_ZERO, lprob_is_valid, lprob_is_zero
-from ._path import Path
-from ._results import CResult, CResults
-from ._sequence import Sequence, CSubSequence
-from ._sequence_table import SequenceTable
-from ._state import FrameState, MuteState, NormalState, TableState
+from ._interval import Interval
 from ._testit import test
+from .imm import (
+    HMM,
+    LPROB_INVALID,
+    LPROB_ZERO,
+    Alphabet,
+    CAlphabet,
+    CPath,
+    CResult,
+    CResults,
+    CSequence,
+    CSequenceTable,
+    CState,
+    CStep,
+    CSubSequence,
+    MuteState,
+    NormalState,
+    Path,
+    Sequence,
+    SequenceABC,
+    SequenceTable,
+    Step,
+    SubSequence,
+    TableState,
+    lprob_is_valid,
+    lprob_is_zero,
+    lprob_normalize,
+    wrap_imm_path,
+    wrap_imm_result,
+    wrap_imm_results,
+)
+from .nmm import Base, BaseTable, Codon, CodonProb, CodonState, CodonTable, FrameState
 
 try:
     from ._ffi import ffi as _
@@ -33,38 +47,44 @@ and reinstall the package again."""
 
 __version__ = "0.0.4"
 
-# from ._cli import cli
-
 __all__ = [
     "Alphabet",
     "Base",
     "BaseTable",
+    "CAlphabet",
+    "CPath",
     "CResult",
     "CResults",
+    "CSequence",
+    "CSequenceTable",
+    "CState",
+    "CStep",
+    "CSubSequence",
     "Codon",
     "CodonProb",
     "CodonState",
     "CodonTable",
     "FrameState",
+    "GeneticCode",
     "HMM",
+    "Interval",
     "LPROB_INVALID",
     "LPROB_ZERO",
     "MuteState",
     "NormalState",
     "Path",
     "Sequence",
-    "CSubSequence",
+    "SequenceABC",
     "SequenceTable",
-    "TableState",
+    "Step",
+    "SubSequence",
     "TableState",
     "__version__",
-    "cli",
-    "create_frame_profile",
-    "create_standard_profile",
     "lprob_is_valid",
     "lprob_is_zero",
-    "test",
-    # "tblout_reader",
-    "GeneticCode",
     "lprob_normalize",
+    "test",
+    "wrap_imm_path",
+    "wrap_imm_result",
+    "wrap_imm_results",
 ]

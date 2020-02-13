@@ -1,6 +1,6 @@
-from typing import List, Dict, Set
-from ._codon import Codon
-from ._base import Base
+from typing import Dict, List, Set
+
+from .nmm import Base, Codon
 
 GENCODE: Dict[str, Dict[bytes, List[bytes]]] = {
     "standard": {
