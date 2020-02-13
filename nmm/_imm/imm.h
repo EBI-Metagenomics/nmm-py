@@ -40,6 +40,12 @@ bool                  imm_abc_has_symbol(struct imm_abc const *abc, char symbol_
 int                   imm_abc_symbol_idx(struct imm_abc const *abc, char symbol_id);
 char                  imm_abc_symbol_id(struct imm_abc const *abc, unsigned symbol_idx);
 
+/* Alphabet table */
+struct imm_abct const *imm_abct_create(struct imm_abc const *abc, double const *lprobs);
+double                 imm_abct_lprob(struct imm_abct const *abct, char symbol);
+void                   imm_abct_destroy(struct imm_abct const *abct);
+struct imm_abc const * imm_abct_get_abc(struct imm_abct const *abct);
+
 /* Sequence */
 struct imm_seq const *imm_seq_create(char const *seq, struct imm_abc const *abc);
 struct imm_abc const *imm_seq_get_abc(struct imm_seq const *seq);

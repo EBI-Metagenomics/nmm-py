@@ -68,3 +68,10 @@ class Step(CStep):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+def create_imm_step(state: CState, seq_len: int) -> ffi.CData:
+    imm_step = lib.imm_step_create(state.imm_state, seq_len)
+    if imm_step == ffi.NULL:
+        raise RuntimeError("Could not create step.")
+    return imm_step

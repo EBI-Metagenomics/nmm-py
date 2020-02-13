@@ -22,21 +22,26 @@ from ._imm import (
     Step,
     SubSequence,
     TableState,
+    create_imm_path,
+    create_imm_step,
     lprob_is_valid,
     lprob_is_zero,
     lprob_normalize,
     wrap_imm_path,
     wrap_imm_result,
     wrap_imm_results,
+    AlphabetTable,
+    CAlphabetTable,
 )
 from ._interval import Interval
 from ._nmm import Base, BaseTable, Codon, CodonProb, CodonState, CodonTable, FrameState
 from ._testit import test
 
 try:
-    from ._ffi import ffi as _
+    from ._ffi import ffi
 
-    del _
+    CData = ffi.CData
+    del ffi
 except Exception as e:
     _ffi_err = """
 It is likely caused by a broken installation of this package.
@@ -49,9 +54,12 @@ __version__ = "0.0.4"
 
 __all__ = [
     "Alphabet",
+    "AlphabetTable",
     "Base",
     "BaseTable",
     "CAlphabet",
+    "CAlphabetTable",
+    "CData",
     "CPath",
     "CResult",
     "CResults",
@@ -80,6 +88,8 @@ __all__ = [
     "SubSequence",
     "TableState",
     "__version__",
+    "create_imm_path",
+    "create_imm_step",
     "lprob_is_valid",
     "lprob_is_zero",
     "lprob_normalize",

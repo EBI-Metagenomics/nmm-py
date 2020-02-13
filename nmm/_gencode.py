@@ -30,9 +30,23 @@ GENCODE: Dict[str, Dict[bytes, List[bytes]]] = {
 
 
 class GeneticCode:
+    """
+    Genetic code.
+
+    Parameters
+    ----------
+    base : `CBase`
+        Four-nucleotides alphabet.
+    name : `str`
+        It only accepts `"standard"` for now.
+    """
+
     def __init__(self, base: Base, name: str = "standard"):
 
-        self._gencode: Dict[bytes, List[Codon]] = {}
+        self._gencode: Dict[bytes, List[Codon]] = {
+            aa: [] for aa in GENCODE[name].keys()
+        }
+
         for aa, triplets in GENCODE[name].items():
             gcode = self._gencode[aa]
             for triplet in triplets:
