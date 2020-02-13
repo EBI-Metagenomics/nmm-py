@@ -1,7 +1,7 @@
 from typing import Dict
 
 from .._ffi import ffi, lib
-from ..imm import CAlphabet, CSequence, CState, Sequence, SequenceTable, TableState
+from .._imm import CAlphabet, CSequence, CState, Sequence, SequenceTable, TableState
 from ._base_table import BaseTable
 from ._codon import Codon
 from ._codon_table import CodonTable

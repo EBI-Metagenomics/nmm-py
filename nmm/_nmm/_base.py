@@ -1,5 +1,5 @@
 from .._ffi import ffi, lib
-from ..imm import CAlphabet
+from .._imm import CAlphabet
 
 
 class CBase:

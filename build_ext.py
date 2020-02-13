@@ -12,10 +12,10 @@ libs = ["imm", "nmm"]
 
 folder = os.path.dirname(os.path.abspath(__file__))
 
-with open(join(folder, "nmm", "imm", "imm.h"), "r") as f:
+with open(join(folder, "nmm", "_imm", "imm.h"), "r") as f:
     ffibuilder.cdef(f.read())
 
-with open(join(folder, "nmm", "nmm", "nmm.h"), "r") as f:
+with open(join(folder, "nmm", "_nmm", "nmm.h"), "r") as f:
     ffibuilder.cdef(f.read())
 
 if platform.system() == "Windows":

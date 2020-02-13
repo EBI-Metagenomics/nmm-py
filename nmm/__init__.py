@@ -1,7 +1,5 @@
 from ._gencode import GeneticCode
-from ._interval import Interval
-from ._testit import test
-from .imm import (
+from ._imm import (
     HMM,
     LPROB_INVALID,
     LPROB_ZERO,
@@ -31,7 +29,9 @@ from .imm import (
     wrap_imm_result,
     wrap_imm_results,
 )
-from .nmm import Base, BaseTable, Codon, CodonProb, CodonState, CodonTable, FrameState
+from ._interval import Interval
+from ._nmm import Base, BaseTable, Codon, CodonProb, CodonState, CodonTable, FrameState
+from ._testit import test
 
 try:
     from ._ffi import ffi as _

@@ -1,5 +1,5 @@
 from .._ffi import ffi, lib
-from ..imm import lprob_is_valid
+from .._imm import lprob_is_valid
 from ._base import CBase
 from ._codon import CCodon
 
