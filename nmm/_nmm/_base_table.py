@@ -12,19 +12,19 @@ class CBaseTable:
     ----------
     nmm_base_table : `<cdata 'struct nmm_base_table *'>`.
         Base table.
-    base : `CBase`
+    base : `CBaseAlphabet`
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_base_table: ffi.CData, base: CBaseAlphabet):
+    def __init__(self, nmm_base_table: ffi.CData, base_abc: CBaseAlphabet):
         if nmm_base_table == ffi.NULL:
             raise RuntimeError("`nmm_base_table` is NULL.")
         self._nmm_base_table = nmm_base_table
-        self._base = base
+        self._base_abc = base_abc
 
     @property
     def alphabet(self) -> CBaseAlphabet:
-        return self._base
+        return self._base_abc
 
     @property
     def nmm_base_table(self) -> ffi.CData:
@@ -44,12 +44,14 @@ class BaseTable(CBaseTable):
 
     Parameters
     ----------
-    base : `CBase`
+    base : `CBaseAlphabet`
         Four-nucleotides alphabet.
     lprobs : `Tuple[float, float, float, float]`
         Log probability of each nucleotide.
     """
 
-    def __init__(self, base: CBaseAlphabet, lprobs: Tuple[float, float, float, float]):
-        nmm_base_table = lib.nmm_base_table_create(base.nmm_base_abc, *lprobs)
-        super().__init__(nmm_base_table, base)
+    def __init__(
+        self, base_abc: CBaseAlphabet, lprobs: Tuple[float, float, float, float]
+    ):
+        nmm_base_table = lib.nmm_base_table_create(base_abc.nmm_base_abc, *lprobs)
+        super().__init__(nmm_base_table, base_abc)

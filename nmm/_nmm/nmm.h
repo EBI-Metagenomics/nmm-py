@@ -12,22 +12,29 @@ struct nmm_triplet
     char c;
 };
 
+/* Amino abc */
+struct nmm_amino_abc const *nmm_amino_abc_create(struct imm_abc const *abc);
+void                        nmm_amino_abc_destroy(struct nmm_amino_abc const *amino_abc);
+struct imm_abc const *      nmm_amino_abc_cast(struct nmm_amino_abc const *amino_abc);
+
+/* Amino table */
+struct nmm_amino_table const *nmm_amino_table_create(struct nmm_amino_abc const *amino_abc,
+                                                     double const *              lprobs);
+double                        nmm_amino_table_lprob(struct nmm_amino_table const *aminot, char amino);
+void                          nmm_amino_table_destroy(struct nmm_amino_table const *aminot);
+struct nmm_amino_abc const *  nmm_amino_table_get_amino_abc(struct nmm_amino_table const *aminot);
+
 /* Base abc */
 struct nmm_base_abc const *nmm_base_abc_create(struct imm_abc const *abc);
 void                       nmm_base_abc_destroy(struct nmm_base_abc const *base);
 struct imm_abc const *     nmm_base_abc_cast(struct nmm_base_abc const *base);
 
 /* Base table */
-struct nmm_base_table const *nmm_base_table_create(struct nmm_base_abc const *base, double a,
+struct nmm_base_table const *nmm_base_table_create(struct nmm_base_abc const *base_abc, double a,
                                                    double b, double c, double d);
-double                     nmm_base_table_lprob(struct nmm_base_table const *baset, char nucleotide);
+double                     nmm_base_table_lprob(struct nmm_base_table const *baset, char base);
 void                       nmm_base_table_destroy(struct nmm_base_table const *baset);
-struct nmm_base_abc const *nmm_base_table_get_base(struct nmm_base_table const *baset);
-
-/* Amino abc */
-struct nmm_amino_abc const *nmm_amino_abc_create(struct imm_abc const *abc);
-void                        nmm_amino_abc_destroy(struct nmm_amino_abc const *amino_abc);
-struct imm_abc const *      nmm_amino_abc_cast(struct nmm_amino_abc const *amino_abc);
+struct nmm_base_abc const *nmm_base_table_get_base_abc(struct nmm_base_table const *baset);
 
 /* Codon */
 struct nmm_codon *         nmm_codon_create(struct nmm_base_abc const *base);

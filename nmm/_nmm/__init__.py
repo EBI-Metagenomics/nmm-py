@@ -1,4 +1,5 @@
 from ._amino_alphabet import AminoAlphabet
+from ._amino_table import AminoTable
 from ._base_alphabet import BaseAlphabet
 from ._base_table import BaseTable
 from ._codon import Codon
@@ -8,11 +9,12 @@ from ._state import CodonState, FrameState
 
 __all__ = [
     "AminoAlphabet",
+    "AminoTable",
     "BaseAlphabet",
     "BaseTable",
     "Codon",
     "CodonProb",
+    "CodonState",
     "CodonTable",
     "FrameState",
-    "CodonState",
 ]

@@ -36,6 +36,7 @@ from ._imm import (
 from ._interval import Interval
 from ._nmm import (
     BaseAlphabet,
+    AminoTable,
     AminoAlphabet,
     BaseTable,
     Codon,
@@ -64,8 +65,9 @@ __version__ = "0.0.4"
 __all__ = [
     "Alphabet",
     "AlphabetTable",
-    "BaseAlphabet",
     "AminoAlphabet",
+    "AminoTable",
+    "BaseAlphabet",
     "BaseTable",
     "CAlphabet",
     "CAlphabetTable",
