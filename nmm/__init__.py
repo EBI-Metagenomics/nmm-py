@@ -4,7 +4,9 @@ from ._imm import (
     LPROB_INVALID,
     LPROB_ZERO,
     Alphabet,
+    AlphabetTable,
     CAlphabet,
+    CAlphabetTable,
     CPath,
     CResult,
     CResults,
@@ -30,20 +32,21 @@ from ._imm import (
     wrap_imm_path,
     wrap_imm_result,
     wrap_imm_results,
-    AlphabetTable,
-    CAlphabetTable,
 )
 from ._interval import Interval
 from ._nmm import (
-    BaseAlphabet,
-    AminoTable,
     AminoAlphabet,
+    AminoTable,
+    BaseAlphabet,
     BaseTable,
+    CAminoAlphabet,
+    CBaseAlphabet,
     Codon,
     CodonProb,
     CodonState,
     CodonTable,
     FrameState,
+    codon_iter,
 )
 from ._testit import test
 
@@ -71,6 +74,8 @@ __all__ = [
     "BaseTable",
     "CAlphabet",
     "CAlphabetTable",
+    "CAminoAlphabet",
+    "CBaseAlphabet",
     "CData",
     "CPath",
     "CResult",
@@ -100,6 +105,7 @@ __all__ = [
     "SubSequence",
     "TableState",
     "__version__",
+    "codon_iter",
     "create_imm_path",
     "create_imm_step",
     "lprob_is_valid",

@@ -30,8 +30,8 @@ class CAminoTable:
     def nmm_amino_table(self) -> ffi.CData:
         return self._nmm_amino_table
 
-    def lprob(self, nucleotide: bytes) -> float:
-        return lib.nmm_amino_table_lprob(self._nmm_amino_table, nucleotide)
+    def lprob(self, amino: bytes) -> float:
+        return lib.nmm_amino_table_lprob(self._nmm_amino_table, amino)
 
     def __del__(self):
         if self._nmm_amino_table != ffi.NULL:
