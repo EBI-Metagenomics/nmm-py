@@ -36,6 +36,7 @@ from ._imm import (
 from ._interval import Interval
 from ._nmm import (
     BaseAlphabet,
+    AminoAlphabet,
     BaseTable,
     Codon,
     CodonProb,
@@ -64,6 +65,7 @@ __all__ = [
     "Alphabet",
     "AlphabetTable",
     "BaseAlphabet",
+    "AminoAlphabet",
     "BaseTable",
     "CAlphabet",
     "CAlphabetTable",

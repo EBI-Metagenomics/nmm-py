@@ -4,7 +4,7 @@ from .._imm import CAlphabet
 
 class CBaseAlphabet:
     """
-    Wrapper around the C implementation of a base (four-nucleotides alphabet).
+    Wrapper around the C implementation of a base alphabet.
 
     Parameters
     ----------
@@ -49,7 +49,7 @@ class CBaseAlphabet:
 
 class BaseAlphabet(CBaseAlphabet):
     """
-    Base is a four-nucleotides alphabet.
+    Base alphabet is a four-nucleotides alphabet.
 
     Parameters
     ----------
