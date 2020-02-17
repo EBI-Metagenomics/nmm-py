@@ -41,10 +41,10 @@ int                   imm_abc_symbol_idx(struct imm_abc const *abc, char symbol_
 char                  imm_abc_symbol_id(struct imm_abc const *abc, unsigned symbol_idx);
 
 /* Alphabet table */
-struct imm_abct const *imm_abct_create(struct imm_abc const *abc, double const *lprobs);
-double                 imm_abct_lprob(struct imm_abct const *abct, char symbol);
-void                   imm_abct_destroy(struct imm_abct const *abct);
-struct imm_abc const * imm_abct_get_abc(struct imm_abct const *abct);
+struct imm_abc_table const *imm_abc_table_create(struct imm_abc const *abc, double const *lprobs);
+double                      imm_abc_table_lprob(struct imm_abc_table const *abc_table, char symbol);
+void                        imm_abc_table_destroy(struct imm_abc_table const *abc_table);
+struct imm_abc const *      imm_abc_table_get_abc(struct imm_abc_table const *abc_table);
 
 /* Sequence */
 struct imm_seq const *imm_seq_create(char const *seq, struct imm_abc const *abc);

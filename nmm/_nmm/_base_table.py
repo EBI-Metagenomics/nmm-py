@@ -10,16 +10,16 @@ class CBaseTable:
 
     Parameters
     ----------
-    nmm_baset : `<cdata 'struct nmm_baset *'>`.
+    nmm_base_table : `<cdata 'struct nmm_base_table *'>`.
         Base table.
     base : `CBase`
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_baset: ffi.CData, base: CBase):
-        if nmm_baset == ffi.NULL:
-            raise RuntimeError("`nmm_baset` is NULL.")
-        self._nmm_baset = nmm_baset
+    def __init__(self, nmm_base_table: ffi.CData, base: CBase):
+        if nmm_base_table == ffi.NULL:
+            raise RuntimeError("`nmm_base_table` is NULL.")
+        self._nmm_base_table = nmm_base_table
         self._base = base
 
     @property
@@ -27,15 +27,15 @@ class CBaseTable:
         return self._base
 
     @property
-    def nmm_baset(self) -> ffi.CData:
-        return self._nmm_baset
+    def nmm_base_table(self) -> ffi.CData:
+        return self._nmm_base_table
 
     def lprob(self, nucleotide: bytes) -> float:
-        return lib.nmm_baset_lprob(self._nmm_baset, nucleotide)
+        return lib.nmm_base_table_lprob(self._nmm_base_table, nucleotide)
 
     def __del__(self):
-        if self._nmm_baset != ffi.NULL:
-            lib.nmm_baset_destroy(self._nmm_baset)
+        if self._nmm_base_table != ffi.NULL:
+            lib.nmm_base_table_destroy(self._nmm_base_table)
 
 
 class BaseTable(CBaseTable):
@@ -51,5 +51,5 @@ class BaseTable(CBaseTable):
     """
 
     def __init__(self, base: CBase, lprobs: Tuple[float, float, float, float]):
-        nmm_baset = lib.nmm_baset_create(base.nmm_base, *lprobs)
-        super().__init__(nmm_baset, base)
+        nmm_base_table = lib.nmm_base_table_create(base.nmm_base_abc, *lprobs)
+        super().__init__(nmm_base_table, base)

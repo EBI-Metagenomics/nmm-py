@@ -24,7 +24,7 @@ class FrameState(CState):
             Epsilon.
         """
         state = lib.nmm_frame_state_create(
-            name, baset.nmm_baset, codont.nmm_codont, epsilon
+            name, baset.nmm_base_table, codont.nmm_codon_table, epsilon
         )
         if state == ffi.NULL:
             raise RuntimeError("`nmm_frame_state_create` failed.")

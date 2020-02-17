@@ -71,7 +71,7 @@ class Codon(CCodon):
     """
 
     def __init__(self, symbols: bytes, base: CBase):
-        super().__init__(lib.nmm_codon_create(base.nmm_base), base)
+        super().__init__(lib.nmm_codon_create(base.nmm_base_abc), base)
         self.symbols = symbols
 
     def __repr__(self) -> str:

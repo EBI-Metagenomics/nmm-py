@@ -8,18 +8,18 @@ class CBase:
 
     Parameters
     ----------
-    nmm_base : `<cdata 'struct nmm_base *'>`.
+    nmm_base_abc : `<cdata 'struct nmm_base_abc *'>`.
         Four-nucleotides alphabet pointer.
     alphabet : `CAlphabet`
         Alphabet.
     """
 
-    def __init__(self, nmm_base: ffi.CData, alphabet: CAlphabet):
-        if nmm_base == ffi.NULL:
-            raise RuntimeError("`nmm_base` is NULL.")
-        if lib.nmm_base_get_abc(nmm_base) != alphabet.imm_abc:
+    def __init__(self, nmm_base_abc: ffi.CData, alphabet: CAlphabet):
+        if nmm_base_abc == ffi.NULL:
+            raise RuntimeError("`nmm_base_abc` is NULL.")
+        if lib.nmm_base_abc_cast(nmm_base_abc) != alphabet.imm_abc:
             raise ValueError("Alphabets must be the same.")
-        self._nmm_base = nmm_base
+        self._nmm_base_abc = nmm_base_abc
         self._alphabet = alphabet
 
     @property
@@ -27,16 +27,18 @@ class CBase:
         return self._alphabet
 
     @property
-    def nmm_base(self) -> ffi.CData:
-        return self._nmm_base
+    def nmm_base_abc(self) -> ffi.CData:
+        return self._nmm_base_abc
 
     @property
     def symbols(self) -> bytes:
-        return ffi.string(lib.imm_abc_symbols(lib.nmm_base_get_abc(self._nmm_base)))
+        return ffi.string(
+            lib.imm_abc_symbols(lib.nmm_base_abc_cast(self._nmm_base_abc))
+        )
 
     def __del__(self):
-        if self._nmm_base != ffi.NULL:
-            lib.nmm_base_destroy(self._nmm_base)
+        if self._nmm_base_abc != ffi.NULL:
+            lib.nmm_base_abc_destroy(self._nmm_base_abc)
 
     def __str__(self) -> str:
         return f"{{{self.symbols.decode()}}}"
@@ -56,7 +58,7 @@ class Base(CBase):
     """
 
     def __init__(self, alphabet: CAlphabet):
-        super().__init__(lib.nmm_base_create(alphabet.imm_abc), alphabet)
+        super().__init__(lib.nmm_base_abc_create(alphabet.imm_abc), alphabet)
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

@@ -11,16 +11,16 @@ class CCodonTable:
 
     Parameters
     ----------
-    nmm_codont : `<cdata 'struct nmm_codont *'>`.
+    nmm_codon_table : `<cdata 'struct nmm_codon_table *'>`.
         Codon table.
     base : `CBase`
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codont: ffi.CData, base: CBase):
-        if nmm_codont == ffi.NULL:
-            raise RuntimeError("`nmm_codont` is NULL.")
-        self._nmm_codont = nmm_codont
+    def __init__(self, nmm_codon_table: ffi.CData, base: CBase):
+        if nmm_codon_table == ffi.NULL:
+            raise RuntimeError("`nmm_codon_table` is NULL.")
+        self._nmm_codon_table = nmm_codon_table
         self._base = base
 
     @property
@@ -28,18 +28,18 @@ class CCodonTable:
         return self._base
 
     @property
-    def nmm_codont(self) -> ffi.CData:
-        return self._nmm_codont
+    def nmm_codon_table(self) -> ffi.CData:
+        return self._nmm_codon_table
 
     def lprob(self, codon: CCodon) -> float:
-        lprob: float = lib.nmm_codont_lprob(self._nmm_codont, codon.nmm_codon)
+        lprob: float = lib.nmm_codon_table_lprob(self._nmm_codon_table, codon.nmm_codon)
         if not lprob_is_valid(lprob):
             raise RuntimeError("Could not get probability.")
         return lprob
 
     def __del__(self):
-        if self._nmm_codont != ffi.NULL:
-            lib.nmm_codont_destroy(self._nmm_codont)
+        if self._nmm_codon_table != ffi.NULL:
+            lib.nmm_codon_table_destroy(self._nmm_codon_table)
 
 
 class CodonTable(CCodonTable):
@@ -55,4 +55,6 @@ class CodonTable(CCodonTable):
     """
 
     def __init__(self, codonp: CCodonProb):
-        super().__init__(lib.nmm_codont_create(codonp.nmm_codonp), codonp.base)
+        super().__init__(
+            lib.nmm_codon_table_create(codonp.nmm_codon_lprob), codonp.base
+        )

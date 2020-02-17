@@ -11,16 +11,16 @@ class CAlphabetTable:
 
     Parameters
     ----------
-    imm_abct : `<cdata 'struct imm_abct *'>`.
+    imm_abc_table : `<cdata 'struct imm_abc_table *'>`.
         Alphabet table.
     alphabet : `CAlphabet`
         Alphabet.
     """
 
-    def __init__(self, imm_abct: ffi.CData, alphabet: CAlphabet):
-        if imm_abct == ffi.NULL:
-            raise RuntimeError("`imm_abct` is NULL.")
-        self._imm_abct = imm_abct
+    def __init__(self, imm_abc_table: ffi.CData, alphabet: CAlphabet):
+        if imm_abc_table == ffi.NULL:
+            raise RuntimeError("`imm_abc_table` is NULL.")
+        self._imm_abc_table = imm_abc_table
         self._alphabet = alphabet
 
     @property
@@ -28,18 +28,18 @@ class CAlphabetTable:
         return self._alphabet
 
     @property
-    def imm_abct(self) -> ffi.CData:
-        return self._imm_abct
+    def imm_abc_table(self) -> ffi.CData:
+        return self._imm_abc_table
 
     def lprob(self, symbol: bytes) -> float:
-        lprob: float = lib.imm_abct_lprob(self._imm_abct, symbol)
+        lprob: float = lib.imm_abc_table_lprob(self._imm_abc_table, symbol)
         if not lprob_is_valid(lprob):
             raise RuntimeError("Could not get probability.")
         return lprob
 
     def __del__(self):
-        if self._imm_abct != ffi.NULL:
-            lib.imm_abct_destroy(self._imm_abct)
+        if self._imm_abc_table != ffi.NULL:
+            lib.imm_abc_table_destroy(self._imm_abc_table)
 
 
 class AlphabetTable(CAlphabetTable):
@@ -55,5 +55,7 @@ class AlphabetTable(CAlphabetTable):
     """
 
     def __init__(self, alphabet: CAlphabet, lprobs: Sequence[float]):
-        imm_abct = lib.imm_abct_create(alphabet.imm_abc, ffi.new("double[]", lprobs))
-        super().__init__(imm_abct, alphabet)
+        imm_abc_table = lib.imm_abc_table_create(
+            alphabet.imm_abc, ffi.new("double[]", lprobs)
+        )
+        super().__init__(imm_abc_table, alphabet)

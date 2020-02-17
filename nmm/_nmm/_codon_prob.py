@@ -10,16 +10,16 @@ class CCodonProb:
 
     Parameters
     ----------
-    nmm_codonp : `<cdata 'struct nmm_codonp *'>`.
+    nmm_codon_lprob : `<cdata 'struct nmm_codon_lprob *'>`.
         Codon probabilities pointer.
     base : `CBase`
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codonp: ffi.CData, base: CBase):
-        if nmm_codonp == ffi.NULL:
-            raise RuntimeError("`nmm_codonp` is NULL.")
-        self._nmm_codonp = nmm_codonp
+    def __init__(self, nmm_codon_lprob: ffi.CData, base: CBase):
+        if nmm_codon_lprob == ffi.NULL:
+            raise RuntimeError("`nmm_codon_lprob` is NULL.")
+        self._nmm_codon_lprob = nmm_codon_lprob
         self._base = base
 
     @property
@@ -27,26 +27,26 @@ class CCodonProb:
         return self._base
 
     @property
-    def nmm_codonp(self) -> ffi.CData:
-        return self._nmm_codonp
+    def nmm_codon_lprob(self) -> ffi.CData:
+        return self._nmm_codon_lprob
 
     def set_lprob(self, codon: CCodon, lprob: float):
-        if lib.nmm_codonp_set_lprob(self._nmm_codonp, codon.nmm_codon, lprob) != 0:
+        if lib.nmm_codon_lprob_set(self._nmm_codon_lprob, codon.nmm_codon, lprob) != 0:
             raise RuntimeError("Could not set codon probability.")
 
     def get_lprob(self, codon: CCodon) -> float:
-        lprob: float = lib.nmm_codonp_get_lprob(self._nmm_codonp, codon.nmm_codon)
+        lprob: float = lib.nmm_codon_lprob_get(self._nmm_codon_lprob, codon.nmm_codon)
         if not lprob_is_valid(lprob):
             raise RuntimeError("Could not get probability.")
         return lprob
 
     def normalize(self):
-        if lib.nmm_codonp_normalize(self._nmm_codonp) != 0:
+        if lib.nmm_codon_lprob_normalize(self._nmm_codon_lprob) != 0:
             raise RuntimeError("Could not normalize.")
 
     def __del__(self):
-        if self._nmm_codonp != ffi.NULL:
-            lib.nmm_codonp_destroy(self._nmm_codonp)
+        if self._nmm_codon_lprob != ffi.NULL:
+            lib.nmm_codon_lprob_destroy(self._nmm_codon_lprob)
 
 
 class CodonProb(CCodonProb):
@@ -60,4 +60,4 @@ class CodonProb(CCodonProb):
     """
 
     def __init__(self, base: CBase):
-        super().__init__(lib.nmm_codonp_create(base.nmm_base), base)
+        super().__init__(lib.nmm_codon_lprob_create(base.nmm_base_abc), base)
