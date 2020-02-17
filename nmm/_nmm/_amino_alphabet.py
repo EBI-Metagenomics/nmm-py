@@ -2,7 +2,7 @@ from .._ffi import ffi, lib
 from .._imm import CAlphabet
 
 
-class CAminoAlphabet:
+class CAminoAlphabet(CAlphabet):
     """
     Wrapper around the C implementation of a amino alphabet.
 
@@ -21,20 +21,11 @@ class CAminoAlphabet:
             raise ValueError("Alphabets must be the same.")
         self._nmm_amino_abc = nmm_amino_abc
         self._alphabet = alphabet
-
-    @property
-    def alphabet(self):
-        return self._alphabet
+        super().__init__(lib.nmm_amino_abc_cast(nmm_amino_abc))
 
     @property
     def nmm_amino_abc(self) -> ffi.CData:
         return self._nmm_amino_abc
-
-    @property
-    def symbols(self) -> bytes:
-        return ffi.string(
-            lib.imm_abc_symbols(lib.nmm_amino_abc_cast(self._nmm_amino_abc))
-        )
 
     def __del__(self):
         if self._nmm_amino_abc != ffi.NULL:

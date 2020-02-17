@@ -23,7 +23,7 @@ class CBaseTable:
         self._base = base
 
     @property
-    def base(self) -> CBaseAlphabet:
+    def alphabet(self) -> CBaseAlphabet:
         return self._base
 
     @property

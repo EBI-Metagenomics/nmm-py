@@ -33,7 +33,7 @@ class FrameState(CState):
         self._codont = codont
         self._epsilon = epsilon
         self._nmm_frame_state = state
-        alphabet = baset.base.alphabet
+        alphabet = baset.alphabet
         super().__init__(lib.imm_state_cast_c(self._nmm_frame_state), alphabet)
 
     def decode(self, seq: CSequence, codon: Codon) -> float:
@@ -63,7 +63,7 @@ class CodonState(TableState):
 
         seqt = SequenceTable(alphabet)
         for k, v in emission.items():
-            seqt.add(Sequence(k.symbols, k.base.alphabet), v)
+            seqt.add(Sequence(k.symbols, k.alphabet), v)
 
         super().__init__(name, seqt)
 
