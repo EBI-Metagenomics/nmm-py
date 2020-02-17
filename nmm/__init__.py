@@ -34,7 +34,15 @@ from ._imm import (
     CAlphabetTable,
 )
 from ._interval import Interval
-from ._nmm import Base, BaseTable, Codon, CodonProb, CodonState, CodonTable, FrameState
+from ._nmm import (
+    BaseAlphabet,
+    BaseTable,
+    Codon,
+    CodonProb,
+    CodonState,
+    CodonTable,
+    FrameState,
+)
 from ._testit import test
 
 try:
@@ -55,7 +63,7 @@ __version__ = "0.0.4"
 __all__ = [
     "Alphabet",
     "AlphabetTable",
-    "Base",
+    "BaseAlphabet",
     "BaseTable",
     "CAlphabet",
     "CAlphabetTable",

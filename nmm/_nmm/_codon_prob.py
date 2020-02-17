@@ -1,6 +1,6 @@
 from .._ffi import ffi, lib
 from .._imm import lprob_is_valid
-from ._base import CBase
+from ._base_alphabet import CBaseAlphabet
 from ._codon import CCodon
 
 
@@ -16,14 +16,14 @@ class CCodonProb:
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codon_lprob: ffi.CData, base: CBase):
+    def __init__(self, nmm_codon_lprob: ffi.CData, base: CBaseAlphabet):
         if nmm_codon_lprob == ffi.NULL:
             raise RuntimeError("`nmm_codon_lprob` is NULL.")
         self._nmm_codon_lprob = nmm_codon_lprob
         self._base = base
 
     @property
-    def base(self) -> CBase:
+    def base(self) -> CBaseAlphabet:
         return self._base
 
     @property
@@ -59,5 +59,5 @@ class CodonProb(CCodonProb):
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, base: CBase):
+    def __init__(self, base: CBaseAlphabet):
         super().__init__(lib.nmm_codon_lprob_create(base.nmm_base_abc), base)

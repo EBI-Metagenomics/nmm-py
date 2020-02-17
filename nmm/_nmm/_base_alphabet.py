@@ -2,7 +2,7 @@ from .._ffi import ffi, lib
 from .._imm import CAlphabet
 
 
-class CBase:
+class CBaseAlphabet:
     """
     Wrapper around the C implementation of a base (four-nucleotides alphabet).
 
@@ -47,7 +47,7 @@ class CBase:
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class Base(CBase):
+class BaseAlphabet(CBaseAlphabet):
     """
     Base is a four-nucleotides alphabet.
 

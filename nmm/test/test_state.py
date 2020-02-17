@@ -14,7 +14,7 @@ from nmm import (
     FrameState,
     BaseTable,
     CodonTable,
-    Base,
+    BaseAlphabet,
     CodonProb,
     Codon,
 )
@@ -70,7 +70,7 @@ def test_table_state():
 
 def test_frame_state():
     alphabet = Alphabet(b"ACGU", b"X")
-    base = Base(alphabet)
+    base = BaseAlphabet(alphabet)
     baset = BaseTable(base, (log(0.25), log(0.25), log(0.25), log(0.25)))
 
     codonp = CodonProb(base)

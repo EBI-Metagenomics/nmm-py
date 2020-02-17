@@ -1,15 +1,15 @@
 import pytest
 from numpy.testing import assert_equal
 
-from nmm import Alphabet, Base
+from nmm import Alphabet, BaseAlphabet
 
 
 def test_base():
-    base = Base(Alphabet(b"ACGT", b"X"))
+    base = BaseAlphabet(Alphabet(b"ACGT", b"X"))
 
     assert_equal(base.symbols, b"ACGT")
     assert_equal(str(base), "{ACGT}")
-    assert_equal(repr(base), "<Base:{ACGT}>")
+    assert_equal(repr(base), "<BaseAlphabet:{ACGT}>")
 
     with pytest.raises(RuntimeError):
-        Base(Alphabet(b"ACGTK", b"X"))
+        BaseAlphabet(Alphabet(b"ACGTK", b"X"))

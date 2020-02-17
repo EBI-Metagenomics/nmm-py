@@ -1,4 +1,4 @@
-from ._base import Base
+from ._base_alphabet import BaseAlphabet
 from ._base_table import BaseTable
 from ._codon import Codon
 from ._codon_prob import CodonProb

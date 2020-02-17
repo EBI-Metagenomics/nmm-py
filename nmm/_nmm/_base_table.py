@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from .._ffi import ffi, lib
-from ._base import CBase
+from ._base_alphabet import CBaseAlphabet
 
 
 class CBaseTable:
@@ -16,14 +16,14 @@ class CBaseTable:
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_base_table: ffi.CData, base: CBase):
+    def __init__(self, nmm_base_table: ffi.CData, base: CBaseAlphabet):
         if nmm_base_table == ffi.NULL:
             raise RuntimeError("`nmm_base_table` is NULL.")
         self._nmm_base_table = nmm_base_table
         self._base = base
 
     @property
-    def base(self) -> CBase:
+    def base(self) -> CBaseAlphabet:
         return self._base
 
     @property
@@ -50,6 +50,6 @@ class BaseTable(CBaseTable):
         Log probability of each nucleotide.
     """
 
-    def __init__(self, base: CBase, lprobs: Tuple[float, float, float, float]):
+    def __init__(self, base: CBaseAlphabet, lprobs: Tuple[float, float, float, float]):
         nmm_base_table = lib.nmm_base_table_create(base.nmm_base_abc, *lprobs)
         super().__init__(nmm_base_table, base)

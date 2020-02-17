@@ -1,6 +1,6 @@
 from typing import Dict, List, Set
 
-from ._nmm import Base, Codon
+from ._nmm import BaseAlphabet, Codon
 
 GENCODE: Dict[str, Dict[bytes, List[bytes]]] = {
     "standard": {
@@ -41,7 +41,7 @@ class GeneticCode:
         It only accepts `"standard"` for now.
     """
 
-    def __init__(self, base: Base, name: str = "standard"):
+    def __init__(self, base: BaseAlphabet, name: str = "standard"):
 
         self._gencode: Dict[bytes, List[Codon]] = {
             aa: [] for aa in GENCODE[name].keys()
