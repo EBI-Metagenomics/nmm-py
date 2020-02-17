@@ -63,7 +63,7 @@ class CodonState(TableState):
 
         seqt = SequenceTable(alphabet)
         for k, v in emission.items():
-            seqt.add(Sequence(k.symbols, k.alphabet), v)
+            seqt.add(Sequence(k.symbols, k.base), v)
 
         super().__init__(name, seqt)
 

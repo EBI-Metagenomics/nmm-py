@@ -108,6 +108,10 @@ class CSubSequence(SequenceABC):
         self._sequence = sequence
 
     @property
+    def imm_seq(self) -> ffi.CData:
+        return lib.imm_subseq_cast(ffi.addressof(self._imm_subseq))
+
+    @property
     def imm_subseq(self) -> ffi.CData:
         return self._imm_subseq
 
@@ -121,7 +125,7 @@ class CSubSequence(SequenceABC):
 
     @property
     def symbols(self) -> bytes:
-        imm_seq = lib.imm_subseq_cast(ffi.addressof(self._imm_subseq))
+        imm_seq = self.imm_seq
         return ffi.string(lib.imm_seq_string(imm_seq), lib.imm_seq_length(imm_seq))
 
     def slice(self, interval: Interval) -> SubSequence:
