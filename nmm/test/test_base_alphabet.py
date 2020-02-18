@@ -1,7 +1,7 @@
 import pytest
 from numpy.testing import assert_equal
 
-from nmm import Alphabet, BaseAlphabet
+from nmm.alphabet import Alphabet, BaseAlphabet
 
 
 def test_base():

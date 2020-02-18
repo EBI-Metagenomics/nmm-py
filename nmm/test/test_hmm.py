@@ -3,18 +3,12 @@ from math import log
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import (
-    HMM,
-    Alphabet,
-    MuteState,
-    NormalState,
-    TableState,
-    SequenceTable,
-    Sequence,
-    LPROB_ZERO,
-    LPROB_INVALID,
-    Path,
-)
+from nmm import HMM
+from nmm.alphabet import Alphabet
+from nmm.path import Path
+from nmm.prob import LPROB_INVALID, LPROB_ZERO, SequenceTable
+from nmm.sequence import Sequence
+from nmm.state import MuteState, NormalState, TableState
 
 
 def test_hmm_states():

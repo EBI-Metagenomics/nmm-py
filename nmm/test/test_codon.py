@@ -1,7 +1,8 @@
 import pytest
 from numpy.testing import assert_equal
 
-from nmm import Alphabet, Codon, BaseAlphabet
+from nmm.alphabet import Alphabet, BaseAlphabet
+from nmm.codon import Codon
 
 
 def test_codon():

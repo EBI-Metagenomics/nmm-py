@@ -1,5 +1,6 @@
 from math import log
-from nmm import Alphabet, BaseAlphabet, BaseTable, lprob_is_valid
+from nmm.alphabet import Alphabet, BaseAlphabet
+from nmm.prob import BaseTable, lprob_is_valid
 
 import pytest
 from numpy.testing import assert_allclose, assert_equal

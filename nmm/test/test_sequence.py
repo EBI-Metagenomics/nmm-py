@@ -1,7 +1,8 @@
 import pytest
 from numpy.testing import assert_equal
 
-from nmm import Sequence, Alphabet
+from nmm.sequence import Sequence
+from nmm.alphabet import Alphabet
 
 
 def test_sequence():

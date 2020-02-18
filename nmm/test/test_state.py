@@ -3,21 +3,11 @@ from math import log
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm import (
-    Alphabet,
-    MuteState,
-    NormalState,
-    Sequence,
-    lprob_is_zero,
-    SequenceTable,
-    TableState,
-    FrameState,
-    BaseTable,
-    CodonTable,
-    BaseAlphabet,
-    CodonProb,
-    Codon,
-)
+from nmm.alphabet import Alphabet, BaseAlphabet
+from nmm.codon import Codon
+from nmm.prob import BaseTable, CodonProb, CodonTable, SequenceTable, lprob_is_zero
+from nmm.sequence import Sequence
+from nmm.state import FrameState, MuteState, NormalState, TableState
 
 
 def test_normal_state():

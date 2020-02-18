@@ -2,7 +2,9 @@ from math import log
 
 from numpy.testing import assert_allclose
 
-from nmm import Alphabet, BaseAlphabet, Codon, CodonProb, CodonTable
+from nmm.alphabet import Alphabet, BaseAlphabet
+from nmm.codon import Codon
+from nmm.prob import CodonProb, CodonTable
 
 
 def test_codon_table():

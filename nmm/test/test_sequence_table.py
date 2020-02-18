@@ -2,7 +2,9 @@ from math import log
 import pytest
 from numpy.testing import assert_equal, assert_allclose
 
-from nmm import Sequence, Alphabet, SequenceTable, lprob_is_zero
+from nmm.sequence import Sequence
+from nmm.alphabet import Alphabet
+from nmm.prob import SequenceTable, lprob_is_zero
 
 
 def test_sequence_table():
