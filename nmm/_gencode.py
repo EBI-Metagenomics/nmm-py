@@ -1,6 +1,6 @@
 from typing import Dict, List, Set
 
-from ._nmm import BaseAlphabet, Codon
+from ._nmm import BaseAlphabet, Codon, AminoAlphabet
 
 GENCODE: Dict[str, Dict[bytes, List[bytes]]] = {
     "standard": {
@@ -41,7 +41,12 @@ class GeneticCode:
         It only accepts `"standard"` for now.
     """
 
-    def __init__(self, base: BaseAlphabet, name: str = "standard"):
+    def __init__(
+        self, base_abc: BaseAlphabet, amino_abc: AminoAlphabet, name: str = "standard"
+    ):
+
+        self._base_alphabet = base_abc
+        self._amino_alphabet = amino_abc
 
         self._gencode: Dict[bytes, List[Codon]] = {
             aa: [] for aa in GENCODE[name].keys()
@@ -50,7 +55,7 @@ class GeneticCode:
         for aa, triplets in GENCODE[name].items():
             gcode = self._gencode[aa]
             for triplet in triplets:
-                gcode.append(Codon(triplet, base))
+                gcode.append(Codon(triplet, base_abc))
 
         self._amino_acid: Dict[Codon, bytes] = {}
         for aa, codons in self._gencode.items():
@@ -66,3 +71,11 @@ class GeneticCode:
 
     def amino_acids(self) -> Set[bytes]:
         return set(self._gencode.keys())
+
+    @property
+    def base_alphabet(self) -> BaseAlphabet:
+        return self._base_alphabet
+
+    @property
+    def amino_alphabet(self) -> AminoAlphabet:
+        return self._amino_alphabet
