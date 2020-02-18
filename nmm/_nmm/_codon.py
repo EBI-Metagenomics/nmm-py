@@ -48,6 +48,12 @@ class CCodon:
         if self._nmm_codon != ffi.NULL:
             lib.nmm_codon_destroy(self._nmm_codon)
 
+    def __eq__(self, another):
+        return bytes(self) == bytes(another)
+
+    def __hash__(self):
+        return hash(bytes(self))
+
     def __str__(self) -> str:
         return f"[{self.symbols.decode()}]"
 
