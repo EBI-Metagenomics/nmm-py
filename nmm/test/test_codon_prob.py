@@ -3,13 +3,13 @@ from math import log
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm.alphabet import Alphabet, BaseAlphabet
+from nmm.alphabet import BaseAlphabet
 from nmm.codon import Codon
 from nmm.prob import CodonProb, lprob_is_zero
 
 
 def test_codon_prob():
-    base = BaseAlphabet(Alphabet(b"ACGT", b"X"))
+    base = BaseAlphabet(b"ACGT", b"X")
     codonp = CodonProb(base)
 
     with pytest.raises(RuntimeError):

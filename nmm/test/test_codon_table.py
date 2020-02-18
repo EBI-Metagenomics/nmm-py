@@ -2,13 +2,13 @@ from math import log
 
 from numpy.testing import assert_allclose
 
-from nmm.alphabet import Alphabet, BaseAlphabet
+from nmm.alphabet import BaseAlphabet
 from nmm.codon import Codon
 from nmm.prob import CodonProb, CodonTable
 
 
 def test_codon_table():
-    base = BaseAlphabet(Alphabet(b"ACGT", b"X"))
+    base = BaseAlphabet(b"ACGT", b"X")
     codonp = CodonProb(base)
 
     codonp.set_lprob(Codon(b"AAA", base), log(0.01))

@@ -1,11 +1,11 @@
 from numpy.testing import assert_equal
 
-from nmm.alphabet import Alphabet, BaseAlphabet
+from nmm.alphabet import BaseAlphabet
 from nmm.codon import codon_iter
 
 
 def test_codon_iter():
-    base = BaseAlphabet(Alphabet(b"ACGT", b"X"))
+    base = BaseAlphabet(b"ACGT", b"X")
 
     codons = list(codon_iter(base))
     assert_equal(len(codons), 64)

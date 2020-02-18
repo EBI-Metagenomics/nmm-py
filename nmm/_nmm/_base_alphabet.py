@@ -1,5 +1,5 @@
 from .._ffi import ffi, lib
-from .._imm import CAlphabet
+from .._imm import Alphabet, CAlphabet
 
 
 class CBaseAlphabet(CAlphabet):
@@ -44,12 +44,18 @@ class BaseAlphabet(CBaseAlphabet):
 
     Parameters
     ----------
-    alphabet : `Alphabet`
-        Four-nucleotides alphabet.
+    symbols : bytes
+        Set of symbols as an array of bytes.
+    any_symbol : bytes
+        Single-char representing any-symbol.
     """
 
-    def __init__(self, alphabet: CAlphabet):
-        super().__init__(lib.nmm_base_abc_create(alphabet.imm_abc), alphabet)
+    def __init__(self, symbols: bytes, any_symbol: bytes):
+        if len(any_symbol) != 1:
+            raise ValueError("`any_symbol` has length different than 1.")
+        abc = Alphabet(symbols, any_symbol)
+        super().__init__(lib.nmm_base_abc_create(abc.imm_abc), abc)
+        self._alphabet = abc
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

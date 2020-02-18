@@ -59,8 +59,7 @@ def test_table_state():
 
 
 def test_frame_state():
-    alphabet = Alphabet(b"ACGU", b"X")
-    base = BaseAlphabet(alphabet)
+    base = BaseAlphabet(b"ACGU", b"X")
     baset = BaseTable(base, (log(0.25), log(0.25), log(0.25), log(0.25)))
 
     codonp = CodonProb(base)
@@ -69,39 +68,39 @@ def test_frame_state():
 
     frame_state = FrameState(b"M1", baset, CodonTable(codonp), 0.0)
 
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AUA", alphabet))), True)
-    assert_allclose(frame_state.lprob(Sequence(b"AUG", alphabet)), log(0.8))
-    assert_allclose(frame_state.lprob(Sequence(b"AUU", alphabet)), log(0.1))
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AU", alphabet))), True)
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"A", alphabet))), True)
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AUUA", alphabet))), True)
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AUUAA", alphabet))), True)
+    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AUA", base))), True)
+    assert_allclose(frame_state.lprob(Sequence(b"AUG", base)), log(0.8))
+    assert_allclose(frame_state.lprob(Sequence(b"AUU", base)), log(0.1))
+    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AU", base))), True)
+    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"A", base))), True)
+    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AUUA", base))), True)
+    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AUUAA", base))), True)
 
     codonp.normalize()
     frame_state = FrameState(b"M1", baset, CodonTable(codonp), 0.1)
 
-    assert_allclose(frame_state.lprob(Sequence(b"AUA", alphabet)), -6.905597115665666)
-    assert_allclose(frame_state.lprob(Sequence(b"AUG", alphabet)), -0.5347732882047062)
-    assert_allclose(frame_state.lprob(Sequence(b"AUU", alphabet)), -2.5902373304999466)
-    assert_allclose(frame_state.lprob(Sequence(b"AU", alphabet)), -2.9158434238698336)
-    assert_allclose(frame_state.lprob(Sequence(b"A", alphabet)), -5.914503505971854)
-    assert_allclose(frame_state.lprob(Sequence(b"AUUA", alphabet)), -6.881032208841384)
-    assert_allclose(frame_state.lprob(Sequence(b"AUUAA", alphabet)), -12.08828960987379)
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AUUAAA", alphabet))), True)
+    assert_allclose(frame_state.lprob(Sequence(b"AUA", base)), -6.905597115665666)
+    assert_allclose(frame_state.lprob(Sequence(b"AUG", base)), -0.5347732882047062)
+    assert_allclose(frame_state.lprob(Sequence(b"AUU", base)), -2.5902373304999466)
+    assert_allclose(frame_state.lprob(Sequence(b"AU", base)), -2.9158434238698336)
+    assert_allclose(frame_state.lprob(Sequence(b"A", base)), -5.914503505971854)
+    assert_allclose(frame_state.lprob(Sequence(b"AUUA", base)), -6.881032208841384)
+    assert_allclose(frame_state.lprob(Sequence(b"AUUAA", base)), -12.08828960987379)
+    assert_equal(lprob_is_zero(frame_state.lprob(Sequence(b"AUUAAA", base))), True)
 
     codon = Codon(b"XXX", base)
-    lprob = frame_state.decode(Sequence(b"AUA", alphabet), codon)
+    lprob = frame_state.decode(Sequence(b"AUA", base), codon)
     assert_allclose(lprob, -7.128586690537968)
     assert_equal(codon.symbols, b"AUG")
 
-    lprob = frame_state.decode(Sequence(b"AUAG", alphabet), codon)
+    lprob = frame_state.decode(Sequence(b"AUAG", base), codon)
     assert_allclose(lprob, -4.813151489562624)
     assert_equal(codon.symbols, b"AUG")
 
-    lprob = frame_state.decode(Sequence(b"A", alphabet), codon)
+    lprob = frame_state.decode(Sequence(b"A", base), codon)
     assert_allclose(lprob, -6.032286541628237)
     assert_equal(codon.symbols, b"AUG")
 
-    lprob = frame_state.decode(Sequence(b"UUU", alphabet), codon)
+    lprob = frame_state.decode(Sequence(b"UUU", base), codon)
     assert_allclose(lprob, -8.110186062956258)
     assert_equal(codon.symbols, b"AUU")

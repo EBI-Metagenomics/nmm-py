@@ -1,4 +1,4 @@
-from . import prob, state, alphabet, path
+from . import alphabet, codon, path, prob, result, sequence, state
 from ._gencode import GeneticCode
 from ._imm import (
     HMM,
@@ -28,15 +28,18 @@ __version__ = "0.0.4"
 
 __all__ = [
     "GeneticCode",
-    "prob",
-    "state",
-    "alphabet",
-    "path",
     "HMM",
     "Interval",
     "__version__",
+    "alphabet",
+    "codon",
     "create_imm_path",
     "create_imm_step",
+    "path",
+    "prob",
+    "result",
+    "sequence",
+    "state",
     "test",
     "wrap_imm_path",
     "wrap_imm_result",
