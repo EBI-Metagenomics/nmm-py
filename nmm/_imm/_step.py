@@ -1,8 +1,12 @@
-from ._state import CState
+from typing import Generic, TypeVar
+
 from .._ffi import ffi, lib
+from ._state import CState
+
+T = TypeVar("T", bound=CState)
 
 
-class CStep:
+class CStep(Generic[T]):
     """
     Wrapper around the C implementation of a path step.
 
@@ -13,23 +17,23 @@ class CStep:
     ----------
     imm_step : `<cdata 'struct imm_step *'>`
         Step pointer.
-    state : `CState`
+    state : `T`
         State.
     """
 
-    def __init__(self, imm_step: ffi.CData, state: CState):
+    def __init__(self, imm_step: ffi.CData, state: T):
         if imm_step == ffi.NULL:
             raise RuntimeError("`imm_step` is NULL.")
         self._imm_step = imm_step
-        self.__state = state
+        self._state = state
 
     @property
     def imm_step(self) -> ffi.CData:
         return self._imm_step
 
     @property
-    def state(self) -> CState:
-        return self.__state
+    def state(self) -> T:
+        return self._state
 
     @property
     def seq_len(self) -> int:
@@ -48,19 +52,19 @@ class CStep:
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class Step(CStep):
+class Step(CStep[T]):
     """
     Path step.
 
     Parameters
     ----------
-    state : `CState`
+    state : `T`
         State.
     seq_len : `int`
         Sequence length.
     """
 
-    def __init__(self, state: CState, seq_len: int):
+    def __init__(self, state: T, seq_len: int):
         imm_step = lib.imm_step_create(state.imm_state, seq_len)
         if imm_step == ffi.NULL:
             raise RuntimeError("Could not create step.")

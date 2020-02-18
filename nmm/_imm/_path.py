@@ -1,11 +1,26 @@
-from typing import Dict, List, Sequence, Tuple
+from __future__ import annotations
+
+from typing import (
+    Dict,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Sequence,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 from .._ffi import ffi, lib
 from ._state import CState
-from ._step import CStep, Step
+from ._step import CStep
+
+S = TypeVar("S", bound=CState)
+T = TypeVar("T", bound=CStep)
 
 
-class CPath:
+class CPath(Generic[T]):
     """
     Wrapper around the C implementation of path.
 
@@ -13,27 +28,27 @@ class CPath:
     ----------
     imm_path : `<cdata 'struct imm_path *'>`
         Path pointer.
-    steps : `Sequence[CStep]`
-        List of steps.
+    steps : `Iterable[T]`
+        Steps.
     """
 
-    def __init__(self, imm_path: ffi.CData, steps: Sequence[CStep]):
+    def __init__(self, imm_path: ffi.CData, steps: Iterable[T]):
         if imm_path == ffi.NULL:
             raise RuntimeError("`imm_path` is NULL.")
         self._imm_path = imm_path
-        self.__steps = list(steps)
+        self._steps = list(steps)
 
     @property
     def imm_path(self) -> ffi.CData:
         return self._imm_path
 
     def __len__(self) -> int:
-        return len(self.__steps)
+        return len(self._steps)
 
-    def __getitem__(self, i) -> CStep:
-        return self.__steps[i]
+    def __getitem__(self, i: int) -> T:
+        return self._steps[i]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[T]:
         for i in range(len(self)):
             yield self[i]
 
@@ -48,25 +63,21 @@ class CPath:
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class Path(CPath):
+class Path(CPath[T]):
     """
     Path.
 
     Parameters
     ----------
-    steps : `Sequence[Tuple[CState, int]]`
+    steps : `Iterable[T]`
         Steps.
     """
 
-    def __init__(self, steps: Sequence[Tuple[CState, int]]):
+    def __init__(self, steps: Iterable[T]):
         imm_path = lib.imm_path_create()
-        self.__steps = [Step(step[0], step[1]) for step in steps]
-        for step in self.__steps:
+        for step in steps:
             lib.imm_path_append(imm_path, step.imm_step)
-        super().__init__(imm_path, self.__steps)
-
-    def __getitem__(self, i) -> CStep:
-        return self.__steps[i]
+        super().__init__(imm_path, list(steps))
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{str(self)}>"
