@@ -35,7 +35,6 @@ from ._imm import (
 )
 from ._interval import Interval
 from ._nmm import (
-    AminoAlphabet,
     AminoTable,
     BaseAlphabet,
     BaseTable,
@@ -46,6 +45,7 @@ from ._nmm import (
     CodonState,
     CodonTable,
     FrameState,
+    StandardAminoAlphabet,
     codon_iter,
 )
 from ._testit import test
@@ -101,6 +101,7 @@ __all__ = [
     "Sequence",
     "SequenceABC",
     "SequenceTable",
+    "StandardAminoAlphabet",
     "Step",
     "SubSequence",
     "TableState",

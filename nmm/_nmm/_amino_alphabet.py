@@ -1,5 +1,5 @@
 from .._ffi import ffi, lib
-from .._imm import CAlphabet
+from .._imm import CAlphabet, Alphabet
 
 
 class CAminoAlphabet(CAlphabet):
@@ -50,6 +50,14 @@ class AminoAlphabet(CAminoAlphabet):
 
     def __init__(self, alphabet: CAlphabet):
         super().__init__(lib.nmm_amino_abc_create(alphabet.imm_abc), alphabet)
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+class StandardAminoAlphabet(AminoAlphabet):
+    def __init__(self):
+        super().__init__(Alphabet(b"ACDEFGHIKLMNPQRSTVWY", b"X"))
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

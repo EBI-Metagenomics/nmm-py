@@ -1,4 +1,4 @@
-from ._amino_alphabet import AminoAlphabet, CAminoAlphabet
+from ._amino_alphabet import AminoAlphabet, CAminoAlphabet, StandardAminoAlphabet
 from ._amino_table import AminoTable
 from ._base_alphabet import BaseAlphabet, CBaseAlphabet
 from ._base_table import BaseTable
@@ -20,5 +20,6 @@ __all__ = [
     "CodonState",
     "CodonTable",
     "FrameState",
+    "StandardAminoAlphabet",
     "codon_iter",
 ]

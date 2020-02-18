@@ -56,6 +56,8 @@ class Alphabet(CAlphabet):
     ----------
     symbols : bytes
         Set of symbols as an array of bytes.
+    any_symbol : bytes
+        Single-char representing any-symbol.
     """
 
     def __init__(self, symbols: bytes, any_symbol: bytes):
