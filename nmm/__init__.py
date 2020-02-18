@@ -35,6 +35,7 @@ from ._imm import (
 )
 from ._interval import Interval
 from ._nmm import (
+    AminoAlphabet,
     AminoTable,
     BaseAlphabet,
     BaseTable,
