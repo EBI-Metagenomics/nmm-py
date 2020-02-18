@@ -218,7 +218,8 @@ def test_hmm_likelihood():
 
     with pytest.raises(ValueError):
         hmm.likelihood(
-            Sequence(b"UU", alphabet), Path([Step(S, 0), Step(M1, 1), Step(M3, 1), Step(E, 0)])
+            Sequence(b"UU", alphabet),
+            Path([Step(S, 0), Step(M1, 1), Step(M3, 1), Step(E, 0)]),
         )
 
 
