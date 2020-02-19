@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import TypeVar, Generic
 from abc import ABC, abstractmethod
+from typing import Generic, TypeVar, Union
 
-from ._alphabet import CAlphabet
 from .._ffi import ffi, lib
 from .._interval import Interval
-
+from ._alphabet import CAlphabet
 
 T = TypeVar("T", bound=CAlphabet)
 
@@ -27,8 +26,8 @@ class SequenceABC(ABC, Generic[T]):
         raise NotImplementedError()
 
     @abstractmethod
-    def slice(self, interval: Interval) -> SequenceABC[T]:
-        del interval
+    def __getitem__(self, i: Union[int, slice, Interval]):
+        del i
         raise NotImplementedError()
 
     @property
@@ -67,7 +66,16 @@ class CSequence(SequenceABC[T]):
     def symbols(self) -> bytes:
         return ffi.string(lib.imm_seq_string(self._imm_seq))
 
-    def slice(self, interval: Interval) -> SubSequence[T]:
+    def __getitem__(self, i: Union[int, slice, Interval]):
+        if isinstance(i, int):
+            return self.symbols[i : i + 1]
+        elif isinstance(i, slice):
+            interval = Interval.from_slice(i)
+        elif isinstance(i, Interval):
+            interval = i
+        else:
+            raise RuntimeError("Index has to be an integer of a slice.")
+
         return SubSequence[T](self, interval)
 
     @property
@@ -144,7 +152,16 @@ class CSubSequence(SequenceABC[T]):
         imm_seq = self.imm_seq
         return ffi.string(lib.imm_seq_string(imm_seq), lib.imm_seq_length(imm_seq))
 
-    def slice(self, interval: Interval) -> SubSequence[T]:
+    def __getitem__(self, i: Union[int, slice, Interval]):
+        if isinstance(i, int):
+            return self.symbols[i : i + 1]
+        elif isinstance(i, slice):
+            interval = Interval.from_slice(i)
+        elif isinstance(i, Interval):
+            interval = i
+        else:
+            raise RuntimeError("Index has to be an integer of a slice.")
+
         start = interval.start + self.start
         length = interval.stop - interval.start
         return SubSequence[T](self._sequence, Interval(start, start + length))

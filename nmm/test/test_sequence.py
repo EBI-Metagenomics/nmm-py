@@ -35,9 +35,9 @@ def test_sequence_base():
     assert_equal(str(seq), "[ACAAAGATX]")
     assert_equal(repr(seq), "<Sequence:[ACAAAGATX]>")
 
-    subseq = seq.slice(Interval(1, 7))
+    subseq = seq[1:7]
     assert_equal(str(subseq), "[CAAAGA]")
-    subseq = subseq.slice(Interval(0, 5))
+    subseq = subseq[Interval(0, 5)]
     assert_equal(str(subseq), "[CAAAG]")
     assert_equal(subseq.alphabet.symbols, b"ACGT")
 

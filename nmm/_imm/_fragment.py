@@ -57,7 +57,7 @@ class Fragment(Generic[TAlphabet, TState]):
         start = end = 0
         for step in self._path:
             end += step.seq_len
-            yield FragStep(self._sequence.slice(Interval(start, end)), step)
+            yield FragStep(self._sequence[Interval(start, end)], step)
             start = end
 
     def __repr__(self) -> str:

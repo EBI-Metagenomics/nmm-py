@@ -1,4 +1,3 @@
-import pytest
 from typing import Union
 from numpy.testing import assert_equal
 from math import log
