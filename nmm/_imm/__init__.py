@@ -1,5 +1,6 @@
 from ._alphabet import Alphabet, CAlphabet
 from ._alphabet_table import AlphabetTable, CAlphabetTable
+from ._fragment import Fragment, FragStep
 from ._hmm import HMM
 from ._lprob import (
     LPROB_INVALID,
@@ -30,6 +31,8 @@ __all__ = [
     "CState",
     "CStep",
     "CSubSequence",
+    "FragStep",
+    "Fragment",
     "HMM",
     "LPROB_INVALID",
     "LPROB_ZERO",
