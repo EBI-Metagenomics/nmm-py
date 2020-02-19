@@ -24,11 +24,11 @@ def test_fragment():
     i = iter(fragment)
 
     frag_step = next(i)
-    assert_equal(frag_step.sequence.symbols, b"")
+    assert_equal(bytes(frag_step.sequence), b"")
     assert_equal(frag_step.step.seq_len, 0)
     assert_equal(frag_step.step.state.name, S.name)
 
     frag_step = next(i)
-    assert_equal(frag_step.sequence.symbols, b"A")
+    assert_equal(bytes(frag_step.sequence), b"A")
     assert_equal(frag_step.step.seq_len, 1)
     assert_equal(frag_step.step.state.name, M1.name)

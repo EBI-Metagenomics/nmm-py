@@ -20,9 +20,8 @@ class SequenceABC(ABC, Generic[T]):
     def length(self) -> int:
         raise NotImplementedError()
 
-    @property
     @abstractmethod
-    def symbols(self) -> bytes:
+    def __bytes__(self) -> bytes:
         raise NotImplementedError()
 
     @abstractmethod
@@ -62,13 +61,12 @@ class CSequence(SequenceABC[T]):
     def length(self) -> int:
         return lib.imm_seq_length(self._imm_seq)
 
-    @property
-    def symbols(self) -> bytes:
+    def __bytes__(self) -> bytes:
         return ffi.string(lib.imm_seq_string(self._imm_seq))
 
     def __getitem__(self, i: Union[int, slice, Interval]):
         if isinstance(i, int):
-            return self.symbols[i : i + 1]
+            return bytes(self)[i : i + 1]
         elif isinstance(i, slice):
             interval = Interval.from_slice(i)
         elif isinstance(i, Interval):
@@ -87,7 +85,7 @@ class CSequence(SequenceABC[T]):
             lib.imm_seq_destroy(self._imm_seq)
 
     def __str__(self) -> str:
-        return f"[{self.symbols.decode()}]"
+        return f"{bytes(self).decode()}"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
@@ -147,14 +145,13 @@ class CSubSequence(SequenceABC[T]):
     def length(self) -> int:
         return lib.imm_subseq_length(ffi.addressof(self._imm_subseq))
 
-    @property
-    def symbols(self) -> bytes:
+    def __bytes__(self) -> bytes:
         imm_seq = self.imm_seq
         return ffi.string(lib.imm_seq_string(imm_seq), lib.imm_seq_length(imm_seq))
 
     def __getitem__(self, i: Union[int, slice, Interval]):
         if isinstance(i, int):
-            return self.symbols[i : i + 1]
+            return bytes(self)[i : i + 1]
         elif isinstance(i, slice):
             interval = Interval.from_slice(i)
         elif isinstance(i, Interval):
@@ -171,7 +168,7 @@ class CSubSequence(SequenceABC[T]):
         return self._sequence.alphabet
 
     def __str__(self) -> str:
-        return f"[{self.symbols.decode()}]"
+        return f"{bytes(self).decode()}"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

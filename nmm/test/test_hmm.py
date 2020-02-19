@@ -341,7 +341,7 @@ def test_hmm_viterbi_3():
 
     results = hmm.viterbi(Sequence(b"AC", alphabet), E)
     score = results[0].loglikelihood
-    assert_equal(results[0].subseq.symbols, b"AC")
+    assert_equal(bytes(results[0].subseq), b"AC")
     path = results[0].path
     steps = list(path)
     assert_equal(steps[0].seq_len, 0)

@@ -11,10 +11,10 @@ def test_sequence():
     seq = Sequence(b"ACAAAGATX", alphabet)
 
     assert_equal(seq.length, 9)
-    assert_equal(seq.symbols, b"ACAAAGATX")
+    assert_equal(bytes(seq), b"ACAAAGATX")
 
-    assert_equal(str(seq), "[ACAAAGATX]")
-    assert_equal(repr(seq), "<Sequence:[ACAAAGATX]>")
+    assert_equal(str(seq), "ACAAAGATX")
+    assert_equal(repr(seq), "<Sequence:ACAAAGATX>")
 
     Sequence(b"ACGXXT", alphabet)
 
@@ -30,15 +30,15 @@ def test_sequence_base():
     seq = Sequence[BaseAlphabet](b"ACAAAGATX", alphabet)
 
     assert_equal(seq.length, 9)
-    assert_equal(seq.symbols, b"ACAAAGATX")
+    assert_equal(bytes(seq), b"ACAAAGATX")
 
-    assert_equal(str(seq), "[ACAAAGATX]")
-    assert_equal(repr(seq), "<Sequence:[ACAAAGATX]>")
+    assert_equal(str(seq), "ACAAAGATX")
+    assert_equal(repr(seq), "<Sequence:ACAAAGATX>")
 
     subseq = seq[1:7]
-    assert_equal(str(subseq), "[CAAAGA]")
+    assert_equal(str(subseq), "CAAAGA")
     subseq = subseq[Interval(0, 5)]
-    assert_equal(str(subseq), "[CAAAG]")
+    assert_equal(str(subseq), "CAAAG")
     assert_equal(subseq.alphabet.symbols, b"ACGT")
 
     del subseq
