@@ -14,10 +14,10 @@ from typing import (
 
 from .._ffi import ffi, lib
 from ._state import CState
-from ._step import CStep
+from ._step import Step
 
 S = TypeVar("S", bound=CState)
-T = TypeVar("T", bound=CStep)
+T = TypeVar("T", bound=Step)
 
 
 class CPath(Generic[T]):
@@ -84,17 +84,17 @@ class Path(CPath[T]):
 
 
 def wrap_imm_path(imm_path: ffi.CData, states: Dict[ffi.CData, CState]) -> CPath:
-    steps: List[CStep] = []
+    steps: List[Step] = []
     imm_step = lib.imm_path_first(imm_path)
     while imm_step != ffi.NULL:
         imm_state = lib.imm_step_state(imm_step)
-        steps.append(CStep(imm_step, states[imm_state]))
+        steps.append(Step(imm_step, states[imm_state]))
         imm_step = lib.imm_path_next(imm_path, imm_step)
 
     return CPath(imm_path, steps)
 
 
-def create_imm_path(steps: Sequence[CStep]) -> ffi.CData:
+def create_imm_path(steps: Sequence[Step]) -> ffi.CData:
     imm_path = lib.imm_path_create()
     for step in steps:
         lib.imm_path_append(imm_path, step.imm_step)

@@ -15,7 +15,7 @@ from ._results import CResults, wrap_imm_results
 from ._sequence import Sequence, SequenceABC, SubSequence
 from ._sequence_table import CSequenceTable, SequenceTable
 from ._state import CState, MuteState, NormalState, TableState
-from ._step import CStep, Step, create_imm_step
+from ._step import Step, create_imm_step
 
 __all__ = [
     "Alphabet",
@@ -27,7 +27,6 @@ __all__ = [
     "CResults",
     "CSequenceTable",
     "CState",
-    "CStep",
     "FragStep",
     "Fragment",
     "HMM",

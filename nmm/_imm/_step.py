@@ -1,4 +1,6 @@
-from typing import Generic, TypeVar
+from __future__ import annotations
+
+from typing import Generic, Type, TypeVar
 
 from .._ffi import ffi, lib
 from ._state import CState
@@ -6,18 +8,18 @@ from ._state import CState
 T = TypeVar("T", bound=CState)
 
 
-class CStep(Generic[T]):
+class Step(Generic[T]):
     """
-    Wrapper around the C implementation of a path step.
+    Path step.
 
     A step is composed of a state and an emitted sequence length. The user should not need to
     directly call the constructor of this class but instead use the methods from the `Path` class.
 
     Parameters
     ----------
-    imm_step : `<cdata 'struct imm_step *'>`
+    imm_step
         Step pointer.
-    state : `T`
+    state
         State.
     """
 
@@ -26,6 +28,23 @@ class CStep(Generic[T]):
             raise RuntimeError("`imm_step` is NULL.")
         self._imm_step = imm_step
         self._state = state
+
+    @classmethod
+    def create(cls: Type[Step], state: T, seq_len: int) -> Step:
+        """
+        Create a path step.
+
+        Parameters
+        ----------
+        state
+            State.
+        seq_len
+            Sequence length.
+        """
+        imm_step = lib.imm_step_create(state.imm_state, seq_len)
+        if imm_step == ffi.NULL:
+            raise RuntimeError("Could not create step.")
+        return cls(imm_step, state)
 
     @property
     def imm_step(self) -> ffi.CData:
@@ -47,28 +66,6 @@ class CStep(Generic[T]):
         state = lib.imm_step_state(self._imm_step)
         name: str = ffi.string(lib.imm_state_get_name(state)).decode()
         return f"<{name},{self.seq_len}>"
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}:{str(self)}>"
-
-
-class Step(CStep[T]):
-    """
-    Path step.
-
-    Parameters
-    ----------
-    state : `T`
-        State.
-    seq_len : `int`
-        Sequence length.
-    """
-
-    def __init__(self, state: T, seq_len: int):
-        imm_step = lib.imm_step_create(state.imm_state, seq_len)
-        if imm_step == ffi.NULL:
-            raise RuntimeError("Could not create step.")
-        super().__init__(imm_step, state)
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

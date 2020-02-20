@@ -5,14 +5,14 @@ from ._alphabet import Alphabet
 from ._path import CPath
 from ._sequence import SequenceABC
 from ._state import CState
-from ._step import CStep
+from ._step import Step
 
 TAlphabet = TypeVar("TAlphabet", bound=Alphabet)
 TState = TypeVar("TState", bound=CState)
 
 
 class FragStep(Generic[TAlphabet, TState]):
-    def __init__(self, sequence: SequenceABC[TAlphabet], step: CStep[TState]):
+    def __init__(self, sequence: SequenceABC[TAlphabet], step: Step[TState]):
         self._sequence = sequence
         self._step = step
 
@@ -21,7 +21,7 @@ class FragStep(Generic[TAlphabet, TState]):
         return self._sequence
 
     @property
-    def step(self) -> CStep[TState]:
+    def step(self) -> Step[TState]:
         return self._step
 
     def __str__(self) -> str:
@@ -44,7 +44,7 @@ class Fragment(Generic[TAlphabet, TState]):
     """
 
     def __init__(
-        self, sequence: SequenceABC[TAlphabet], path: CPath[CStep[TState]],
+        self, sequence: SequenceABC[TAlphabet], path: CPath[Step[TState]],
     ):
         self._sequence = sequence
         self._path = path
