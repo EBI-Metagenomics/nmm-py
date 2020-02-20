@@ -1,7 +1,4 @@
-from ._nmm import (
-    Codon,
-    codon_iter,
-)
+from ._nmm import Codon, codon_iter
 
 __all__ = [
     "Codon",

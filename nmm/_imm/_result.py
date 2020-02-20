@@ -20,6 +20,7 @@ class Result:
     sequence
         Sequence.
     """
+
     def __init__(self, imm_result: CData, path: Path, sequence: SequenceABC):
         if imm_result == ffi.NULL:
             raise RuntimeError("`imm_result` is NULL.")

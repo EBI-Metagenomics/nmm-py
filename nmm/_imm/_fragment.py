@@ -1,6 +1,5 @@
 from typing import Generic, Iterator, TypeVar
 
-from .._cdata import CData
 from .._interval import Interval
 from ._alphabet import Alphabet
 from ._path import Path

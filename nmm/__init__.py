@@ -1,9 +1,9 @@
 from . import alphabet, codon, fragment, path, prob, result, sequence, state
+from ._cdata import CData
 from ._gencode import GeneticCode
 from ._imm import HMM
 from ._interval import Interval
 from ._testit import test
-from ._cdata import CData
 
 try:
     from ._ffi import ffi

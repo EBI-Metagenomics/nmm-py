@@ -2,8 +2,8 @@ import pytest
 from numpy.testing import assert_equal
 
 from nmm import Interval
-from nmm.sequence import Sequence
 from nmm.alphabet import Alphabet, BaseAlphabet
+from nmm.sequence import Sequence
 
 
 def test_sequence():

@@ -3,7 +3,7 @@ from typing import Dict, Iterable, List
 from .._cdata import CData
 from .._ffi import ffi, lib
 from ._result import Result
-from ._sequence import SequenceABC, Sequence
+from ._sequence import Sequence, SequenceABC
 from ._state import State
 
 

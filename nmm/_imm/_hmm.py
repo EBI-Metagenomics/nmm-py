@@ -1,14 +1,13 @@
-from ._sequence import Sequence
-from ._path import Path
-from ._state import State
-from ._alphabet import Alphabet
-from ._lprob import lprob_zero, lprob_is_valid
-from ._results import Results
-from .._cdata import CData
 from typing import Dict
 
-
+from .._cdata import CData
 from .._ffi import ffi, lib
+from ._alphabet import Alphabet
+from ._lprob import lprob_is_valid, lprob_zero
+from ._path import Path
+from ._results import Results
+from ._sequence import Sequence
+from ._state import State
 
 
 class HMM:

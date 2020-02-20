@@ -1,8 +1,7 @@
-from typing import Iterable
 import itertools
+from typing import Iterable
 
 from ._base_alphabet import BaseAlphabet
-from .._cdata import CData
 from ._codon import Codon
 
 

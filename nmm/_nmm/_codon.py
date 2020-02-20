@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Type
 
-from .._ffi import ffi, lib
 from .._cdata import CData
+from .._ffi import ffi, lib
 from ._base_alphabet import BaseAlphabet
 
 

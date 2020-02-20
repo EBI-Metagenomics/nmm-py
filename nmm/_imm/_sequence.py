@@ -3,8 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Generic, Type, TypeVar, Union
 
-from .._ffi import ffi, lib
 from .._cdata import CData
+from .._ffi import ffi, lib
 from .._interval import Interval
 from ._alphabet import Alphabet
 

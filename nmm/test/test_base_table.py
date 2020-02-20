@@ -1,9 +1,10 @@
 from math import log
-from nmm.alphabet import BaseAlphabet
-from nmm.prob import BaseTable, lprob_is_valid
 
 import pytest
 from numpy.testing import assert_allclose, assert_equal
+
+from nmm.alphabet import BaseAlphabet
+from nmm.prob import BaseTable, lprob_is_valid
 
 
 def test_base_table():

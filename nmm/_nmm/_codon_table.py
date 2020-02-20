@@ -31,10 +31,7 @@ class CodonTable:
         self._alphabet = alphabet
 
     @classmethod
-    def create(
-        cls: Type[CodonTable],
-        codonp: CodonProb,
-    ) -> CodonTable:
+    def create(cls: Type[CodonTable], codonp: CodonProb,) -> CodonTable:
         """
         Create a codon table.
 
