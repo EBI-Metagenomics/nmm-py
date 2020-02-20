@@ -4,11 +4,11 @@ from .._interval import Interval
 from ._alphabet import Alphabet
 from ._path import Path
 from ._sequence import SequenceABC
-from ._state import CState
+from ._state import State
 from ._step import Step
 
 TAlphabet = TypeVar("TAlphabet", bound=Alphabet)
-TState = TypeVar("TState", bound=CState)
+TState = TypeVar("TState", bound=State)
 
 
 class FragStep(Generic[TAlphabet, TState]):

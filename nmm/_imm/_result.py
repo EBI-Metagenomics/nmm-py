@@ -3,7 +3,7 @@ from typing import Dict
 from .._ffi import ffi, lib
 from ._path import Path, wrap_imm_path
 from ._sequence import Sequence, SubSequence
-from ._state import CState
+from ._state import State
 
 
 class CResult:
@@ -35,7 +35,7 @@ class CResult:
 
 
 def wrap_imm_result(
-    imm_result: ffi.CData, sequence: Sequence, states: Dict[ffi.CData, CState]
+    imm_result: ffi.CData, sequence: Sequence, states: Dict[ffi.CData, State]
 ):
     path = wrap_imm_path(lib.imm_result_path(imm_result), states)
     imm_subseq = lib.imm_result_subseq(imm_result)

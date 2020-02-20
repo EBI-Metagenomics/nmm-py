@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Generic, Type, TypeVar
 
 from .._ffi import ffi, lib
-from ._state import CState
+from ._state import State
 
-T = TypeVar("T", bound=CState)
+T = TypeVar("T", bound=State)
 
 
 class Step(Generic[T]):

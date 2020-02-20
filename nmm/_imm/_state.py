@@ -1,13 +1,13 @@
 from typing import Sequence
 
-from ._alphabet import Alphabet
 from .._ffi import ffi, lib
+from ._alphabet import Alphabet
 from ._lprob import lprob_is_valid
-from ._sequence import Sequence
+from ._sequence import Sequence as Seq
 from ._sequence_table import SequenceTable
 
 
-class CState:
+class State:
     def __init__(self, imm_state: ffi.CData, alphabet: Alphabet):
         if imm_state == ffi.NULL:
             raise RuntimeError("`imm_state` is NULL.")
@@ -34,16 +34,16 @@ class CState:
     def max_seq(self) -> int:
         return lib.imm_state_max_seq(self._imm_state)
 
-    def lprob(self, seq: Sequence) -> float:
+    def lprob(self, sequence: Seq) -> float:
         """
         Log-space probability of sequence emission.
 
         Parameters
         ----------
-        seq : `Sequence`
+        sequence
             Sequence.
         """
-        lprob: float = lib.imm_state_lprob(self._imm_state, seq.imm_seq)
+        lprob: float = lib.imm_state_lprob(self._imm_state, sequence.imm_seq)
         if not lprob_is_valid(lprob):
             raise RuntimeError("Could not get probability.")
         return lprob
@@ -58,16 +58,16 @@ class CState:
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class MuteState(CState):
+class MuteState(State):
     def __init__(self, name: bytes, alphabet: Alphabet):
         """
         Mute state.
 
         Parameters
         ----------
-        name : bytes
+        name
             State name.
-        alphabet : `Alphabet`
+        alphabet
             Alphabet.
         """
         self._imm_mute_state = lib.imm_mute_state_create(name, alphabet.imm_abc)
@@ -84,18 +84,18 @@ class MuteState(CState):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class NormalState(CState):
+class NormalState(State):
     def __init__(self, name: bytes, alphabet: Alphabet, lprobs: Sequence[float]):
         """
         Normal state.
 
         Parameters
         ----------
-        name : bytes
+        name
             State name.
-        alphabet : `Alphabet`
+        alphabet
             Alphabet.
-        lprobs : `typing.Sequence[float]`
+        lprobs
             Emission probabilities in log-space for each alphabet letter.
         """
         state = lib.imm_normal_state_create(name, alphabet.imm_abc, list(lprobs))
@@ -113,14 +113,14 @@ class NormalState(CState):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class TableState(CState):
+class TableState(State):
     def __init__(self, name: bytes, sequence_table: SequenceTable):
         """
         Parameters
         ----------
-        name : bytes
+        name
             State name.
-        sequence_table : `SequenceTable`
+        sequence_table
             Table of sequence probabilities.
         """
         state = lib.imm_table_state_create(name, sequence_table.imm_seq_table)

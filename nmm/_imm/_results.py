@@ -1,6 +1,6 @@
 from typing import List, Sequence, Dict
 
-from ._state import CState
+from ._state import State
 from .._ffi import ffi, lib
 from ._result import CResult
 from ._sequence import Sequence as Seq
@@ -46,7 +46,7 @@ class CResults:
 
 
 def wrap_imm_results(
-    imm_results: ffi.CData, sequence: Seq, states: Dict[ffi.CData, CState]
+    imm_results: ffi.CData, sequence: Seq, states: Dict[ffi.CData, State]
 ):
     from ._result import wrap_imm_result
 

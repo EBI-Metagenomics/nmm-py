@@ -1,13 +1,13 @@
 from typing import Dict
 
 from .._ffi import ffi, lib
-from .._imm import Alphabet, CState, Sequence, SequenceTable, TableState
+from .._imm import Alphabet, State, Sequence, SequenceTable, TableState
 from ._base_table import BaseTable
 from ._codon import Codon
 from ._codon_table import CodonTable
 
 
-class FrameState(CState):
+class FrameState(State):
     def __init__(
         self, name: bytes, baset: BaseTable, codont: CodonTable, epsilon: float
     ):
