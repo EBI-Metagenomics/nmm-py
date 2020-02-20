@@ -3,7 +3,7 @@ from .._imm import lprob_is_valid
 from ._base_alphabet import BaseAlphabet
 from ._codon import Codon
 from .._cdata import CData
-from ._codon_prob import CCodonProb
+from ._codon_prob import CodonProb
 
 
 class CCodonTable:
@@ -51,11 +51,11 @@ class CodonTable(CCodonTable):
 
     Parameters
     ----------
-    codonp : `CCodonProb`
+    codonp : `CodonProb`
         Non-marginal codon probabilities.
     """
 
-    def __init__(self, codonp: CCodonProb):
+    def __init__(self, codonp: CodonProb):
         super().__init__(
-            lib.nmm_codon_table_create(codonp.nmm_codon_lprob), codonp.base
+            lib.nmm_codon_table_create(codonp.nmm_codon_lprob), codonp.alphabet
         )

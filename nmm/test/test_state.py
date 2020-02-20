@@ -62,7 +62,7 @@ def test_frame_state():
     base = BaseAlphabet.create(b"ACGU", b"X")
     baset = BaseTable(base, (log(0.25), log(0.25), log(0.25), log(0.25)))
 
-    codonp = CodonProb(base)
+    codonp = CodonProb.create(base)
     codonp.set_lprob(Codon.create(b"AUG", base), log(0.8))
     codonp.set_lprob(Codon.create(b"AUU", base), log(0.1))
 

@@ -1,31 +1,47 @@
+from __future__ import annotations
+
+from typing import Type
+
+from .._cdata import CData
 from .._ffi import ffi, lib
 from .._imm import lprob_is_valid
 from ._base_alphabet import BaseAlphabet
 from ._codon import Codon
-from .._cdata import CData
 
 
-class CCodonProb:
+class CodonProb:
     """
-    Wrapper around the C implementation of codon probabilities.
+    Codon probabilities.
 
     Parameters
     ----------
-    nmm_codon_lprob : `<cdata 'struct nmm_codon_lprob *'>`.
+    nmm_codon_lprob
         Codon probabilities pointer.
-    base : `CBase`
+    alphabet
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codon_lprob: CData, base_abc: BaseAlphabet):
+    def __init__(self, nmm_codon_lprob: CData, alphabet: BaseAlphabet):
         if nmm_codon_lprob == ffi.NULL:
             raise RuntimeError("`nmm_codon_lprob` is NULL.")
         self._nmm_codon_lprob = nmm_codon_lprob
-        self._base_abc = base_abc
+        self._alphabet = alphabet
+
+    @classmethod
+    def create(cls: Type[CodonProb], alphabet: BaseAlphabet) -> CodonProb:
+        """
+        Create codon probabilities.
+
+        Parameters
+        ----------
+        alphabet
+            Four-nucleotides alphabet.
+        """
+        return cls(lib.nmm_codon_lprob_create(alphabet.nmm_base_abc), alphabet)
 
     @property
-    def base(self) -> BaseAlphabet:
-        return self._base_abc
+    def alphabet(self) -> BaseAlphabet:
+        return self._alphabet
 
     @property
     def nmm_codon_lprob(self) -> CData:
@@ -48,17 +64,3 @@ class CCodonProb:
     def __del__(self):
         if self._nmm_codon_lprob != ffi.NULL:
             lib.nmm_codon_lprob_destroy(self._nmm_codon_lprob)
-
-
-class CodonProb(CCodonProb):
-    """
-    Codon probabilities.
-
-    Parameters
-    ----------
-    base : `CBase`
-        Four-nucleotides alphabet.
-    """
-
-    def __init__(self, base_abc: BaseAlphabet):
-        super().__init__(lib.nmm_codon_lprob_create(base_abc.nmm_base_abc), base_abc)
