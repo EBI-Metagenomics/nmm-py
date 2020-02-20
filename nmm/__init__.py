@@ -1,10 +1,6 @@
 from . import alphabet, codon, fragment, path, prob, result, sequence, state
 from ._gencode import GeneticCode
-from ._imm import (
-    HMM,
-    wrap_imm_result,
-    wrap_imm_results,
-)
+from ._imm import HMM
 from ._interval import Interval
 from ._testit import test
 
@@ -36,6 +32,4 @@ __all__ = [
     "sequence",
     "state",
     "test",
-    "wrap_imm_result",
-    "wrap_imm_results",
 ]

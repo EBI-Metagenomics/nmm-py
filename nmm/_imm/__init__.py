@@ -10,8 +10,8 @@ from ._lprob import (
     lprob_zero,
 )
 from ._path import Path
-from ._result import Result, wrap_imm_result
-from ._results import Results, wrap_imm_results
+from ._result import Result
+from ._results import Results
 from ._sequence import Sequence, SequenceABC, SubSequence
 from ._sequence_table import SequenceTable
 from ._state import MuteState, NormalState, State, TableState
@@ -40,6 +40,4 @@ __all__ = [
     "lprob_is_valid",
     "lprob_is_zero",
     "lprob_normalize",
-    "wrap_imm_result",
-    "wrap_imm_results",
 ]
