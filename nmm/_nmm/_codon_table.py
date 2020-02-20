@@ -1,32 +1,53 @@
+from __future__ import annotations
+
+from typing import Type
+
+from .._cdata import CData
 from .._ffi import ffi, lib
 from .._imm import lprob_is_valid
 from ._base_alphabet import BaseAlphabet
 from ._codon import Codon
-from .._cdata import CData
 from ._codon_prob import CodonProb
 
 
-class CCodonTable:
+class CodonTable:
     """
-    Wrapper around the C implementation of a codon table.
+    Codon table.
+
+    Compute marginal and non-marginal codon probabilities.
 
     Parameters
     ----------
-    nmm_codon_table : `<cdata 'struct nmm_codon_table *'>`.
+    nmm_codon_table
         Codon table.
-    base : `CBase`
+    alphabet
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codon_table: CData, base: BaseAlphabet):
+    def __init__(self, nmm_codon_table: CData, alphabet: BaseAlphabet):
         if nmm_codon_table == ffi.NULL:
             raise RuntimeError("`nmm_codon_table` is NULL.")
         self._nmm_codon_table = nmm_codon_table
-        self._base = base
+        self._alphabet = alphabet
+
+    @classmethod
+    def create(
+        cls: Type[CodonTable],
+        codonp: CodonProb,
+    ) -> CodonTable:
+        """
+        Create a codon table.
+
+        Parameters
+        ----------
+        codonp
+            Non-marginal codon probabilities.
+        """
+        return cls(lib.nmm_codon_table_create(codonp.nmm_codon_lprob), codonp.alphabet)
 
     @property
-    def base(self) -> BaseAlphabet:
-        return self._base
+    def alphabet(self) -> BaseAlphabet:
+        return self._alphabet
 
     @property
     def nmm_codon_table(self) -> CData:
@@ -41,21 +62,3 @@ class CCodonTable:
     def __del__(self):
         if self._nmm_codon_table != ffi.NULL:
             lib.nmm_codon_table_destroy(self._nmm_codon_table)
-
-
-class CodonTable(CCodonTable):
-    """
-    Codon table.
-
-    Compute marginal and non-marginal codon probabilities.
-
-    Parameters
-    ----------
-    codonp : `CodonProb`
-        Non-marginal codon probabilities.
-    """
-
-    def __init__(self, codonp: CodonProb):
-        super().__init__(
-            lib.nmm_codon_table_create(codonp.nmm_codon_lprob), codonp.alphabet
-        )

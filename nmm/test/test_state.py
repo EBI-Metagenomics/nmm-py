@@ -60,13 +60,13 @@ def test_table_state():
 
 def test_frame_state():
     base = BaseAlphabet.create(b"ACGU", b"X")
-    baset = BaseTable(base, (log(0.25), log(0.25), log(0.25), log(0.25)))
+    baset = BaseTable.create(base, (log(0.25), log(0.25), log(0.25), log(0.25)))
 
     codonp = CodonProb.create(base)
     codonp.set_lprob(Codon.create(b"AUG", base), log(0.8))
     codonp.set_lprob(Codon.create(b"AUU", base), log(0.1))
 
-    frame_state = FrameState(b"M1", baset, CodonTable(codonp), 0.0)
+    frame_state = FrameState(b"M1", baset, CodonTable.create(codonp), 0.0)
 
     assert_equal(lprob_is_zero(frame_state.lprob(Sequence.create(b"AUA", base))), True)
     assert_allclose(frame_state.lprob(Sequence.create(b"AUG", base)), log(0.8))
@@ -79,7 +79,7 @@ def test_frame_state():
     )
 
     codonp.normalize()
-    frame_state = FrameState(b"M1", baset, CodonTable(codonp), 0.1)
+    frame_state = FrameState(b"M1", baset, CodonTable.create(codonp), 0.1)
 
     assert_allclose(
         frame_state.lprob(Sequence.create(b"AUA", base)), -6.905597115665666

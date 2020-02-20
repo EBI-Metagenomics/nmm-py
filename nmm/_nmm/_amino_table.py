@@ -1,31 +1,51 @@
-from typing import Iterable
+from __future__ import annotations
 
-from .._ffi import ffi, lib
+from typing import Iterable, Type
+
 from .._cdata import CData
+from .._ffi import ffi, lib
 from ._amino_alphabet import AminoAlphabet
 
 
-class CAminoTable:
+class AminoTable:
     """
-    Wrapper around the C implementation of a amino table.
+    Amino table of probabilities.
 
     Parameters
     ----------
-    nmm_amino_table : `<cdata 'struct nmm_amino_table *'>`.
+    nmm_amino_table
         Amino table.
-    amino : `AminoAlphabet`
-        20-nucleotides alphabet.
+    alphabet
+        20-symbols alphabet.
     """
 
-    def __init__(self, nmm_amino_table: CData, amino_abc: AminoAlphabet):
+    def __init__(self, nmm_amino_table: CData, alphabet: AminoAlphabet):
         if nmm_amino_table == ffi.NULL:
             raise RuntimeError("`nmm_amino_table` is NULL.")
         self._nmm_amino_table = nmm_amino_table
-        self._amino_abc = amino_abc
+        self._alphabet = alphabet
+
+    @classmethod
+    def create(
+        cls: Type[AminoTable], alphabet: AminoAlphabet, lprobs: Iterable[float],
+    ) -> AminoTable:
+        """
+        Create an amino table of probabilities.
+
+        Parameters
+        ----------
+        alphabet
+            20-symbols alphabet.
+        lprobs
+            Log probability of each amino acid.
+        """
+        abc = alphabet.nmm_amino_abc
+        nmm_amino_table = lib.nmm_amino_table_create(abc, list(lprobs))
+        return cls(nmm_amino_table, alphabet)
 
     @property
     def alphabet(self) -> AminoAlphabet:
-        return self._amino_abc
+        return self._alphabet
 
     @property
     def nmm_amino_table(self) -> CData:
@@ -37,22 +57,3 @@ class CAminoTable:
     def __del__(self):
         if self._nmm_amino_table != ffi.NULL:
             lib.nmm_amino_table_destroy(self._nmm_amino_table)
-
-
-class AminoTable(CAminoTable):
-    """
-    Amino table of probabilities.
-
-    Parameters
-    ----------
-    amino : `AminoAlphabet`
-        20-nucleotides alphabet.
-    lprobs : `Tuple[float, float, float, float]`
-        Log probability of each nucleotide.
-    """
-
-    def __init__(self, amino_abc: AminoAlphabet, lprobs: Iterable[float]):
-        nmm_amino_table = lib.nmm_amino_table_create(
-            amino_abc.nmm_amino_abc, list(lprobs)
-        )
-        super().__init__(nmm_amino_table, amino_abc)

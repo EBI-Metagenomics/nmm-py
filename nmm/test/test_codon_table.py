@@ -16,7 +16,7 @@ def test_codon_table():
     codonp.set_lprob(Codon.create(b"CAA", base), log(0.40))
     codonp.set_lprob(Codon.create(b"CAT", base), log(0.40))
 
-    codont = CodonTable(codonp)
+    codont = CodonTable.create(codonp)
     assert_allclose(codont.lprob(Codon.create(b"CAT", base)), log(0.40))
     assert_allclose(codont.lprob(Codon.create(b"CAX", base)), log(0.80))
     assert_allclose(codont.lprob(Codon.create(b"XXX", base)), log(1.12))
