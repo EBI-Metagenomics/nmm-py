@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Generic, Iterable, Iterator, List, Type, TypeVar
 
+from .._cdata import CData
 from .._ffi import ffi, lib
 from ._state import State
 from ._step import Step
@@ -21,7 +22,7 @@ class Path(Generic[T]):
         Steps.
     """
 
-    def __init__(self, imm_path: ffi.CData, steps: Iterable[T]):
+    def __init__(self, imm_path: CData, steps: Iterable[T]):
         if imm_path == ffi.NULL:
             raise RuntimeError("`imm_path` is NULL.")
         self._imm_path = imm_path
@@ -43,7 +44,7 @@ class Path(Generic[T]):
         return cls(imm_path, list(steps))
 
     @property
-    def imm_path(self) -> ffi.CData:
+    def imm_path(self) -> CData:
         return self._imm_path
 
     def __len__(self) -> int:
@@ -67,7 +68,7 @@ class Path(Generic[T]):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-def wrap_imm_path(imm_path: ffi.CData, states: Dict[ffi.CData, State]) -> Path:
+def wrap_imm_path(imm_path: CData, states: Dict[CData, State]) -> Path:
     steps: List[Step] = []
     imm_step = lib.imm_path_first(imm_path)
     while imm_step != ffi.NULL:

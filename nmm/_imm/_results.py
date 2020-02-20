@@ -1,5 +1,6 @@
 from typing import List, Sequence, Dict
 
+from .._cdata import CData
 from ._state import State
 from .._ffi import ffi, lib
 from ._result import CResult
@@ -18,9 +19,7 @@ class CResults:
         Sequence.
     """
 
-    def __init__(
-        self, imm_results: ffi.CData, results: Sequence[CResult], sequence: Seq
-    ):
+    def __init__(self, imm_results: CData, results: Sequence[CResult], sequence: Seq):
         if imm_results == ffi.NULL:
             raise RuntimeError("`imm_results` is NULL.")
         self._imm_results = imm_results
@@ -45,9 +44,7 @@ class CResults:
         return "[" + ",".join([str(r) for r in self]) + "]"
 
 
-def wrap_imm_results(
-    imm_results: ffi.CData, sequence: Seq, states: Dict[ffi.CData, State]
-):
+def wrap_imm_results(imm_results: CData, sequence: Seq, states: Dict[CData, State]):
     from ._result import wrap_imm_result
 
     results: List[CResult] = []

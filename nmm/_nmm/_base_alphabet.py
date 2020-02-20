@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Type
 
 from .._ffi import ffi, lib
+from .._cdata import CData
 from .._imm import Alphabet
 
 
@@ -18,7 +19,7 @@ class BaseAlphabet(Alphabet):
         Alphabet.
     """
 
-    def __init__(self, nmm_base_abc: ffi.CData, alphabet: Alphabet):
+    def __init__(self, nmm_base_abc: CData, alphabet: Alphabet):
         if nmm_base_abc == ffi.NULL:
             raise RuntimeError("`nmm_base_abc` is NULL.")
         if lib.nmm_base_abc_cast(nmm_base_abc) != alphabet.imm_abc:
@@ -47,7 +48,7 @@ class BaseAlphabet(Alphabet):
         return cls(lib.nmm_base_abc_create(abc.imm_abc), abc)
 
     @property
-    def nmm_base_abc(self) -> ffi.CData:
+    def nmm_base_abc(self) -> CData:
         return self._nmm_base_abc
 
     def __del__(self):

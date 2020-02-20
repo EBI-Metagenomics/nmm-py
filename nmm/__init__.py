@@ -11,7 +11,6 @@ from ._testit import test
 try:
     from ._ffi import ffi
 
-    CData = ffi.CData
     del ffi
 except Exception as e:
     _ffi_err = """

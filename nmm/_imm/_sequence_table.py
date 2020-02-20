@@ -2,6 +2,7 @@ from ._lprob import lprob_is_valid
 from ._alphabet import Alphabet
 from ._sequence import Sequence
 from .._ffi import ffi, lib
+from .._cdata import CData
 
 
 class CSequenceTable:
@@ -13,13 +14,13 @@ class CSequenceTable:
     imm_seq_table : `<cdata 'struct imm_seq_table *'>`.
     """
 
-    def __init__(self, imm_seq_table: ffi.CData):
+    def __init__(self, imm_seq_table: CData):
         if imm_seq_table == ffi.NULL:
             raise RuntimeError("`imm_seq_table` is NULL.")
         self._imm_seq_table = imm_seq_table
 
     @property
-    def imm_seq_table(self) -> ffi.CData:
+    def imm_seq_table(self) -> CData:
         return self._imm_seq_table
 
     @property

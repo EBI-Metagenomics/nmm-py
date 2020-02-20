@@ -1,6 +1,7 @@
 from typing import Iterable
 
 from .._ffi import ffi, lib
+from .._cdata import CData
 from ._amino_alphabet import AminoAlphabet
 
 
@@ -16,7 +17,7 @@ class CAminoTable:
         20-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_amino_table: ffi.CData, amino_abc: AminoAlphabet):
+    def __init__(self, nmm_amino_table: CData, amino_abc: AminoAlphabet):
         if nmm_amino_table == ffi.NULL:
             raise RuntimeError("`nmm_amino_table` is NULL.")
         self._nmm_amino_table = nmm_amino_table
@@ -27,7 +28,7 @@ class CAminoTable:
         return self._amino_abc
 
     @property
-    def nmm_amino_table(self) -> ffi.CData:
+    def nmm_amino_table(self) -> CData:
         return self._nmm_amino_table
 
     def lprob(self, amino: bytes) -> float:

@@ -8,7 +8,7 @@ from nmm.codon import Codon
 def test_codon():
     base = BaseAlphabet.create(b"ACGT", b"X")
 
-    codon = Codon(b"AAA", base)
+    codon = Codon.create(b"AAA", base)
     assert_equal(codon.symbols, b"AAA")
 
     codon.symbols = b"GTX"

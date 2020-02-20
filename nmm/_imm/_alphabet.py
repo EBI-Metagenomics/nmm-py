@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Type
 
+from .._cdata import CData
 from .._ffi import ffi, lib
 
 
@@ -15,7 +16,7 @@ class Alphabet:
         Pointer.
     """
 
-    def __init__(self, imm_abc: ffi.CData):
+    def __init__(self, imm_abc: CData):
         super().__init__()
         if imm_abc == ffi.NULL:
             raise RuntimeError("`imm_abc` is NULL.")
@@ -39,7 +40,7 @@ class Alphabet:
         return cls(lib.imm_abc_create(symbols, any_symbol))
 
     @property
-    def imm_abc(self) -> ffi.CData:
+    def imm_abc(self) -> CData:
         return self._imm_abc
 
     @property

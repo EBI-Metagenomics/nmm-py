@@ -15,15 +15,15 @@ def test_codon_prob():
     with pytest.raises(RuntimeError):
         codonp.normalize()
 
-    codonp.set_lprob(Codon(b"AAA", base), log(0.01))
-    assert_allclose(codonp.get_lprob(Codon(b"AAA", base)), log(0.01))
+    codonp.set_lprob(Codon.create(b"AAA", base), log(0.01))
+    assert_allclose(codonp.get_lprob(Codon.create(b"AAA", base)), log(0.01))
 
     codonp.normalize()
-    assert_allclose(codonp.get_lprob(Codon(b"AAA", base)), log(1.0))
+    assert_allclose(codonp.get_lprob(Codon.create(b"AAA", base)), log(1.0))
 
-    codonp.set_lprob(Codon(b"AAA", base), log(0.01))
-    assert_allclose(codonp.get_lprob(Codon(b"AAA", base)), log(0.01))
+    codonp.set_lprob(Codon.create(b"AAA", base), log(0.01))
+    assert_allclose(codonp.get_lprob(Codon.create(b"AAA", base)), log(0.01))
 
-    assert_equal(lprob_is_zero(codonp.get_lprob(Codon(b"ACA", base))), True)
+    assert_equal(lprob_is_zero(codonp.get_lprob(Codon.create(b"ACA", base))), True)
     with pytest.raises(RuntimeError):
-        codonp.get_lprob(Codon(b"AXA", base))
+        codonp.get_lprob(Codon.create(b"AXA", base))

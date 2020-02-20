@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Generic, Type, TypeVar
 
+from .._cdata import CData
 from .._ffi import ffi, lib
 from ._state import State
 
@@ -23,7 +24,7 @@ class Step(Generic[T]):
         State.
     """
 
-    def __init__(self, imm_step: ffi.CData, state: T):
+    def __init__(self, imm_step: CData, state: T):
         if imm_step == ffi.NULL:
             raise RuntimeError("`imm_step` is NULL.")
         self._imm_step = imm_step
@@ -47,7 +48,7 @@ class Step(Generic[T]):
         return cls(imm_step, state)
 
     @property
-    def imm_step(self) -> ffi.CData:
+    def imm_step(self) -> CData:
         return self._imm_step
 
     @property

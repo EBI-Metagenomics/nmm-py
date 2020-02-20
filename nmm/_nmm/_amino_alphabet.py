@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Type
 
 from .._ffi import ffi, lib
+from .._cdata import CData
 from .._imm import Alphabet
 
 
@@ -18,7 +19,7 @@ class AminoAlphabet(Alphabet):
         Alphabet.
     """
 
-    def __init__(self, nmm_amino_abc: ffi.CData, alphabet: Alphabet):
+    def __init__(self, nmm_amino_abc: CData, alphabet: Alphabet):
         if nmm_amino_abc == ffi.NULL:
             raise RuntimeError("`nmm_amino_abc` is NULL.")
         if lib.nmm_amino_abc_cast(nmm_amino_abc) != alphabet.imm_abc:
@@ -47,7 +48,7 @@ class AminoAlphabet(Alphabet):
         return cls(lib.nmm_amino_abc_create(abc.imm_abc), abc)
 
     @property
-    def nmm_amino_abc(self) -> ffi.CData:
+    def nmm_amino_abc(self) -> CData:
         return self._nmm_amino_abc
 
     def __del__(self):

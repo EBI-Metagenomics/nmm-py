@@ -1,5 +1,6 @@
 from typing import Tuple
 
+from .._cdata import CData
 from .._ffi import ffi, lib
 from ._base_alphabet import BaseAlphabet
 
@@ -16,7 +17,7 @@ class CBaseTable:
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_base_table: ffi.CData, base_abc: BaseAlphabet):
+    def __init__(self, nmm_base_table: CData, base_abc: BaseAlphabet):
         if nmm_base_table == ffi.NULL:
             raise RuntimeError("`nmm_base_table` is NULL.")
         self._nmm_base_table = nmm_base_table
@@ -27,7 +28,7 @@ class CBaseTable:
         return self._base_abc
 
     @property
-    def nmm_base_table(self) -> ffi.CData:
+    def nmm_base_table(self) -> CData:
         return self._nmm_base_table
 
     def lprob(self, nucleotide: bytes) -> float:

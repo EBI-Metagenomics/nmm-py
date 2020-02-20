@@ -4,6 +4,7 @@ from ._state import State
 from ._alphabet import Alphabet
 from ._lprob import lprob_zero, lprob_is_valid
 from ._results import CResults
+from .._cdata import CData
 from typing import Dict
 
 
@@ -22,12 +23,12 @@ class HMM:
 
     def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
-        self._states: Dict[ffi.CData, State] = {}
+        self._states: Dict[CData, State] = {}
         self._hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
         if self._hmm == ffi.NULL:
             raise RuntimeError("`imm_hmm_create` failed.")
 
-    def states(self) -> Dict[ffi.CData, State]:
+    def states(self) -> Dict[CData, State]:
         return self._states
 
     def set_start_lprob(self, state: State, lprob: float):

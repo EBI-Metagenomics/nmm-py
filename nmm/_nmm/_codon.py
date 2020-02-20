@@ -1,30 +1,49 @@
+from __future__ import annotations
+
+from typing import Type
+
 from .._ffi import ffi, lib
+from .._cdata import CData
 from ._base_alphabet import BaseAlphabet
 
 
-class CCodon:
+class Codon:
     """
-    Wrapper around the C implementation of codon.
-
-    Codon is a triplet of symbols from a given alphabet.
+    Codon is a sequence of three symbols from a four-nucleotides alphabet.
 
     Parameters
     ----------
-    nmm_codon : `<cdata 'struct nmm_codon *'>`.
+    nmm_codon
         Codon pointer.
-    base : `CBase`
+    alphabet
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codon: ffi.CData, base: BaseAlphabet):
+    def __init__(self, nmm_codon: CData, alphabet: BaseAlphabet):
         if nmm_codon == ffi.NULL:
             raise RuntimeError("`nmm_codon` is NULL.")
         self._nmm_codon = nmm_codon
-        self._base = base
+        self._alphabet = alphabet
+
+    @classmethod
+    def create(cls: Type[Codon], symbols: bytes, alphabet: BaseAlphabet) -> Codon:
+        """
+        Create a codon.
+
+        Parameters
+        ----------
+        symbols
+            Sequence of four symbols.
+        alphabet
+            Four-nucleotides alphabet.
+        """
+        codon = cls(lib.nmm_codon_create(alphabet.nmm_base_abc), alphabet)
+        codon.symbols = symbols
+        return codon
 
     @property
-    def base(self) -> BaseAlphabet:
-        return self._base
+    def alphabet(self) -> BaseAlphabet:
+        return self._alphabet
 
     @property
     def symbols(self) -> bytes:
@@ -41,7 +60,7 @@ class CCodon:
             raise ValueError("Could not set codon.")
 
     @property
-    def nmm_codon(self) -> ffi.CData:
+    def nmm_codon(self) -> CData:
         return self._nmm_codon
 
     def __del__(self):
@@ -59,26 +78,6 @@ class CCodon:
 
     def __bytes__(self) -> bytes:
         return str(self).encode()
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}:{str(self)}>"
-
-
-class Codon(CCodon):
-    """
-    Codon is a sequence of three symbols from a four-nucleotides alphabet.
-
-    Parameters
-    ----------
-    symbols : bytes
-        Sequence of four symbols.
-    base : `CBase`
-        Four-nucleotides alphabet.
-    """
-
-    def __init__(self, symbols: bytes, base: BaseAlphabet):
-        super().__init__(lib.nmm_codon_create(base.nmm_base_abc), base)
-        self.symbols = symbols
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

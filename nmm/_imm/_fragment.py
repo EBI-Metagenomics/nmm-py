@@ -2,6 +2,7 @@ from typing import Generic, Iterator, TypeVar
 
 from .._interval import Interval
 from ._alphabet import Alphabet
+from .._cdata import CData
 from ._path import Path
 from ._sequence import SequenceABC
 from ._state import State

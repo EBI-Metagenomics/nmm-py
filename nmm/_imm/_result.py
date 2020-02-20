@@ -1,5 +1,6 @@
 from typing import Dict
 
+from .._cdata import CData
 from .._ffi import ffi, lib
 from ._path import Path, wrap_imm_path
 from ._sequence import Sequence, SubSequence
@@ -7,7 +8,7 @@ from ._state import State
 
 
 class CResult:
-    def __init__(self, imm_result: ffi.CData, path: Path, subseq: SubSequence):
+    def __init__(self, imm_result: CData, path: Path, subseq: SubSequence):
         if imm_result == ffi.NULL:
             raise RuntimeError("`imm_result` is NULL.")
         self._imm_result = imm_result
@@ -34,9 +35,7 @@ class CResult:
         return str(self.loglikelihood)
 
 
-def wrap_imm_result(
-    imm_result: ffi.CData, sequence: Sequence, states: Dict[ffi.CData, State]
-):
+def wrap_imm_result(imm_result: CData, sequence: Sequence, states: Dict[CData, State]):
     path = wrap_imm_path(lib.imm_result_path(imm_result), states)
     imm_subseq = lib.imm_result_subseq(imm_result)
     subseq = SubSequence(imm_subseq, sequence)

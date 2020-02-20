@@ -1,5 +1,6 @@
 from typing import Sequence
 
+from .._cdata import CData
 from .._ffi import ffi, lib
 from ._alphabet import Alphabet
 from ._lprob import lprob_is_valid
@@ -8,7 +9,7 @@ from ._sequence_table import SequenceTable
 
 
 class State:
-    def __init__(self, imm_state: ffi.CData, alphabet: Alphabet):
+    def __init__(self, imm_state: CData, alphabet: Alphabet):
         if imm_state == ffi.NULL:
             raise RuntimeError("`imm_state` is NULL.")
         self._imm_state = imm_state
@@ -19,7 +20,7 @@ class State:
         return self._alphabet
 
     @property
-    def imm_state(self) -> ffi.CData:
+    def imm_state(self) -> CData:
         return self._imm_state
 
     @property

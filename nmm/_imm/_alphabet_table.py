@@ -1,6 +1,7 @@
 from typing import Sequence
 
 from .._ffi import ffi, lib
+from .._cdata import CData
 from ._alphabet import Alphabet
 from ._lprob import lprob_is_valid
 
@@ -17,7 +18,7 @@ class CAlphabetTable:
         Alphabet.
     """
 
-    def __init__(self, imm_abc_table: ffi.CData, alphabet: Alphabet):
+    def __init__(self, imm_abc_table: CData, alphabet: Alphabet):
         if imm_abc_table == ffi.NULL:
             raise RuntimeError("`imm_abc_table` is NULL.")
         self._imm_abc_table = imm_abc_table
@@ -28,7 +29,7 @@ class CAlphabetTable:
         return self._alphabet
 
     @property
-    def imm_abc_table(self) -> ffi.CData:
+    def imm_abc_table(self) -> CData:
         return self._imm_abc_table
 
     def lprob(self, symbol: bytes) -> float:

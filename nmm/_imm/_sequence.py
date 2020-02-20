@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Generic, Type, TypeVar, Union
 
 from .._ffi import ffi, lib
+from .._cdata import CData
 from .._interval import Interval
 from ._alphabet import Alphabet
 
@@ -47,7 +48,7 @@ class Sequence(SequenceABC[T]):
         Alphabet.
     """
 
-    def __init__(self, imm_seq: ffi.CData, alphabet: T):
+    def __init__(self, imm_seq: CData, alphabet: T):
         if imm_seq == ffi.NULL:
             raise RuntimeError("`imm_seq` is NULL.")
         self._imm_seq = imm_seq
@@ -68,7 +69,7 @@ class Sequence(SequenceABC[T]):
         return cls(lib.imm_seq_create(sequence, alphabet.imm_abc), alphabet)
 
     @property
-    def imm_seq(self) -> ffi.CData:
+    def imm_seq(self) -> CData:
         return self._imm_seq
 
     @property
@@ -117,7 +118,7 @@ class SubSequence(SequenceABC[T]):
         Sequence.
     """
 
-    def __init__(self, imm_subseq: ffi.CData, sequence: Sequence[T]):
+    def __init__(self, imm_subseq: CData, sequence: Sequence[T]):
         if ffi.getctype(ffi.typeof(imm_subseq)) != "struct imm_subseq":
             raise TypeError("Wrong `imm_subseq` type.")
         self._imm_subseq = imm_subseq
@@ -145,11 +146,11 @@ class SubSequence(SequenceABC[T]):
         return cls(imm_subseq, sequence)
 
     @property
-    def imm_seq(self) -> ffi.CData:
+    def imm_seq(self) -> CData:
         return lib.imm_subseq_cast(ffi.addressof(self._imm_subseq))
 
     @property
-    def imm_subseq(self) -> ffi.CData:
+    def imm_subseq(self) -> CData:
         return self._imm_subseq
 
     @property

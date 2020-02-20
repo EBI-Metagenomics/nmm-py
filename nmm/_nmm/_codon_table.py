@@ -1,7 +1,8 @@
 from .._ffi import ffi, lib
 from .._imm import lprob_is_valid
 from ._base_alphabet import BaseAlphabet
-from ._codon import CCodon
+from ._codon import Codon
+from .._cdata import CData
 from ._codon_prob import CCodonProb
 
 
@@ -17,7 +18,7 @@ class CCodonTable:
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codon_table: ffi.CData, base: BaseAlphabet):
+    def __init__(self, nmm_codon_table: CData, base: BaseAlphabet):
         if nmm_codon_table == ffi.NULL:
             raise RuntimeError("`nmm_codon_table` is NULL.")
         self._nmm_codon_table = nmm_codon_table
@@ -28,10 +29,10 @@ class CCodonTable:
         return self._base
 
     @property
-    def nmm_codon_table(self) -> ffi.CData:
+    def nmm_codon_table(self) -> CData:
         return self._nmm_codon_table
 
-    def lprob(self, codon: CCodon) -> float:
+    def lprob(self, codon: Codon) -> float:
         lprob: float = lib.nmm_codon_table_lprob(self._nmm_codon_table, codon.nmm_codon)
         if not lprob_is_valid(lprob):
             raise RuntimeError("Could not get probability.")
