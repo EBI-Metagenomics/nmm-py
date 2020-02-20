@@ -3,7 +3,7 @@ from typing import List, Sequence, Dict
 from ._state import CState
 from .._ffi import ffi, lib
 from ._result import CResult
-from ._sequence import CSequence
+from ._sequence import Sequence as Seq
 
 
 class CResults:
@@ -14,12 +14,12 @@ class CResults:
     ----------
     imm_results : `<cdata 'struct imm_results *'>`.
         Results pointer.
-    sequence : `CSequence`
+    sequence : `Seq`
         Sequence.
     """
 
     def __init__(
-        self, imm_results: ffi.CData, results: Sequence[CResult], sequence: CSequence
+        self, imm_results: ffi.CData, results: Sequence[CResult], sequence: Seq
     ):
         if imm_results == ffi.NULL:
             raise RuntimeError("`imm_results` is NULL.")
@@ -46,7 +46,7 @@ class CResults:
 
 
 def wrap_imm_results(
-    imm_results: ffi.CData, sequence: CSequence, states: Dict[ffi.CData, CState]
+    imm_results: ffi.CData, sequence: Seq, states: Dict[ffi.CData, CState]
 ):
     from ._result import wrap_imm_result
 

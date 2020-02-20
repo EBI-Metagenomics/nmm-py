@@ -62,6 +62,12 @@ class AminoAlphabet(Alphabet):
 
 
 class CanonicalAminoAlphabet(AminoAlphabet):
+    """
+    Canonical amino acid alphabet.
+
+    The canonical symbols are `ACDEFGHIKLMNPQRSTVWY`.
+    """
+
     def __init__(self):
         super().__init__(Alphabet.create(b"ACDEFGHIKLMNPQRSTVWY", b"X"))
 

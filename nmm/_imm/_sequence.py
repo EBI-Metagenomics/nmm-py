@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar, Union
+from typing import Generic, Type, TypeVar, Union
 
 from .._ffi import ffi, lib
 from .._interval import Interval
@@ -35,15 +35,15 @@ class SequenceABC(ABC, Generic[T]):
         raise NotImplementedError()
 
 
-class CSequence(SequenceABC[T]):
+class Sequence(SequenceABC[T]):
     """
-    Wrapper around the C implementation of sequence.
+    Sequence of symbols from a given alphabet.
 
     Parameters
     ----------
-    imm_seq : `<cdata 'struct imm_seq *'>`.
+    imm_seq
         Sequence pointer.
-    alphabet : `T`
+    alphabet
         Alphabet.
     """
 
@@ -52,6 +52,20 @@ class CSequence(SequenceABC[T]):
             raise RuntimeError("`imm_seq` is NULL.")
         self._imm_seq = imm_seq
         self._alphabet = alphabet
+
+    @classmethod
+    def create(cls: Type[Sequence[T]], sequence: bytes, alphabet: T) -> Sequence[T]:
+        """
+        Create a sequence of symbols.
+
+        Parameters
+        ----------
+        sequence
+            Sequence of symbols.
+        alphabet
+            Alphabet.
+        """
+        return cls(lib.imm_seq_create(sequence, alphabet.imm_abc), alphabet)
 
     @property
     def imm_seq(self) -> ffi.CData:
@@ -74,7 +88,7 @@ class CSequence(SequenceABC[T]):
         else:
             raise RuntimeError("Index has to be an integer of a slice.")
 
-        return SubSequence[T](self, interval)
+        return SubSequence[T].create(self, interval)
 
     @property
     def alphabet(self) -> T:
@@ -91,43 +105,44 @@ class CSequence(SequenceABC[T]):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class Sequence(CSequence[T]):
+class SubSequence(SequenceABC[T]):
     """
-    Sequence of symbols from a given alphabet.
+    Subsequence of symbols of a given sequence.
 
     Parameters
     ----------
-    sequence : `bytes`
-        Sequence of symbols.
-    alphabet : `T`
-        Alphabet.
-    """
-
-    def __init__(self, sequence: bytes, alphabet: T):
-        super().__init__(lib.imm_seq_create(sequence, alphabet.imm_abc), alphabet)
-        self._alphabet = alphabet
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}:{str(self)}>"
-
-
-class CSubSequence(SequenceABC[T]):
-    """
-    Wrapper around the C implementation of subsequence.
-
-    Parameters
-    ----------
-    imm_subseq : `<cdata 'struct imm_subseq *'>`.
+    imm_subseq
         Subsequence pointer.
-    sequence : `CSequence`
+    sequence
         Sequence.
     """
 
-    def __init__(self, imm_subseq: ffi.CData, sequence: CSequence[T]):
+    def __init__(self, imm_subseq: ffi.CData, sequence: Sequence[T]):
         if ffi.getctype(ffi.typeof(imm_subseq)) != "struct imm_subseq":
             raise TypeError("Wrong `imm_subseq` type.")
         self._imm_subseq = imm_subseq
         self._sequence = sequence
+
+    @classmethod
+    def create(
+        cls: Type[SubSequence[T]], sequence: Sequence[T], interval: Interval
+    ) -> SubSequence[T]:
+        """
+        Subsequence of symbols of a given sequence.
+
+        Parameters
+        ----------
+        sequence
+            Sequence.
+        interval
+            Interval.
+        """
+        length = interval.stop - interval.start
+        if interval.start < 0 or length < 0 or length > sequence.length:
+            raise ValueError("Out-of-range interval.")
+
+        imm_subseq = lib.imm_subseq_slice(sequence.imm_seq, interval.start, length)
+        return cls(imm_subseq, sequence)
 
     @property
     def imm_seq(self) -> ffi.CData:
@@ -161,7 +176,7 @@ class CSubSequence(SequenceABC[T]):
 
         start = interval.start + self.start
         length = interval.stop - interval.start
-        return SubSequence[T](self._sequence, Interval(start, start + length))
+        return SubSequence[T].create(self._sequence, Interval(start, start + length))
 
     @property
     def alphabet(self) -> T:
@@ -172,24 +187,3 @@ class CSubSequence(SequenceABC[T]):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
-
-
-class SubSequence(CSubSequence[T]):
-    """
-    Subsequence of symbols of a given sequence.
-
-    Parameters
-    ----------
-    sequence : `CSequence`
-        Sequence.
-    interval : `Interval`
-        Interval.
-    """
-
-    def __init__(self, sequence: CSequence[T], interval: Interval):
-        length = interval.stop - interval.start
-        if interval.start < 0 or length < 0 or length > sequence.length:
-            raise ValueError("Out-of-range interval.")
-
-        imm_subseq = lib.imm_subseq_slice(sequence.imm_seq, interval.start, length)
-        super().__init__(imm_subseq, sequence)

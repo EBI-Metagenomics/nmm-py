@@ -8,7 +8,7 @@ from nmm.alphabet import Alphabet, BaseAlphabet
 
 def test_sequence():
     alphabet = Alphabet.create(b"ACGT", b"X")
-    seq = Sequence(b"ACAAAGATX", alphabet)
+    seq = Sequence.create(b"ACAAAGATX", alphabet)
 
     assert_equal(seq.length, 9)
     assert_equal(bytes(seq), b"ACAAAGATX")
@@ -16,18 +16,18 @@ def test_sequence():
     assert_equal(str(seq), "ACAAAGATX")
     assert_equal(repr(seq), "<Sequence:ACAAAGATX>")
 
-    Sequence(b"ACGXXT", alphabet)
+    Sequence.create(b"ACGXXT", alphabet)
 
     with pytest.raises(RuntimeError):
-        Sequence(b"ACGWT", alphabet)
+        Sequence.create(b"ACGWT", alphabet)
 
     with pytest.raises(RuntimeError):
-        Sequence("ACGTç".encode(), alphabet)
+        Sequence.create("ACGTç".encode(), alphabet)
 
 
 def test_sequence_base():
     alphabet = BaseAlphabet(b"ACGT", b"X")
-    seq = Sequence[BaseAlphabet](b"ACAAAGATX", alphabet)
+    seq = Sequence.create(b"ACAAAGATX", alphabet)
 
     assert_equal(seq.length, 9)
     assert_equal(bytes(seq), b"ACAAAGATX")
@@ -44,10 +44,10 @@ def test_sequence_base():
     del subseq
     assert_equal(seq.alphabet.symbols, b"ACGT")
 
-    Sequence[BaseAlphabet](b"ACGXXT", alphabet)
+    Sequence.create(b"ACGXXT", alphabet)
 
     with pytest.raises(RuntimeError):
-        Sequence[BaseAlphabet](b"ACGWT", alphabet)
+        Sequence.create(b"ACGWT", alphabet)
 
     with pytest.raises(RuntimeError):
-        Sequence[BaseAlphabet]("ACGTç".encode(), alphabet)
+        Sequence.create("ACGTç".encode(), alphabet)

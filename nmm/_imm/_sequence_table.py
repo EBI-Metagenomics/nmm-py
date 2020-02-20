@@ -1,6 +1,6 @@
 from ._lprob import lprob_is_valid
 from ._alphabet import Alphabet
-from ._sequence import CSequence
+from ._sequence import Sequence
 from .._ffi import ffi, lib
 
 
@@ -32,7 +32,7 @@ class CSequenceTable:
         imm_abc = lib.imm_seq_table_get_abc(self._imm_seq_table)
         return ffi.string(lib.imm_abc_string(imm_abc))
 
-    def add(self, sequence: CSequence, lprob: float):
+    def add(self, sequence: Sequence, lprob: float):
         if lib.imm_seq_table_add(self._imm_seq_table, sequence.imm_seq, lprob) != 0:
             raise RuntimeError("Could not add sequence.")
 
@@ -40,7 +40,7 @@ class CSequenceTable:
         if lib.imm_seq_table_normalize(self._imm_seq_table) != 0:
             raise RuntimeError("Could not normalize it.")
 
-    def lprob(self, sequence: CSequence) -> float:
+    def lprob(self, sequence: Sequence) -> float:
         lprob: float = lib.imm_seq_table_lprob(self._imm_seq_table, sequence.imm_seq)
         if not lprob_is_valid(lprob):
             raise RuntimeError("Could not get probability.")

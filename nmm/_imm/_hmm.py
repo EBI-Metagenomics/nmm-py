@@ -1,4 +1,4 @@
-from ._sequence import CSequence
+from ._sequence import Sequence
 from ._path import CPath
 from ._state import CState
 from ._alphabet import Alphabet
@@ -105,14 +105,14 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def likelihood(self, seq: CSequence, path: CPath):
+    def likelihood(self, seq: Sequence, path: CPath):
         lprob: float = lib.imm_hmm_likelihood(self._hmm, seq.imm_seq, path.imm_path)
         if not lprob_is_valid(lprob):
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
     def viterbi(
-        self, seq: CSequence, end_state: CState, window_length: int = 0
+        self, seq: Sequence, end_state: CState, window_length: int = 0
     ) -> CResults:
         from ._results import wrap_imm_results
 

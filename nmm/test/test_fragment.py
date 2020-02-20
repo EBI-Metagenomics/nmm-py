@@ -11,7 +11,7 @@ from nmm.state import MuteState, NormalState
 
 def test_fragment():
     alphabet = BaseAlphabet(b"ACGT", b"X")
-    seq = Sequence[BaseAlphabet](b"ACAAAGATX", alphabet)
+    seq = Sequence.create(b"ACAAAGATX", alphabet)
 
     S = MuteState(b"S", alphabet)
     E = MuteState(b"E", alphabet)

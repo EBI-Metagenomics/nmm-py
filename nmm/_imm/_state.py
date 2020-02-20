@@ -3,7 +3,7 @@ from typing import Sequence
 from ._alphabet import Alphabet
 from .._ffi import ffi, lib
 from ._lprob import lprob_is_valid
-from ._sequence import CSequence
+from ._sequence import Sequence
 from ._sequence_table import SequenceTable
 
 
@@ -34,13 +34,13 @@ class CState:
     def max_seq(self) -> int:
         return lib.imm_state_max_seq(self._imm_state)
 
-    def lprob(self, seq: CSequence) -> float:
+    def lprob(self, seq: Sequence) -> float:
         """
         Log-space probability of sequence emission.
 
         Parameters
         ----------
-        seq : `CSequence`
+        seq : `Sequence`
             Sequence.
         """
         lprob: float = lib.imm_state_lprob(self._imm_state, seq.imm_seq)

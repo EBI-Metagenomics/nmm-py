@@ -1,7 +1,7 @@
 from typing import Dict
 
 from .._ffi import ffi, lib
-from .._imm import Alphabet, CSequence, CState, Sequence, SequenceTable, TableState
+from .._imm import Alphabet, CState, Sequence, SequenceTable, TableState
 from ._base_table import BaseTable
 from ._codon import Codon
 from ._codon_table import CodonTable
@@ -36,7 +36,7 @@ class FrameState(CState):
         alphabet = baset.alphabet
         super().__init__(lib.imm_state_cast_c(self._nmm_frame_state), alphabet)
 
-    def decode(self, seq: CSequence, codon: Codon) -> float:
+    def decode(self, seq: Sequence, codon: Codon) -> float:
         state = self._nmm_frame_state
         return lib.nmm_frame_state_decode(state, seq.imm_seq, codon.nmm_codon)
 

@@ -14,20 +14,20 @@ def test_sequence_table():
     with pytest.raises(RuntimeError):
         seqt.normalize()
 
-    seqt.add(Sequence(b"AGTG", alphabet), log(0.2))
-    seqt.add(Sequence(b"T", alphabet), log(1.2))
+    seqt.add(Sequence.create(b"AGTG", alphabet), log(0.2))
+    seqt.add(Sequence.create(b"T", alphabet), log(1.2))
 
-    assert_allclose(seqt.lprob(Sequence(b"AGTG", alphabet)), log(0.2))
-    assert_allclose(seqt.lprob(Sequence(b"T", alphabet)), log(1.2))
-    assert_equal(lprob_is_zero(seqt.lprob(Sequence(b"", alphabet))), True)
-
-    with pytest.raises(RuntimeError):
-        seqt.lprob(Sequence(b"AT", Alphabet.create(b"AT", b"X")))
+    assert_allclose(seqt.lprob(Sequence.create(b"AGTG", alphabet)), log(0.2))
+    assert_allclose(seqt.lprob(Sequence.create(b"T", alphabet)), log(1.2))
+    assert_equal(lprob_is_zero(seqt.lprob(Sequence.create(b"", alphabet))), True)
 
     with pytest.raises(RuntimeError):
-        seqt.add(Sequence(b"AT", Alphabet.create(b"AT", b"X")), log(0.2))
+        seqt.lprob(Sequence.create(b"AT", Alphabet.create(b"AT", b"X")))
+
+    with pytest.raises(RuntimeError):
+        seqt.add(Sequence.create(b"AT", Alphabet.create(b"AT", b"X")), log(0.2))
 
     seqt.normalize()
 
-    assert_allclose(seqt.lprob(Sequence(b"AGTG", alphabet)), log(0.2 / 1.4))
-    assert_allclose(seqt.lprob(Sequence(b"T", alphabet)), log(1.2 / 1.4))
+    assert_allclose(seqt.lprob(Sequence.create(b"AGTG", alphabet)), log(0.2 / 1.4))
+    assert_allclose(seqt.lprob(Sequence.create(b"T", alphabet)), log(1.2 / 1.4))
