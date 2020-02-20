@@ -11,14 +11,13 @@ from ._alphabet import Alphabet
 T = TypeVar("T", bound=Alphabet)
 
 
-class SequenceABC(ABC, Generic[T]):
+class SequenceABC(Generic[T], ABC):
     """
     Sequence of symbols.
     """
 
-    @property
     @abstractmethod
-    def length(self) -> int:
+    def __len__(self) -> int:
         raise NotImplementedError()
 
     @abstractmethod
@@ -72,8 +71,7 @@ class Sequence(SequenceABC[T]):
     def imm_seq(self) -> CData:
         return self._imm_seq
 
-    @property
-    def length(self) -> int:
+    def __len__(self) -> int:
         return lib.imm_seq_length(self._imm_seq)
 
     def __bytes__(self) -> bytes:
@@ -139,7 +137,7 @@ class SubSequence(SequenceABC[T]):
             Interval.
         """
         length = interval.stop - interval.start
-        if interval.start < 0 or length < 0 or length > sequence.length:
+        if interval.start < 0 or length < 0 or length > len(sequence):
             raise ValueError("Out-of-range interval.")
 
         imm_subseq = lib.imm_subseq_slice(sequence.imm_seq, interval.start, length)
@@ -157,8 +155,7 @@ class SubSequence(SequenceABC[T]):
     def start(self) -> int:
         return lib.imm_subseq_start(ffi.addressof(self._imm_subseq))
 
-    @property
-    def length(self) -> int:
+    def __len__(self) -> int:
         return lib.imm_subseq_length(ffi.addressof(self._imm_subseq))
 
     def __bytes__(self) -> bytes:

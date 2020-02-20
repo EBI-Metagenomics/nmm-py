@@ -1,8 +1,8 @@
 from typing import Generic, Iterator, TypeVar
 
+from .._cdata import CData
 from .._interval import Interval
 from ._alphabet import Alphabet
-from .._cdata import CData
 from ._path import Path
 from ._sequence import SequenceABC
 from ._state import State
@@ -53,6 +53,10 @@ class Fragment(Generic[TAlphabet, TState]):
     @property
     def sequence(self) -> SequenceABC[TAlphabet]:
         return self._sequence
+
+    @property
+    def path(self) -> Path[Step[TState]]:
+        return self._path
 
     def __iter__(self) -> Iterator[FragStep]:
         start = end = 0

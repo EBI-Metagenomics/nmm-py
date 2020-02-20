@@ -10,7 +10,7 @@ def test_sequence():
     alphabet = Alphabet.create(b"ACGT", b"X")
     seq = Sequence.create(b"ACAAAGATX", alphabet)
 
-    assert_equal(seq.length, 9)
+    assert_equal(len(seq), 9)
     assert_equal(bytes(seq), b"ACAAAGATX")
 
     assert_equal(str(seq), "ACAAAGATX")
@@ -29,7 +29,7 @@ def test_sequence_base():
     alphabet = BaseAlphabet.create(b"ACGT", b"X")
     seq = Sequence.create(b"ACAAAGATX", alphabet)
 
-    assert_equal(seq.length, 9)
+    assert_equal(len(seq), 9)
     assert_equal(bytes(seq), b"ACAAAGATX")
 
     assert_equal(str(seq), "ACAAAGATX")
