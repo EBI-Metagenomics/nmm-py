@@ -61,7 +61,7 @@ class AminoAlphabet(Alphabet):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class StandardAminoAlphabet(AminoAlphabet):
+class CanonicalAminoAlphabet(AminoAlphabet):
     def __init__(self):
         super().__init__(Alphabet.create(b"ACDEFGHIKLMNPQRSTVWY", b"X"))
 

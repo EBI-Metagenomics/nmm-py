@@ -1,7 +1,7 @@
 from ._imm import Alphabet
 from ._nmm import (
     AminoAlphabet,
-    StandardAminoAlphabet,
+    CanonicalAminoAlphabet,
     BaseAlphabet,
     CBaseAlphabet,
 )
@@ -11,5 +11,5 @@ __all__ = [
     "AminoAlphabet",
     "BaseAlphabet",
     "CBaseAlphabet",
-    "StandardAminoAlphabet",
+    "CanonicalAminoAlphabet",
 ]
