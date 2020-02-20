@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from .._ffi import ffi, lib
-from ._alphabet import CAlphabet
+from ._alphabet import Alphabet
 from ._lprob import lprob_is_valid
 
 
@@ -13,18 +13,18 @@ class CAlphabetTable:
     ----------
     imm_abc_table : `<cdata 'struct imm_abc_table *'>`.
         Alphabet table.
-    alphabet : `CAlphabet`
+    alphabet : `Alphabet`
         Alphabet.
     """
 
-    def __init__(self, imm_abc_table: ffi.CData, alphabet: CAlphabet):
+    def __init__(self, imm_abc_table: ffi.CData, alphabet: Alphabet):
         if imm_abc_table == ffi.NULL:
             raise RuntimeError("`imm_abc_table` is NULL.")
         self._imm_abc_table = imm_abc_table
         self._alphabet = alphabet
 
     @property
-    def alphabet(self) -> CAlphabet:
+    def alphabet(self) -> Alphabet:
         return self._alphabet
 
     @property
@@ -48,13 +48,13 @@ class AlphabetTable(CAlphabetTable):
 
     Parameters
     ----------
-    alphabet : `CAlphabet`
+    alphabet : `Alphabet`
         Alphabet.
     lprobs : `Tuple[float, float, float, float]`
         Log probability of each nucleotide.
     """
 
-    def __init__(self, alphabet: CAlphabet, lprobs: Sequence[float]):
+    def __init__(self, alphabet: Alphabet, lprobs: Sequence[float]):
         imm_abc_table = lib.imm_abc_table_create(
             alphabet.imm_abc, ffi.new("double[]", lprobs)
         )

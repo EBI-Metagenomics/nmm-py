@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from ._alphabet import CAlphabet
+from ._alphabet import Alphabet
 from .._ffi import ffi, lib
 from ._lprob import lprob_is_valid
 from ._sequence import CSequence
@@ -8,14 +8,14 @@ from ._sequence_table import SequenceTable
 
 
 class CState:
-    def __init__(self, imm_state: ffi.CData, alphabet: CAlphabet):
+    def __init__(self, imm_state: ffi.CData, alphabet: Alphabet):
         if imm_state == ffi.NULL:
             raise RuntimeError("`imm_state` is NULL.")
         self._imm_state = imm_state
         self._alphabet = alphabet
 
     @property
-    def alphabet(self) -> CAlphabet:
+    def alphabet(self) -> Alphabet:
         return self._alphabet
 
     @property
@@ -59,7 +59,7 @@ class CState:
 
 
 class MuteState(CState):
-    def __init__(self, name: bytes, alphabet: CAlphabet):
+    def __init__(self, name: bytes, alphabet: Alphabet):
         """
         Mute state.
 
@@ -67,7 +67,7 @@ class MuteState(CState):
         ----------
         name : bytes
             State name.
-        alphabet : `CAlphabet`
+        alphabet : `Alphabet`
             Alphabet.
         """
         self._imm_mute_state = lib.imm_mute_state_create(name, alphabet.imm_abc)
@@ -85,7 +85,7 @@ class MuteState(CState):
 
 
 class NormalState(CState):
-    def __init__(self, name: bytes, alphabet: CAlphabet, lprobs: Sequence[float]):
+    def __init__(self, name: bytes, alphabet: Alphabet, lprobs: Sequence[float]):
         """
         Normal state.
 
@@ -93,7 +93,7 @@ class NormalState(CState):
         ----------
         name : bytes
             State name.
-        alphabet : `CAlphabet`
+        alphabet : `Alphabet`
             Alphabet.
         lprobs : `typing.Sequence[float]`
             Emission probabilities in log-space for each alphabet letter.

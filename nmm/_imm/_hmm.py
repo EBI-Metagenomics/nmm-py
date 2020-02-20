@@ -1,7 +1,7 @@
 from ._sequence import CSequence
 from ._path import CPath
 from ._state import CState
-from ._alphabet import CAlphabet
+from ._alphabet import Alphabet
 from ._lprob import LPROB_ZERO, lprob_is_valid
 from ._results import CResults
 from typing import Dict
@@ -16,11 +16,11 @@ class HMM:
 
     Parameters
     ----------
-    alphabet : `CAlphabet`
+    alphabet : `Alphabet`
         Alphabet.
     """
 
-    def __init__(self, alphabet: CAlphabet):
+    def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
         self._states: Dict[ffi.CData, CState] = {}
         self._hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
@@ -70,7 +70,7 @@ class HMM:
             raise RuntimeError("Could not set transition probability.")
 
     @property
-    def alphabet(self) -> CAlphabet:
+    def alphabet(self) -> Alphabet:
         return self._alphabet
 
     def add_state(self, state: CState, start_lprob: float = LPROB_ZERO):

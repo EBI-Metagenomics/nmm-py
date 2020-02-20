@@ -1,13 +1,13 @@
 from typing import Generic, Iterator, TypeVar
 
 from .._interval import Interval
-from ._alphabet import CAlphabet
+from ._alphabet import Alphabet
 from ._path import CPath
 from ._sequence import SequenceABC
 from ._state import CState
 from ._step import CStep
 
-TAlphabet = TypeVar("TAlphabet", bound=CAlphabet)
+TAlphabet = TypeVar("TAlphabet", bound=Alphabet)
 TState = TypeVar("TState", bound=CState)
 
 
@@ -59,6 +59,9 @@ class Fragment(Generic[TAlphabet, TState]):
             end += step.seq_len
             yield FragStep(self._sequence[Interval(start, end)], step)
             start = end
+
+    def __str__(self) -> str:
+        return ",".join(str(seq_step) for seq_step in self)
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

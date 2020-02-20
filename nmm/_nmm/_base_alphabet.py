@@ -1,8 +1,8 @@
 from .._ffi import ffi, lib
-from .._imm import Alphabet, CAlphabet
+from .._imm import Alphabet
 
 
-class CBaseAlphabet(CAlphabet):
+class CBaseAlphabet(Alphabet):
     """
     Wrapper around the C implementation of a base alphabet.
 
@@ -10,11 +10,11 @@ class CBaseAlphabet(CAlphabet):
     ----------
     nmm_base_abc : `<cdata 'struct nmm_base_abc *'>`.
         Four-nucleotides alphabet pointer.
-    alphabet : `CAlphabet`
+    alphabet : `Alphabet`
         Alphabet.
     """
 
-    def __init__(self, nmm_base_abc: ffi.CData, alphabet: CAlphabet):
+    def __init__(self, nmm_base_abc: ffi.CData, alphabet: Alphabet):
         if nmm_base_abc == ffi.NULL:
             raise RuntimeError("`nmm_base_abc` is NULL.")
         if lib.nmm_base_abc_cast(nmm_base_abc) != alphabet.imm_abc:
@@ -53,7 +53,7 @@ class BaseAlphabet(CBaseAlphabet):
     def __init__(self, symbols: bytes, any_symbol: bytes):
         if len(any_symbol) != 1:
             raise ValueError("`any_symbol` has length different than 1.")
-        abc = Alphabet(symbols, any_symbol)
+        abc = Alphabet.create(symbols, any_symbol)
         super().__init__(lib.nmm_base_abc_create(abc.imm_abc), abc)
         self._alphabet = abc
 

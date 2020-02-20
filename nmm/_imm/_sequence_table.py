@@ -1,5 +1,5 @@
 from ._lprob import lprob_is_valid
-from ._alphabet import CAlphabet
+from ._alphabet import Alphabet
 from ._sequence import CSequence
 from .._ffi import ffi, lib
 
@@ -63,16 +63,16 @@ class SequenceTable(CSequenceTable):
 
     Parameters
     ----------
-    alphabet : `CAlphabet`
+    alphabet : `Alphabet`
         Alphabet.
     """
 
-    def __init__(self, alphabet: CAlphabet):
+    def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
         super().__init__(lib.imm_seq_table_create(alphabet.imm_abc))
 
     @property
-    def alphabet(self) -> CAlphabet:
+    def alphabet(self) -> Alphabet:
         return self._alphabet
 
     def __repr__(self) -> str:

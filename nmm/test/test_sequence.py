@@ -7,7 +7,7 @@ from nmm.alphabet import Alphabet, BaseAlphabet
 
 
 def test_sequence():
-    alphabet = Alphabet(b"ACGT", b"X")
+    alphabet = Alphabet.create(b"ACGT", b"X")
     seq = Sequence(b"ACAAAGATX", alphabet)
 
     assert_equal(seq.length, 9)

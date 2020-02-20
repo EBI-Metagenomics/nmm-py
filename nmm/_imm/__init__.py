@@ -1,4 +1,4 @@
-from ._alphabet import Alphabet, CAlphabet
+from ._alphabet import Alphabet
 from ._alphabet_table import AlphabetTable, CAlphabetTable
 from ._fragment import Fragment, FragStep
 from ._hmm import HMM
@@ -20,7 +20,6 @@ from ._step import CStep, Step, create_imm_step
 __all__ = [
     "Alphabet",
     "AlphabetTable",
-    "CAlphabet",
     "CAlphabetTable",
     "CPath",
     "CResult",

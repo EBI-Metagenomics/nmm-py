@@ -8,7 +8,7 @@ from nmm.prob import SequenceTable, lprob_is_zero
 
 
 def test_sequence_table():
-    alphabet = Alphabet(b"ACGT", b"X")
+    alphabet = Alphabet.create(b"ACGT", b"X")
     seqt = SequenceTable(alphabet)
 
     with pytest.raises(RuntimeError):
@@ -22,10 +22,10 @@ def test_sequence_table():
     assert_equal(lprob_is_zero(seqt.lprob(Sequence(b"", alphabet))), True)
 
     with pytest.raises(RuntimeError):
-        seqt.lprob(Sequence(b"AT", Alphabet(b"AT", b"X")))
+        seqt.lprob(Sequence(b"AT", Alphabet.create(b"AT", b"X")))
 
     with pytest.raises(RuntimeError):
-        seqt.add(Sequence(b"AT", Alphabet(b"AT", b"X")), log(0.2))
+        seqt.add(Sequence(b"AT", Alphabet.create(b"AT", b"X")), log(0.2))
 
     seqt.normalize()
 

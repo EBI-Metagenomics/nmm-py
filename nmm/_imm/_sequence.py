@@ -5,9 +5,9 @@ from typing import Generic, TypeVar, Union
 
 from .._ffi import ffi, lib
 from .._interval import Interval
-from ._alphabet import CAlphabet
+from ._alphabet import Alphabet
 
-T = TypeVar("T", bound=CAlphabet)
+T = TypeVar("T", bound=Alphabet)
 
 
 class SequenceABC(ABC, Generic[T]):

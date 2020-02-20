@@ -5,7 +5,7 @@ from nmm.alphabet import Alphabet
 
 
 def test_alphabet():
-    abc = Alphabet(b"ACGT", b"X")
+    abc = Alphabet.create(b"ACGT", b"X")
     assert_equal(abc.length, 4)
 
     assert_equal(abc.has_symbol(b"A"), True)

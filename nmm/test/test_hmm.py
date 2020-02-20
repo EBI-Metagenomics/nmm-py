@@ -12,7 +12,7 @@ from nmm.state import MuteState, NormalState, TableState
 
 
 def test_hmm_states():
-    alphabet = Alphabet(b"ACGU", b"X")
+    alphabet = Alphabet.create(b"ACGU", b"X")
     hmm = HMM(alphabet)
 
     S = MuteState(b"S", alphabet)
@@ -35,7 +35,7 @@ def test_hmm_states():
 
 
 def test_hmm_trans_prob():
-    alphabet = Alphabet(b"ACGU", b"X")
+    alphabet = Alphabet.create(b"ACGU", b"X")
     hmm = HMM(alphabet)
 
     S = MuteState(b"S", alphabet)
@@ -89,7 +89,7 @@ def test_hmm_trans_prob():
 
 
 def test_hmm_likelihood():
-    alphabet = Alphabet(b"ACGU", b"X")
+    alphabet = Alphabet.create(b"ACGU", b"X")
     hmm = HMM(alphabet)
 
     S = MuteState(b"S", alphabet)
@@ -224,7 +224,7 @@ def test_hmm_likelihood():
 
 
 def test_hmm_viterbi_1():
-    alphabet = Alphabet(b"ACGU", b"X")
+    alphabet = Alphabet.create(b"ACGU", b"X")
     hmm = HMM(alphabet)
 
     S = MuteState(b"S", alphabet)
@@ -259,7 +259,7 @@ def test_hmm_viterbi_1():
 
 
 def test_hmm_viterbi_2():
-    alphabet = Alphabet(b"AC", b"X")
+    alphabet = Alphabet.create(b"AC", b"X")
     hmm = HMM(alphabet)
 
     S = MuteState(b"S", alphabet)
@@ -303,7 +303,7 @@ def test_hmm_viterbi_2():
 
 
 def test_hmm_viterbi_3():
-    alphabet = Alphabet(b"AC", b"X")
+    alphabet = Alphabet.create(b"AC", b"X")
     hmm = HMM(alphabet)
 
     S = MuteState(b"S", alphabet)

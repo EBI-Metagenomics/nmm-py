@@ -11,7 +11,7 @@ from nmm.state import FrameState, MuteState, NormalState, TableState
 
 
 def test_normal_state():
-    alphabet = Alphabet(b"ACGT", b"X")
+    alphabet = Alphabet.create(b"ACGT", b"X")
 
     state = NormalState(b"M0", alphabet, [log(0.1), log(0.2), log(0.3), log(0.3)],)
     assert_equal(state.name, b"M0")
@@ -23,7 +23,7 @@ def test_normal_state():
     assert_equal(state.max_seq, 1)
 
     with pytest.raises(RuntimeError):
-        state.lprob(Sequence(b"T", Alphabet(b"ACGT", b"X")))
+        state.lprob(Sequence(b"T", Alphabet.create(b"ACGT", b"X")))
 
     assert_equal(lprob_is_zero(state.lprob(Sequence(b"AC", alphabet))), True)
 
@@ -32,7 +32,7 @@ def test_normal_state():
 
 
 def test_mute_state():
-    alphabet = Alphabet(b"ACGU", b"X")
+    alphabet = Alphabet.create(b"ACGU", b"X")
     state = MuteState(b"S", alphabet)
 
     assert_equal(state.name, b"S")
@@ -45,7 +45,7 @@ def test_mute_state():
 
 
 def test_table_state():
-    alphabet = Alphabet(b"ACGU", b"X")
+    alphabet = Alphabet.create(b"ACGU", b"X")
     seqt = SequenceTable(alphabet)
     seqt.add(Sequence(b"AUG", alphabet), log(0.8))
     seqt.add(Sequence(b"AUU", alphabet), log(0.4))

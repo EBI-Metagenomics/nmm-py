@@ -1,13 +1,16 @@
+from __future__ import annotations
+from typing import Type
 from .._ffi import ffi, lib
 
 
-class CAlphabet:
+class Alphabet:
     """
-    Wrapper around the C implementation of alphabet.
+    Set of symbols for Markov Models.
 
     Parameters
     ----------
-    imm_abc : `<cdata 'struct imm_abc *'>`.
+    imm_abc
+        Pointer.
     """
 
     def __init__(self, imm_abc: ffi.CData):
@@ -15,6 +18,23 @@ class CAlphabet:
         if imm_abc == ffi.NULL:
             raise RuntimeError("`imm_abc` is NULL.")
         self._imm_abc = imm_abc
+
+    @classmethod
+    def create(cls: Type[Alphabet], symbols: bytes, any_symbol: bytes) -> Alphabet:
+        """
+        Create an alphabet.
+
+        Parameters
+        ----------
+        symbols
+            Set of symbols as an array of bytes.
+        any_symbol
+            Single-char representing any-symbol.
+        """
+        if len(any_symbol) != 1:
+            raise ValueError("`any_symbol` has length different than 1.")
+        super().__init__(lib.imm_abc_create(symbols, any_symbol))
+        return cls(lib.imm_abc_create(symbols, any_symbol))
 
     @property
     def imm_abc(self) -> ffi.CData:
@@ -43,27 +63,6 @@ class CAlphabet:
 
     def __str__(self) -> str:
         return f"{{{self.symbols.decode()}}}"
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}:{str(self)}>"
-
-
-class Alphabet(CAlphabet):
-    """
-    Alphabet set for Markov models.
-
-    Parameters
-    ----------
-    symbols : bytes
-        Set of symbols as an array of bytes.
-    any_symbol : bytes
-        Single-char representing any-symbol.
-    """
-
-    def __init__(self, symbols: bytes, any_symbol: bytes):
-        if len(any_symbol) != 1:
-            raise ValueError("`any_symbol` has length different than 1.")
-        super().__init__(lib.imm_abc_create(symbols, any_symbol))
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

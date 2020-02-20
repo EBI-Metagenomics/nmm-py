@@ -1,4 +1,4 @@
-from ._imm import Alphabet, CAlphabet
+from ._imm import Alphabet
 from ._nmm import (
     AminoAlphabet,
     CAminoAlphabet,
@@ -11,7 +11,6 @@ __all__ = [
     "Alphabet",
     "AminoAlphabet",
     "BaseAlphabet",
-    "CAlphabet",
     "CAminoAlphabet",
     "CBaseAlphabet",
     "StandardAminoAlphabet",

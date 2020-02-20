@@ -1,7 +1,7 @@
 from typing import Dict
 
 from .._ffi import ffi, lib
-from .._imm import CAlphabet, CSequence, CState, Sequence, SequenceTable, TableState
+from .._imm import Alphabet, CSequence, CState, Sequence, SequenceTable, TableState
 from ._base_table import BaseTable
 from ._codon import Codon
 from ._codon_table import CodonTable
@@ -49,13 +49,13 @@ class FrameState(CState):
 
 
 class CodonState(TableState):
-    def __init__(self, name: bytes, alphabet: CAlphabet, emission: Dict[Codon, float]):
+    def __init__(self, name: bytes, alphabet: Alphabet, emission: Dict[Codon, float]):
         """
         Parameters
         ----------
         name : bytes
             State name.
-        alphabet : `CAlphabet`
+        alphabet : `Alphabet`
             Alphabet.
         emission : `Dict[Codon, float]`
             Codon probabilities.
