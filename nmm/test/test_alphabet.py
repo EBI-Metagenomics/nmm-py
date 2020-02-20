@@ -29,7 +29,7 @@ def test_alphabet():
     assert_equal(repr(abc), "<Alphabet:{ACGT}>")
 
     with pytest.raises(TypeError):
-        Alphabet("ACGTç", b"X")
+        Alphabet.create("ACGTç", b"X")
 
     with pytest.raises(RuntimeError):
-        Alphabet("ACGTç".encode(), b"X")
+        Alphabet.create("ACGTç".encode(), b"X")

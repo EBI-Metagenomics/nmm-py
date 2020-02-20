@@ -1,7 +1,7 @@
 from typing import Iterable
 
 from .._ffi import ffi, lib
-from ._amino_alphabet import CAminoAlphabet
+from ._amino_alphabet import AminoAlphabet
 
 
 class CAminoTable:
@@ -12,18 +12,18 @@ class CAminoTable:
     ----------
     nmm_amino_table : `<cdata 'struct nmm_amino_table *'>`.
         Amino table.
-    amino : `CAminoAlphabet`
+    amino : `AminoAlphabet`
         20-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_amino_table: ffi.CData, amino_abc: CAminoAlphabet):
+    def __init__(self, nmm_amino_table: ffi.CData, amino_abc: AminoAlphabet):
         if nmm_amino_table == ffi.NULL:
             raise RuntimeError("`nmm_amino_table` is NULL.")
         self._nmm_amino_table = nmm_amino_table
         self._amino_abc = amino_abc
 
     @property
-    def alphabet(self) -> CAminoAlphabet:
+    def alphabet(self) -> AminoAlphabet:
         return self._amino_abc
 
     @property
@@ -44,13 +44,13 @@ class AminoTable(CAminoTable):
 
     Parameters
     ----------
-    amino : `CAminoAlphabet`
+    amino : `AminoAlphabet`
         20-nucleotides alphabet.
     lprobs : `Tuple[float, float, float, float]`
         Log probability of each nucleotide.
     """
 
-    def __init__(self, amino_abc: CAminoAlphabet, lprobs: Iterable[float]):
+    def __init__(self, amino_abc: AminoAlphabet, lprobs: Iterable[float]):
         nmm_amino_table = lib.nmm_amino_table_create(
             amino_abc.nmm_amino_abc, list(lprobs)
         )

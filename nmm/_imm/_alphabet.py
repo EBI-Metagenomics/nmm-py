@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from typing import Type
+
 from .._ffi import ffi, lib
 
 

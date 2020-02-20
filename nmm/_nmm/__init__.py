@@ -1,4 +1,4 @@
-from ._amino_alphabet import AminoAlphabet, CAminoAlphabet, StandardAminoAlphabet
+from ._amino_alphabet import AminoAlphabet, StandardAminoAlphabet
 from ._amino_table import AminoTable
 from ._base_alphabet import BaseAlphabet, CBaseAlphabet
 from ._base_table import BaseTable
@@ -13,7 +13,6 @@ __all__ = [
     "AminoTable",
     "BaseAlphabet",
     "BaseTable",
-    "CAminoAlphabet",
     "CBaseAlphabet",
     "Codon",
     "CodonProb",
