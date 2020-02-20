@@ -14,7 +14,7 @@ class AminoAlphabet(Alphabet):
     Parameters
     ----------
     nmm_amino_abc
-        20 symbols alphabet pointer.
+        20-symbols alphabet pointer.
     alphabet
         Alphabet.
     """
@@ -70,7 +70,8 @@ class CanonicalAminoAlphabet(AminoAlphabet):
     """
 
     def __init__(self):
-        super().__init__(Alphabet.create(b"ACDEFGHIKLMNPQRSTVWY", b"X"))
+        abc = Alphabet.create(b"ACDEFGHIKLMNPQRSTVWY", b"X")
+        super().__init__(lib.nmm_amino_abc_create(abc.imm_abc), abc)
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

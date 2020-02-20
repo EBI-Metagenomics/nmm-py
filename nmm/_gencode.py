@@ -35,9 +35,11 @@ class GeneticCode:
 
     Parameters
     ----------
-    base : `CBase`
-        Four-nucleotides alphabet.
-    name : `str`
+    base_abc
+        Base alphabet.
+    amino_abc
+        Amino acid alphabet.
+    name
         It only accepts `"standard"` for now.
     """
 
@@ -55,7 +57,7 @@ class GeneticCode:
         for aa, triplets in GENCODE[name].items():
             gcode = self._gencode[aa]
             for triplet in triplets:
-                gcode.append(Codon(triplet, base_abc))
+                gcode.append(Codon.create(triplet, base_abc))
 
         self._amino_acid: Dict[Codon, bytes] = {}
         for aa, codons in self._gencode.items():
