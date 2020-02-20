@@ -2,7 +2,7 @@ from ._sequence import Sequence
 from ._path import Path
 from ._state import CState
 from ._alphabet import Alphabet
-from ._lprob import LPROB_ZERO, lprob_is_valid
+from ._lprob import lprob_zero, lprob_is_valid
 from ._results import CResults
 from typing import Dict
 
@@ -73,7 +73,7 @@ class HMM:
     def alphabet(self) -> Alphabet:
         return self._alphabet
 
-    def add_state(self, state: CState, start_lprob: float = LPROB_ZERO):
+    def add_state(self, state: CState, start_lprob: float = lprob_zero()):
         """
         Parameters
         ----------

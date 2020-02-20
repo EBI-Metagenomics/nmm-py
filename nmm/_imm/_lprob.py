@@ -1,8 +1,13 @@
 from math import inf, isinf, isnan, nan
 from typing import Iterable
 
-LPROB_ZERO: float = -inf
-LPROB_INVALID: float = nan
+
+def lprob_zero() -> float:
+    return -inf
+
+
+def lprob_invalid() -> float:
+    return nan
 
 
 def lprob_is_zero(x: float):

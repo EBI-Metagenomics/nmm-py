@@ -3,13 +3,13 @@ from ._alphabet_table import AlphabetTable, CAlphabetTable
 from ._fragment import Fragment, FragStep
 from ._hmm import HMM
 from ._lprob import (
-    LPROB_INVALID,
-    LPROB_ZERO,
+    lprob_invalid,
     lprob_is_valid,
     lprob_is_zero,
     lprob_normalize,
+    lprob_zero,
 )
-from ._path import Path, wrap_imm_path
+from ._path import Path
 from ._result import CResult, wrap_imm_result
 from ._results import CResults, wrap_imm_results
 from ._sequence import Sequence, SequenceABC, SubSequence
@@ -29,8 +29,8 @@ __all__ = [
     "FragStep",
     "Fragment",
     "HMM",
-    "LPROB_INVALID",
-    "LPROB_ZERO",
+    "lprob_invalid",
+    "lprob_zero",
     "MuteState",
     "NormalState",
     "Path",
@@ -43,7 +43,6 @@ __all__ = [
     "lprob_is_valid",
     "lprob_is_zero",
     "lprob_normalize",
-    "wrap_imm_path",
     "wrap_imm_result",
     "wrap_imm_results",
 ]

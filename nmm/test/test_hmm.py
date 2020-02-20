@@ -6,7 +6,7 @@ from numpy.testing import assert_allclose, assert_equal
 from nmm import HMM
 from nmm.alphabet import Alphabet
 from nmm.path import Path, Step
-from nmm.prob import LPROB_INVALID, LPROB_ZERO, SequenceTable
+from nmm.prob import SequenceTable, lprob_invalid, lprob_zero
 from nmm.sequence import Sequence
 from nmm.state import MuteState, NormalState, TableState
 
@@ -48,10 +48,10 @@ def test_hmm_trans_prob():
         hmm.transition(S, E)
 
     with pytest.raises(ValueError):
-        hmm.set_transition(S, E, LPROB_ZERO)
+        hmm.set_transition(S, E, lprob_zero())
 
     with pytest.raises(ValueError):
-        hmm.set_transition(E, S, LPROB_ZERO)
+        hmm.set_transition(E, S, lprob_zero())
 
     with pytest.raises(ValueError):
         hmm.del_state(E)
@@ -59,17 +59,17 @@ def test_hmm_trans_prob():
     hmm.add_state(E)
 
     with pytest.raises(RuntimeError):
-        hmm.set_transition(E, S, LPROB_INVALID)
+        hmm.set_transition(E, S, lprob_invalid())
 
     with pytest.raises(ValueError):
         hmm.normalize()
 
     hmm.set_transition(S, E, log(0.5))
 
-    assert_allclose(hmm.transition(S, S), LPROB_ZERO)
+    assert_allclose(hmm.transition(S, S), lprob_zero())
     assert_allclose(hmm.transition(S, E), log(0.5))
-    assert_allclose(hmm.transition(E, S), LPROB_ZERO)
-    assert_allclose(hmm.transition(E, E), LPROB_ZERO)
+    assert_allclose(hmm.transition(E, S), lprob_zero())
+    assert_allclose(hmm.transition(E, E), lprob_zero())
 
     with pytest.raises(ValueError):
         hmm.normalize()
@@ -83,8 +83,8 @@ def test_hmm_trans_prob():
     hmm.normalize()
 
     assert_allclose(hmm.transition(S, E), log(1.0))
-    assert_allclose(hmm.transition(E, S), LPROB_ZERO)
-    assert_allclose(hmm.transition(S, S), LPROB_ZERO)
+    assert_allclose(hmm.transition(E, S), lprob_zero())
+    assert_allclose(hmm.transition(S, S), lprob_zero())
     assert_allclose(hmm.transition(E, E), log(1.0))
 
 
@@ -96,15 +96,15 @@ def test_hmm_likelihood():
     hmm.add_state(S, log(1.0))
 
     E = MuteState(b"E", alphabet)
-    hmm.add_state(E, LPROB_ZERO)
+    hmm.add_state(E, lprob_zero())
 
-    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), LPROB_ZERO, LPROB_ZERO],)
-    hmm.add_state(M1, LPROB_ZERO)
+    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), lprob_zero(), lprob_zero()],)
+    hmm.add_state(M1, lprob_zero())
 
     M2 = NormalState(
-        b"M2", alphabet, [log(0.4 / 1.6), log(0.6 / 1.6), LPROB_ZERO, log(0.6 / 1.6)]
+        b"M2", alphabet, [log(0.4 / 1.6), log(0.6 / 1.6), lprob_zero(), log(0.6 / 1.6)]
     )
-    hmm.add_state(M2, LPROB_ZERO)
+    hmm.add_state(M2, lprob_zero())
 
     hmm.set_transition(S, M1, log(1.0))
     hmm.set_transition(M1, M2, log(1.0))
@@ -149,7 +149,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"AU", alphabet),
@@ -201,7 +201,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"CG", alphabet),
@@ -214,7 +214,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"CU", alphabet),
@@ -240,7 +240,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"GA", alphabet),
@@ -253,7 +253,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"GG", alphabet),
@@ -266,7 +266,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"GU", alphabet),
@@ -279,7 +279,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"UC", alphabet),
@@ -292,7 +292,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"UA", alphabet),
@@ -305,7 +305,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"UG", alphabet),
@@ -318,7 +318,7 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
     p = hmm.likelihood(
         Sequence.create(b"UU", alphabet),
@@ -331,9 +331,9 @@ def test_hmm_likelihood():
             ]
         ),
     )
-    assert_allclose(p, LPROB_ZERO)
+    assert_allclose(p, lprob_zero())
 
-    M3 = NormalState(b"M2", alphabet, [log(0.4), log(0.6), LPROB_ZERO, log(0.6)],)
+    M3 = NormalState(b"M2", alphabet, [log(0.4), log(0.6), lprob_zero(), log(0.6)],)
 
     with pytest.raises(ValueError):
         hmm.likelihood(
@@ -357,15 +357,15 @@ def test_hmm_viterbi_1():
     hmm.add_state(S, log(1.0))
 
     E = MuteState(b"E", alphabet)
-    hmm.add_state(E, LPROB_ZERO)
+    hmm.add_state(E, lprob_zero())
 
-    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), LPROB_ZERO, LPROB_ZERO],)
-    hmm.add_state(M1, LPROB_ZERO)
+    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), lprob_zero(), lprob_zero()],)
+    hmm.add_state(M1, lprob_zero())
 
     M2 = NormalState(
-        b"M2", alphabet, [log(0.4 / 1.6), log(0.6 / 1.6), LPROB_ZERO, log(0.6 / 1.6)],
+        b"M2", alphabet, [log(0.4 / 1.6), log(0.6 / 1.6), lprob_zero(), log(0.6 / 1.6)],
     )
-    hmm.add_state(M2, LPROB_ZERO)
+    hmm.add_state(M2, lprob_zero())
 
     hmm.set_transition(S, M1, log(1.0))
     hmm.set_transition(M1, M2, log(1.0))
@@ -373,11 +373,11 @@ def test_hmm_viterbi_1():
     hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
 
-    hmm.set_transition(E, E, LPROB_ZERO)
-    assert_allclose(hmm.transition(E, E), LPROB_ZERO)
-    assert_allclose(hmm.transition(S, S), LPROB_ZERO)
-    assert_allclose(hmm.transition(S, E), LPROB_ZERO)
-    assert_allclose(hmm.transition(E, S), LPROB_ZERO)
+    hmm.set_transition(E, E, lprob_zero())
+    assert_allclose(hmm.transition(E, E), lprob_zero())
+    assert_allclose(hmm.transition(S, S), lprob_zero())
+    assert_allclose(hmm.transition(S, E), lprob_zero())
+    assert_allclose(hmm.transition(E, S), lprob_zero())
 
     results = hmm.viterbi(Sequence.create(b"AC", alphabet), E)
     assert_equal(len(results), 1)
@@ -392,20 +392,20 @@ def test_hmm_viterbi_2():
     hmm.add_state(S, log(1.0))
 
     E = MuteState(b"E", alphabet)
-    hmm.add_state(E, LPROB_ZERO)
+    hmm.add_state(E, lprob_zero())
 
     M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2)])
-    hmm.add_state(M1, LPROB_ZERO)
+    hmm.add_state(M1, lprob_zero())
 
     M2 = NormalState(b"M2", alphabet, [log(0.4), log(0.6)])
-    hmm.add_state(M2, LPROB_ZERO)
+    hmm.add_state(M2, lprob_zero())
 
     hmm.set_transition(S, M1, log(1.0))
     hmm.set_transition(M1, M2, log(1.0))
     hmm.set_transition(M2, E, log(1.0))
     hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
-    hmm.set_transition(E, E, LPROB_ZERO)
+    hmm.set_transition(E, E, lprob_zero())
 
     score = hmm.viterbi(Sequence.create(b"AC", alphabet), E)[0].loglikelihood
     assert_allclose(score, log(0.48))
@@ -436,19 +436,19 @@ def test_hmm_viterbi_3():
     hmm.add_state(S, log(1.0))
 
     E = MuteState(b"E", alphabet)
-    hmm.add_state(E, LPROB_ZERO)
+    hmm.add_state(E, lprob_zero())
 
     M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2)])
-    hmm.add_state(M1, LPROB_ZERO)
+    hmm.add_state(M1, lprob_zero())
 
     D1 = MuteState(b"D1", alphabet)
-    hmm.add_state(D1, LPROB_ZERO)
+    hmm.add_state(D1, lprob_zero())
 
     M2 = NormalState(b"M2", alphabet, [log(0.4), log(0.6)])
-    hmm.add_state(M2, LPROB_ZERO)
+    hmm.add_state(M2, lprob_zero())
 
     D2 = MuteState(b"D2", alphabet)
-    hmm.add_state(D2, LPROB_ZERO)
+    hmm.add_state(D2, lprob_zero())
 
     hmm.set_transition(S, M1, log(0.8))
     hmm.set_transition(S, D1, log(0.2))
@@ -463,7 +463,7 @@ def test_hmm_viterbi_3():
     hmm.set_transition(M2, E, log(1.0))
     hmm.set_transition(E, E, log(1.0))
     hmm.normalize()
-    hmm.set_transition(E, E, LPROB_ZERO)
+    hmm.set_transition(E, E, lprob_zero())
 
     results = hmm.viterbi(Sequence.create(b"AC", alphabet), E)
     score = results[0].loglikelihood
