@@ -3,7 +3,7 @@ from ._path import Path
 from ._state import State
 from ._alphabet import Alphabet
 from ._lprob import lprob_zero, lprob_is_valid
-from ._results import CResults
+from ._results import Results
 from .._cdata import CData
 from typing import Dict
 
@@ -114,7 +114,7 @@ class HMM:
 
     def viterbi(
         self, seq: Sequence, end_state: State, window_length: int = 0
-    ) -> CResults:
+    ) -> Results:
         from ._results import wrap_imm_results
 
         imm_seq = seq.imm_seq

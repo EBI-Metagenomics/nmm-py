@@ -1,3 +1,3 @@
-from ._imm import CResult, CResults
+from ._imm import Result, Results
 
-__all__ = ["CResult", "CResults"]
+__all__ = ["Result", "Results"]

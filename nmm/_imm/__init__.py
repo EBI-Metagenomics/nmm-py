@@ -10,8 +10,8 @@ from ._lprob import (
     lprob_zero,
 )
 from ._path import Path
-from ._result import CResult, wrap_imm_result
-from ._results import CResults, wrap_imm_results
+from ._result import Result, wrap_imm_result
+from ._results import Results, wrap_imm_results
 from ._sequence import Sequence, SequenceABC, SubSequence
 from ._sequence_table import SequenceTable
 from ._state import MuteState, NormalState, State, TableState
@@ -20,9 +20,8 @@ from ._step import Step
 __all__ = [
     "Alphabet",
     "AlphabetTable",
-    "CResult",
-    "CResult",
-    "CResults",
+    "Result",
+    "Results",
     "State",
     "FragStep",
     "Fragment",

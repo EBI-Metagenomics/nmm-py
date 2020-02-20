@@ -3,17 +3,29 @@ from typing import Dict
 from .._cdata import CData
 from .._ffi import ffi, lib
 from ._path import Path, wrap_imm_path
-from ._sequence import Sequence, SubSequence
+from ._sequence import Sequence, SequenceABC, SubSequence
 from ._state import State
 
 
-class CResult:
-    def __init__(self, imm_result: CData, path: Path, subseq: SubSequence):
+class Result:
+    """
+    Result.
+
+    Parameters
+    ----------
+    imm_result
+        Result pointer.
+    path
+        Path.
+    sequence
+        Sequence.
+    """
+    def __init__(self, imm_result: CData, path: Path, sequence: SequenceABC):
         if imm_result == ffi.NULL:
             raise RuntimeError("`imm_result` is NULL.")
         self._imm_result = imm_result
         self._path = path
-        self._subseq = subseq
+        self._sequence = sequence
 
     @property
     def loglikelihood(self) -> float:
@@ -24,8 +36,8 @@ class CResult:
         return self._path
 
     @property
-    def subseq(self) -> SubSequence:
-        return self._subseq
+    def sequence(self) -> SequenceABC:
+        return self._sequence
 
     def __del__(self):
         if self._imm_result != ffi.NULL:
@@ -38,5 +50,4 @@ class CResult:
 def wrap_imm_result(imm_result: CData, sequence: Sequence, states: Dict[CData, State]):
     path = wrap_imm_path(lib.imm_result_path(imm_result), states)
     imm_subseq = lib.imm_result_subseq(imm_result)
-    subseq = SubSequence(imm_subseq, sequence)
-    return CResult(imm_result, path, subseq)
+    return Result(imm_result, path, SubSequence(imm_subseq, sequence))

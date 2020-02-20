@@ -1,25 +1,29 @@
-from typing import List, Sequence, Dict
+from typing import Dict, Iterable, List
 
 from .._cdata import CData
-from ._state import State
 from .._ffi import ffi, lib
-from ._result import CResult
-from ._sequence import Sequence as Seq
+from ._result import Result
+from ._sequence import SequenceABC, Sequence
+from ._state import State
 
 
-class CResults:
+class Results:
     """
-    Wrapper around the C implementation of results.
+    Results.
 
     Parameters
     ----------
-    imm_results : `<cdata 'struct imm_results *'>`.
+    imm_results
         Results pointer.
-    sequence : `Seq`
+    results
+        List of results.
+    sequence
         Sequence.
     """
 
-    def __init__(self, imm_results: CData, results: Sequence[CResult], sequence: Seq):
+    def __init__(
+        self, imm_results: CData, results: Iterable[Result], sequence: SequenceABC
+    ):
         if imm_results == ffi.NULL:
             raise RuntimeError("`imm_results` is NULL.")
         self._imm_results = imm_results
@@ -29,7 +33,7 @@ class CResults:
     def __len__(self) -> int:
         return len(self._results)
 
-    def __getitem__(self, i) -> CResult:
+    def __getitem__(self, i) -> Result:
         return self._results[i]
 
     def __iter__(self):
@@ -44,12 +48,14 @@ class CResults:
         return "[" + ",".join([str(r) for r in self]) + "]"
 
 
-def wrap_imm_results(imm_results: CData, sequence: Seq, states: Dict[CData, State]):
+def wrap_imm_results(
+    imm_results: CData, sequence: Sequence, states: Dict[CData, State]
+):
     from ._result import wrap_imm_result
 
-    results: List[CResult] = []
+    results: List[Result] = []
     for i in range(lib.imm_results_size(imm_results)):
         imm_result = lib.imm_results_get(imm_results, i)
         results.append(wrap_imm_result(imm_result, sequence, states))
 
-    return CResults(imm_results, results, sequence)
+    return Results(imm_results, results, sequence)
