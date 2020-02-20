@@ -9,13 +9,13 @@ from ._lprob import (
     lprob_is_zero,
     lprob_normalize,
 )
-from ._path import CPath, Path, create_imm_path, wrap_imm_path
+from ._path import CPath, Path, wrap_imm_path
 from ._result import CResult, wrap_imm_result
 from ._results import CResults, wrap_imm_results
 from ._sequence import Sequence, SequenceABC, SubSequence
 from ._sequence_table import CSequenceTable, SequenceTable
 from ._state import CState, MuteState, NormalState, TableState
-from ._step import Step, create_imm_step
+from ._step import Step
 
 __all__ = [
     "Alphabet",
@@ -41,8 +41,6 @@ __all__ = [
     "Step",
     "SubSequence",
     "TableState",
-    "create_imm_path",
-    "create_imm_step",
     "lprob_is_valid",
     "lprob_is_zero",
     "lprob_normalize",

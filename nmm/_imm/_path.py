@@ -92,12 +92,3 @@ def wrap_imm_path(imm_path: ffi.CData, states: Dict[ffi.CData, CState]) -> CPath
         imm_step = lib.imm_path_next(imm_path, imm_step)
 
     return CPath(imm_path, steps)
-
-
-def create_imm_path(steps: Sequence[Step]) -> ffi.CData:
-    imm_path = lib.imm_path_create()
-    for step in steps:
-        lib.imm_path_append(imm_path, step.imm_step)
-    if imm_path == ffi.NULL:
-        raise RuntimeError("Could not create path.")
-    return imm_path

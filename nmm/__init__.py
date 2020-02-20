@@ -2,8 +2,6 @@ from . import alphabet, codon, fragment, path, prob, result, sequence, state
 from ._gencode import GeneticCode
 from ._imm import (
     HMM,
-    create_imm_path,
-    create_imm_step,
     wrap_imm_path,
     wrap_imm_result,
     wrap_imm_results,
@@ -33,8 +31,6 @@ __all__ = [
     "__version__",
     "alphabet",
     "codon",
-    "create_imm_path",
-    "create_imm_step",
     "fragment",
     "path",
     "prob",
