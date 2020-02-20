@@ -46,7 +46,7 @@ def test_mute_state():
 
 def test_table_state():
     alphabet = Alphabet.create(b"ACGU", b"X")
-    seqt = SequenceTable(alphabet)
+    seqt = SequenceTable.create(alphabet)
     seqt.add(Sequence.create(b"AUG", alphabet), log(0.8))
     seqt.add(Sequence.create(b"AUU", alphabet), log(0.4))
 

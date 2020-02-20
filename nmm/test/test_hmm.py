@@ -18,7 +18,7 @@ def test_hmm_states():
     S = MuteState(b"S", alphabet)
     hmm.add_state(S)
 
-    seqt = SequenceTable(alphabet)
+    seqt = SequenceTable.create(alphabet)
     seqt.add(Sequence.create(b"AGU", alphabet), log(0.8))
     seqt.add(Sequence.create(b"AGG", alphabet), log(0.2))
 

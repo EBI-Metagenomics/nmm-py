@@ -1,5 +1,5 @@
 from ._alphabet import Alphabet
-from ._alphabet_table import AlphabetTable, CAlphabetTable
+from ._alphabet_table import AlphabetTable
 from ._fragment import Fragment, FragStep
 from ._hmm import HMM
 from ._lprob import (
@@ -13,18 +13,16 @@ from ._path import Path
 from ._result import CResult, wrap_imm_result
 from ._results import CResults, wrap_imm_results
 from ._sequence import Sequence, SequenceABC, SubSequence
-from ._sequence_table import CSequenceTable, SequenceTable
+from ._sequence_table import SequenceTable
 from ._state import MuteState, NormalState, State, TableState
 from ._step import Step
 
 __all__ = [
     "Alphabet",
     "AlphabetTable",
-    "CAlphabetTable",
     "CResult",
     "CResult",
     "CResults",
-    "CSequenceTable",
     "State",
     "FragStep",
     "Fragment",

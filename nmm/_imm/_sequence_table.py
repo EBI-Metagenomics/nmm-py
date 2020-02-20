@@ -1,23 +1,47 @@
-from ._lprob import lprob_is_valid
-from ._alphabet import Alphabet
-from ._sequence import Sequence
-from .._ffi import ffi, lib
+from __future__ import annotations
+
+from typing import Type
+
 from .._cdata import CData
+from .._ffi import ffi, lib
+from ._alphabet import Alphabet
+from ._lprob import lprob_is_valid
+from ._sequence import Sequence
 
 
-class CSequenceTable:
+class SequenceTable:
     """
-    Wrapper around the C implementation of sequence table.
+    Table of sequence probabilities.
 
     Parameters
     ----------
-    imm_seq_table : `<cdata 'struct imm_seq_table *'>`.
+    imm_seq_table
+        Pointer.
+    alphabet
+        Alphabet.
     """
 
-    def __init__(self, imm_seq_table: CData):
+    def __init__(self, imm_seq_table: CData, alphabet: Alphabet):
         if imm_seq_table == ffi.NULL:
             raise RuntimeError("`imm_seq_table` is NULL.")
         self._imm_seq_table = imm_seq_table
+        self._alphabet = alphabet
+
+    @classmethod
+    def create(cls: Type[SequenceTable], alphabet: Alphabet) -> SequenceTable:
+        """
+        Create a table of sequence probabilities.
+
+        Parameters
+        ----------
+        alphabet
+            Alphabet.
+        """
+        return cls(lib.imm_seq_table_create(alphabet.imm_abc), alphabet)
+
+    @property
+    def alphabet(self) -> Alphabet:
+        return self._alphabet
 
     @property
     def imm_seq_table(self) -> CData:
@@ -53,28 +77,6 @@ class CSequenceTable:
 
     def __str__(self) -> str:
         return f"[{self.symbols.decode()}]"
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}:{str(self)}>"
-
-
-class SequenceTable(CSequenceTable):
-    """
-    Table of sequence probabilities.
-
-    Parameters
-    ----------
-    alphabet : `Alphabet`
-        Alphabet.
-    """
-
-    def __init__(self, alphabet: Alphabet):
-        self._alphabet = alphabet
-        super().__init__(lib.imm_seq_table_create(alphabet.imm_abc))
-
-    @property
-    def alphabet(self) -> Alphabet:
-        return self._alphabet
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

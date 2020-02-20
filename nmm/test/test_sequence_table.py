@@ -9,7 +9,7 @@ from nmm.prob import SequenceTable, lprob_is_zero
 
 def test_sequence_table():
     alphabet = Alphabet.create(b"ACGT", b"X")
-    seqt = SequenceTable(alphabet)
+    seqt = SequenceTable.create(alphabet)
 
     with pytest.raises(RuntimeError):
         seqt.normalize()
