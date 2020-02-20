@@ -1,13 +1,13 @@
 from typing import Dict
 
 from .._ffi import ffi, lib
-from ._path import CPath, wrap_imm_path
+from ._path import Path, wrap_imm_path
 from ._sequence import Sequence, SubSequence
 from ._state import CState
 
 
 class CResult:
-    def __init__(self, imm_result: ffi.CData, path: CPath, subseq: SubSequence):
+    def __init__(self, imm_result: ffi.CData, path: Path, subseq: SubSequence):
         if imm_result == ffi.NULL:
             raise RuntimeError("`imm_result` is NULL.")
         self._imm_result = imm_result
@@ -19,7 +19,7 @@ class CResult:
         return lib.imm_result_loglik(self._imm_result)
 
     @property
-    def path(self) -> CPath:
+    def path(self) -> Path:
         return self._path
 
     @property

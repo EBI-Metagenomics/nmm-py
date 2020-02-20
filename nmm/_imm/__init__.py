@@ -9,7 +9,7 @@ from ._lprob import (
     lprob_is_zero,
     lprob_normalize,
 )
-from ._path import CPath, Path, wrap_imm_path
+from ._path import Path, wrap_imm_path
 from ._result import CResult, wrap_imm_result
 from ._results import CResults, wrap_imm_results
 from ._sequence import Sequence, SequenceABC, SubSequence
@@ -21,7 +21,6 @@ __all__ = [
     "Alphabet",
     "AlphabetTable",
     "CAlphabetTable",
-    "CPath",
     "CResult",
     "CResult",
     "CResults",

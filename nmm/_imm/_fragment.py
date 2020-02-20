@@ -2,7 +2,7 @@ from typing import Generic, Iterator, TypeVar
 
 from .._interval import Interval
 from ._alphabet import Alphabet
-from ._path import CPath
+from ._path import Path
 from ._sequence import SequenceABC
 from ._state import CState
 from ._step import Step
@@ -44,7 +44,7 @@ class Fragment(Generic[TAlphabet, TState]):
     """
 
     def __init__(
-        self, sequence: SequenceABC[TAlphabet], path: CPath[Step[TState]],
+        self, sequence: SequenceABC[TAlphabet], path: Path[Step[TState]],
     ):
         self._sequence = sequence
         self._path = path

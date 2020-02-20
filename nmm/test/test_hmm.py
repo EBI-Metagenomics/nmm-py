@@ -114,103 +114,222 @@ def test_hmm_likelihood():
 
     p = hmm.likelihood(
         Sequence.create(b"AC", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, log(0.3))
 
     p = hmm.likelihood(
         Sequence.create(b"AA", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, log(0.2))
 
     p = hmm.likelihood(
         Sequence.create(b"AG", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"AU", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, log(0.3))
 
     p = hmm.likelihood(
         Sequence.create(b"CC", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, log(0.075))
 
     p = hmm.likelihood(
         Sequence.create(b"CA", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, log(0.05))
 
     p = hmm.likelihood(
         Sequence.create(b"CG", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"CG", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"CU", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, log(0.075))
 
     p = hmm.likelihood(
         Sequence.create(b"GC", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"GA", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"GG", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"GU", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"UC", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"UA", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"UG", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
     p = hmm.likelihood(
         Sequence.create(b"UU", alphabet),
-        Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]),
+        Path.create(
+            [
+                Step.create(S, 0),
+                Step.create(M1, 1),
+                Step.create(M2, 1),
+                Step.create(E, 0),
+            ]
+        ),
     )
     assert_allclose(p, LPROB_ZERO)
 
@@ -219,7 +338,14 @@ def test_hmm_likelihood():
     with pytest.raises(ValueError):
         hmm.likelihood(
             Sequence.create(b"UU", alphabet),
-            Path([Step.create(S, 0), Step.create(M1, 1), Step.create(M3, 1), Step.create(E, 0)]),
+            Path.create(
+                [
+                    Step.create(S, 0),
+                    Step.create(M1, 1),
+                    Step.create(M3, 1),
+                    Step.create(E, 0),
+                ]
+            ),
         )
 
 

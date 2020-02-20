@@ -19,7 +19,7 @@ def test_fragment():
     M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), log(0.01), log(0.01)],)
     M2 = NormalState(b"M2", alphabet, [log(0.4), log(0.6), log(0.1), log(0.6)])
 
-    path = Path(
+    path = Path.create(
         [Step.create(S, 0), Step.create(M1, 1), Step.create(M2, 1), Step.create(E, 0)]
     )
 

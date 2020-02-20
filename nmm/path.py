@@ -1,3 +1,3 @@
-from ._imm import CPath, Path, Step
+from ._imm import Path, Step
 
-__all__ = ["CPath", "Path", "Step"]
+__all__ = ["Path", "Step"]

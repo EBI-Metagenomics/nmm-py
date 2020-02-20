@@ -1,5 +1,5 @@
 from ._sequence import Sequence
-from ._path import CPath
+from ._path import Path
 from ._state import CState
 from ._alphabet import Alphabet
 from ._lprob import LPROB_ZERO, lprob_is_valid
@@ -105,7 +105,7 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def likelihood(self, seq: Sequence, path: CPath):
+    def likelihood(self, seq: Sequence, path: Path):
         lprob: float = lib.imm_hmm_likelihood(self._hmm, seq.imm_seq, path.imm_path)
         if not lprob_is_valid(lprob):
             raise ValueError("Could not calculate the likelihood.")
