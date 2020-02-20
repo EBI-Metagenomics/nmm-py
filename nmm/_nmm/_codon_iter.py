@@ -1,17 +1,17 @@
 from typing import Iterable
 import itertools
 
-from ._base_alphabet import CBaseAlphabet
+from ._base_alphabet import BaseAlphabet
 from ._codon import Codon
 
 
-def codon_iter(base_abc: CBaseAlphabet) -> Iterable[Codon]:
+def codon_iter(base_abc: BaseAlphabet) -> Iterable[Codon]:
     """
     Codon iterator.
 
     Parameters
     ----------
-    base_abc : CBaseAlphabet
+    base_abc
         Base alphabet.
     """
     bases = [base_abc.symbols[i : i + 1] for i in range(len(base_abc.symbols))]

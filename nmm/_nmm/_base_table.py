@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from .._ffi import ffi, lib
-from ._base_alphabet import CBaseAlphabet
+from ._base_alphabet import BaseAlphabet
 
 
 class CBaseTable:
@@ -12,18 +12,18 @@ class CBaseTable:
     ----------
     nmm_base_table : `<cdata 'struct nmm_base_table *'>`.
         Base table.
-    base : `CBaseAlphabet`
+    base : `BaseAlphabet`
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_base_table: ffi.CData, base_abc: CBaseAlphabet):
+    def __init__(self, nmm_base_table: ffi.CData, base_abc: BaseAlphabet):
         if nmm_base_table == ffi.NULL:
             raise RuntimeError("`nmm_base_table` is NULL.")
         self._nmm_base_table = nmm_base_table
         self._base_abc = base_abc
 
     @property
-    def alphabet(self) -> CBaseAlphabet:
+    def alphabet(self) -> BaseAlphabet:
         return self._base_abc
 
     @property
@@ -44,14 +44,14 @@ class BaseTable(CBaseTable):
 
     Parameters
     ----------
-    base : `CBaseAlphabet`
+    base : `BaseAlphabet`
         Four-nucleotides alphabet.
     lprobs : `Tuple[float, float, float, float]`
         Log probability of each nucleotide.
     """
 
     def __init__(
-        self, base_abc: CBaseAlphabet, lprobs: Tuple[float, float, float, float]
+        self, base_abc: BaseAlphabet, lprobs: Tuple[float, float, float, float]
     ):
         nmm_base_table = lib.nmm_base_table_create(base_abc.nmm_base_abc, *lprobs)
         super().__init__(nmm_base_table, base_abc)

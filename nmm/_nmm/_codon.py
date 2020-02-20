@@ -1,5 +1,5 @@
 from .._ffi import ffi, lib
-from ._base_alphabet import CBaseAlphabet
+from ._base_alphabet import BaseAlphabet
 
 
 class CCodon:
@@ -16,14 +16,14 @@ class CCodon:
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codon: ffi.CData, base: CBaseAlphabet):
+    def __init__(self, nmm_codon: ffi.CData, base: BaseAlphabet):
         if nmm_codon == ffi.NULL:
             raise RuntimeError("`nmm_codon` is NULL.")
         self._nmm_codon = nmm_codon
         self._base = base
 
     @property
-    def base(self) -> CBaseAlphabet:
+    def base(self) -> BaseAlphabet:
         return self._base
 
     @property
@@ -76,7 +76,7 @@ class Codon(CCodon):
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, symbols: bytes, base: CBaseAlphabet):
+    def __init__(self, symbols: bytes, base: BaseAlphabet):
         super().__init__(lib.nmm_codon_create(base.nmm_base_abc), base)
         self.symbols = symbols
 

@@ -59,7 +59,7 @@ def test_table_state():
 
 
 def test_frame_state():
-    base = BaseAlphabet(b"ACGU", b"X")
+    base = BaseAlphabet.create(b"ACGU", b"X")
     baset = BaseTable(base, (log(0.25), log(0.25), log(0.25), log(0.25)))
 
     codonp = CodonProb(base)

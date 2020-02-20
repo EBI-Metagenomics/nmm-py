@@ -26,7 +26,7 @@ def test_sequence():
 
 
 def test_sequence_base():
-    alphabet = BaseAlphabet(b"ACGT", b"X")
+    alphabet = BaseAlphabet.create(b"ACGT", b"X")
     seq = Sequence.create(b"ACAAAGATX", alphabet)
 
     assert_equal(seq.length, 9)

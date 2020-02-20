@@ -5,11 +5,11 @@ from nmm.alphabet import BaseAlphabet
 
 
 def test_base_alphabet():
-    base = BaseAlphabet(b"ACGT", b"X")
+    base = BaseAlphabet.create(b"ACGT", b"X")
 
     assert_equal(base.symbols, b"ACGT")
     assert_equal(str(base), "{ACGT}")
     assert_equal(repr(base), "<BaseAlphabet:{ACGT}>")
 
     with pytest.raises(RuntimeError):
-        BaseAlphabet(b"ACGTK", b"X")
+        BaseAlphabet.create(b"ACGTK", b"X")

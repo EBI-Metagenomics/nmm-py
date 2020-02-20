@@ -8,7 +8,7 @@ from nmm.prob import CodonProb, CodonTable
 
 
 def test_codon_table():
-    base = BaseAlphabet(b"ACGT", b"X")
+    base = BaseAlphabet.create(b"ACGT", b"X")
     codonp = CodonProb(base)
 
     codonp.set_lprob(Codon(b"AAA", base), log(0.01))

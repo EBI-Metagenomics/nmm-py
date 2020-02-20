@@ -9,7 +9,7 @@ from nmm.prob import CodonProb, lprob_is_zero
 
 
 def test_codon_prob():
-    base = BaseAlphabet(b"ACGT", b"X")
+    base = BaseAlphabet.create(b"ACGT", b"X")
     codonp = CodonProb(base)
 
     with pytest.raises(RuntimeError):

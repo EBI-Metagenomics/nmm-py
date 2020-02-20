@@ -6,7 +6,7 @@ from nmm.codon import Codon
 
 
 def test_codon():
-    base = BaseAlphabet(b"ACGT", b"X")
+    base = BaseAlphabet.create(b"ACGT", b"X")
 
     codon = Codon(b"AAA", base)
     assert_equal(codon.symbols, b"AAA")

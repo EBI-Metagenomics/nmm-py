@@ -1,6 +1,6 @@
 from .._ffi import ffi, lib
 from .._imm import lprob_is_valid
-from ._base_alphabet import CBaseAlphabet
+from ._base_alphabet import BaseAlphabet
 from ._codon import CCodon
 from ._codon_prob import CCodonProb
 
@@ -17,14 +17,14 @@ class CCodonTable:
         Four-nucleotides alphabet.
     """
 
-    def __init__(self, nmm_codon_table: ffi.CData, base: CBaseAlphabet):
+    def __init__(self, nmm_codon_table: ffi.CData, base: BaseAlphabet):
         if nmm_codon_table == ffi.NULL:
             raise RuntimeError("`nmm_codon_table` is NULL.")
         self._nmm_codon_table = nmm_codon_table
         self._base = base
 
     @property
-    def base(self) -> CBaseAlphabet:
+    def base(self) -> BaseAlphabet:
         return self._base
 
     @property
