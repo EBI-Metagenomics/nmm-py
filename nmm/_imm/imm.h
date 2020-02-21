@@ -39,6 +39,7 @@ char const *          imm_abc_symbols(struct imm_abc const *abc);
 bool                  imm_abc_has_symbol(struct imm_abc const *abc, char symbol_id);
 int                   imm_abc_symbol_idx(struct imm_abc const *abc, char symbol_id);
 char                  imm_abc_symbol_id(struct imm_abc const *abc, unsigned symbol_idx);
+char                  imm_abc_any_symbol(struct imm_abc const *abc);
 
 /* Alphabet table */
 struct imm_abc_table const *imm_abc_table_create(struct imm_abc const *abc, double const *lprobs);

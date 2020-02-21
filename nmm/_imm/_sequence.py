@@ -80,7 +80,7 @@ class Sequence(SequenceABC[T]):
     def __getitem__(self, i: Union[int, slice, Interval]):
         if isinstance(i, int):
             return bytes(self)[i : i + 1]
-        elif isinstance(i, slice):
+        if isinstance(i, slice):
             interval = Interval.from_slice(i)
         elif isinstance(i, Interval):
             interval = i
@@ -165,7 +165,7 @@ class SubSequence(SequenceABC[T]):
     def __getitem__(self, i: Union[int, slice, Interval]):
         if isinstance(i, int):
             return bytes(self)[i : i + 1]
-        elif isinstance(i, slice):
+        if isinstance(i, slice):
             interval = Interval.from_slice(i)
         elif isinstance(i, Interval):
             interval = i

@@ -1,22 +1,24 @@
-from typing import Sequence
+from typing import Iterable, Generic, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib
 from ._alphabet import Alphabet
 from ._lprob import lprob_is_valid
-from ._sequence import Sequence as Seq
+from ._sequence import Sequence
 from ._sequence_table import SequenceTable
 
+T = TypeVar("T", bound=Alphabet)
 
-class State:
-    def __init__(self, imm_state: CData, alphabet: Alphabet):
+
+class State(Generic[T]):
+    def __init__(self, imm_state: CData, alphabet: T):
         if imm_state == ffi.NULL:
             raise RuntimeError("`imm_state` is NULL.")
         self._imm_state = imm_state
         self._alphabet = alphabet
 
     @property
-    def alphabet(self) -> Alphabet:
+    def alphabet(self) -> T:
         return self._alphabet
 
     @property
@@ -35,7 +37,7 @@ class State:
     def max_seq(self) -> int:
         return lib.imm_state_max_seq(self._imm_state)
 
-    def lprob(self, sequence: Seq) -> float:
+    def lprob(self, sequence: Sequence) -> float:
         """
         Log-space probability of sequence emission.
 
@@ -59,8 +61,8 @@ class State:
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class MuteState(State):
-    def __init__(self, name: bytes, alphabet: Alphabet):
+class MuteState(State[T]):
+    def __init__(self, name: bytes, alphabet: T):
         """
         Mute state.
 
@@ -85,8 +87,8 @@ class MuteState(State):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class NormalState(State):
-    def __init__(self, name: bytes, alphabet: Alphabet, lprobs: Sequence[float]):
+class NormalState(State[T]):
+    def __init__(self, name: bytes, alphabet: T, lprobs: Iterable[float]):
         """
         Normal state.
 
@@ -114,7 +116,7 @@ class NormalState(State):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class TableState(State):
+class TableState(State[T]):
     def __init__(self, name: bytes, sequence_table: SequenceTable):
         """
         Parameters

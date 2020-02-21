@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Type
+from typing import Type, TypeVar, Generic
 
 from .._cdata import CData
 from .._ffi import ffi, lib
@@ -8,8 +8,10 @@ from ._alphabet import Alphabet
 from ._lprob import lprob_is_valid
 from ._sequence import Sequence
 
+T = TypeVar("T", bound=Alphabet)
 
-class SequenceTable:
+
+class SequenceTable(Generic[T]):
     """
     Table of sequence probabilities.
 
@@ -21,14 +23,14 @@ class SequenceTable:
         Alphabet.
     """
 
-    def __init__(self, imm_seq_table: CData, alphabet: Alphabet):
+    def __init__(self, imm_seq_table: CData, alphabet: T):
         if imm_seq_table == ffi.NULL:
             raise RuntimeError("`imm_seq_table` is NULL.")
         self._imm_seq_table = imm_seq_table
         self._alphabet = alphabet
 
     @classmethod
-    def create(cls: Type[SequenceTable], alphabet: Alphabet) -> SequenceTable:
+    def create(cls: Type[SequenceTable], alphabet: T) -> SequenceTable:
         """
         Create a table of sequence probabilities.
 
@@ -40,7 +42,7 @@ class SequenceTable:
         return cls(lib.imm_seq_table_create(alphabet.imm_abc), alphabet)
 
     @property
-    def alphabet(self) -> Alphabet:
+    def alphabet(self) -> T:
         return self._alphabet
 
     @property

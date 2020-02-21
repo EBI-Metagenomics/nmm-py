@@ -60,6 +60,10 @@ class Alphabet:
     def symbol_id(self, symbol_idx: int) -> bytes:
         return lib.imm_abc_symbol_id(self._imm_abc, symbol_idx)
 
+    @property
+    def any_symbol(self) -> bytes:
+        return lib.imm_abc_any_symbol(self._imm_abc)
+
     def __del__(self):
         if self._imm_abc != ffi.NULL:
             lib.imm_abc_destroy(self._imm_abc)
