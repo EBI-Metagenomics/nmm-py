@@ -60,3 +60,23 @@ class BaseAlphabet(Alphabet):
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+class RNAAlphabet(BaseAlphabet):
+    """
+    RNA alphabet.
+    """
+
+    def __init__(self):
+        abc = Alphabet.create(b"ACGU", b"X")
+        super().__init__(lib.nmm_base_abc_create(abc.imm_abc), abc)
+
+
+class DNAAlphabet(BaseAlphabet):
+    """
+    DNA alphabet.
+    """
+
+    def __init__(self):
+        abc = Alphabet.create(b"ACGT", b"X")
+        super().__init__(lib.nmm_base_abc_create(abc.imm_abc), abc)

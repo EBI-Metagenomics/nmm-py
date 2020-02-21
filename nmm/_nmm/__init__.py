@@ -1,6 +1,6 @@
 from ._amino_alphabet import AminoAlphabet, CanonicalAminoAlphabet
 from ._amino_table import AminoTable
-from ._base_alphabet import BaseAlphabet
+from ._base_alphabet import BaseAlphabet, DNAAlphabet, RNAAlphabet
 from ._base_table import BaseTable
 from ._codon import Codon
 from ._codon_iter import codon_iter
@@ -13,11 +13,13 @@ __all__ = [
     "AminoTable",
     "BaseAlphabet",
     "BaseTable",
+    "CanonicalAminoAlphabet",
     "Codon",
     "CodonProb",
     "CodonState",
     "CodonTable",
+    "DNAAlphabet",
     "FrameState",
-    "CanonicalAminoAlphabet",
+    "RNAAlphabet",
     "codon_iter",
 ]
