@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Generic, Iterable, Iterator, List, Type, TypeVar
+from typing import Mapping, Generic, Iterable, Iterator, List, Type, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib
@@ -8,6 +8,7 @@ from ._state import State
 from ._step import Step
 
 T = TypeVar("T", bound=Step)
+TState = TypeVar("TState", bound=State)
 
 
 class Path(Generic[T]):
@@ -68,8 +69,8 @@ class Path(Generic[T]):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-def wrap_imm_path(imm_path: CData, states: Dict[CData, State]) -> Path:
-    steps: List[Step] = []
+def wrap_imm_path(imm_path: CData, states: Mapping[CData, TState]) -> Path:
+    steps: List[Step[TState]] = []
     imm_step = lib.imm_path_first(imm_path)
     while imm_step != ffi.NULL:
         imm_state = lib.imm_step_state(imm_step)

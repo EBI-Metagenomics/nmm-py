@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, TypeVar, Generic
 
 from .._cdata import CData
 from .._ffi import ffi, lib
@@ -10,7 +10,10 @@ from ._sequence import Sequence
 from ._state import State
 
 
-class HMM:
+TState = TypeVar("TState", bound=State)
+
+
+class HMM(Generic[TState]):
     """
     Hidden Markov model.
 
@@ -22,25 +25,25 @@ class HMM:
 
     def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
-        self._states: Dict[CData, State] = {}
+        self._states: Dict[CData, TState] = {}
         self._hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
         if self._hmm == ffi.NULL:
             raise RuntimeError("`imm_hmm_create` failed.")
 
-    def states(self) -> Dict[CData, State]:
+    def states(self) -> Dict[CData, TState]:
         return self._states
 
-    def set_start_lprob(self, state: State, lprob: float):
+    def set_start_lprob(self, state: TState, lprob: float):
         if lib.imm_hmm_set_start(self._hmm, state.imm_state, lprob) != 0:
             raise RuntimeError("Could not set start probability.")
 
-    def transition(self, a: State, b: State):
+    def transition(self, a: TState, b: TState):
         """
         Parameters
         ----------
-        a : State
+        a
             Source state.
-        b : State
+        b
             Destination state.
         """
         lprob: float = lib.imm_hmm_get_trans(self._hmm, a.imm_state, b.imm_state)
@@ -48,13 +51,13 @@ class HMM:
             raise RuntimeError("Could not retrieve transition probability.")
         return lprob
 
-    def set_transition(self, a: State, b: State, lprob: float):
+    def set_transition(self, a: TState, b: TState, lprob: float):
         """
         Parameters
         ----------
-        a : State
+        a
             Source state.
-        b : State
+        b
             Destination state.
         lprob : float
             Transition probability in log-space.
@@ -73,20 +76,20 @@ class HMM:
     def alphabet(self) -> Alphabet:
         return self._alphabet
 
-    def add_state(self, state: State, start_lprob: float = lprob_zero()):
+    def add_state(self, state: TState, start_lprob: float = lprob_zero()):
         """
         Parameters
         ----------
-        state :  `State`
+        state
             Add state.
-        start_lprob : float
+        start_lprob
             Log-space probability of being the initial state.
         """
         if lib.imm_hmm_add_state(self._hmm, state.imm_state, start_lprob) != 0:
             raise ValueError(f"Could not add state {str(state.name)}.")
         self._states[state.imm_state] = state
 
-    def del_state(self, state: State):
+    def del_state(self, state: TState):
         if state.imm_state not in self._states:
             raise ValueError(f"State {state} not found.")
 
@@ -100,7 +103,7 @@ class HMM:
         if lib.imm_hmm_normalize(self._hmm) != 0:
             raise ValueError("Normalization error.")
 
-    def normalize_transitions(self, state: State):
+    def normalize_transitions(self, state: TState):
         err: int = lib.imm_hmm_normalize_trans(self._hmm, state.imm_state)
         if err != 0:
             raise ValueError("Normalization error.")
@@ -112,8 +115,8 @@ class HMM:
         return lprob
 
     def viterbi(
-        self, seq: Sequence, end_state: State, window_length: int = 0
-    ) -> Results:
+        self, seq: Sequence, end_state: TState, window_length: int = 0
+    ) -> Results[TState]:
         from ._results import wrap_imm_results
 
         imm_seq = seq.imm_seq
