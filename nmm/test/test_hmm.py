@@ -493,3 +493,18 @@ def test_hmm_viterbi_3():
 
     score = hmm.viterbi(Sequence.create(b"AC", alphabet), M2)[0].loglikelihood
     assert_allclose(score, log(0.3072))
+
+    results = hmm.viterbi(Sequence.create(b"ACAC", alphabet), M2, 2)
+    assert_equal(len(results), 3)
+
+    assert_allclose(results[0].loglikelihood, log(0.3072))
+    assert_equal(bytes(results[0].sequence), b"AC")
+
+    assert_allclose(results[1].loglikelihood, log(0.0512))
+    assert_equal(bytes(results[1].sequence), b"CA")
+
+    assert_allclose(results[2].loglikelihood, log(0.3072))
+    assert_equal(bytes(results[2].sequence), b"AC")
+
+    assert_equal(results[1].path[1].seq_len, 1)
+    assert_equal(results[1].path[1].state.name, b"M1")
