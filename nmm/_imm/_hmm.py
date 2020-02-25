@@ -105,7 +105,7 @@ class HMM:
         if err != 0:
             raise ValueError("Normalization error.")
 
-    def likelihood(self, seq: Sequence, path: Path):
+    def likelihood(self, seq: Sequence, path: Path) -> float:
         lprob: float = lib.imm_hmm_likelihood(self._hmm, seq.imm_seq, path.imm_path)
         if not lprob_is_valid(lprob):
             raise ValueError("Could not calculate the likelihood.")
