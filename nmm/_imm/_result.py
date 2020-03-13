@@ -4,7 +4,7 @@ from .._cdata import CData
 from .._ffi import ffi, lib
 from ._path import Path, wrap_imm_path
 from ._step import Step
-from ._sequence import Sequence, SequenceABC, SubSequence
+from ._sequence import Sequence, SubSequence
 from ._state import State
 
 
@@ -26,7 +26,7 @@ class Result(Generic[TState]):
     """
 
     def __init__(
-        self, imm_result: CData, path: Path[Step[TState]], sequence: SequenceABC
+        self, imm_result: CData, path: Path[Step[TState]], sequence: SubSequence,
     ):
         if imm_result == ffi.NULL:
             raise RuntimeError("`imm_result` is NULL.")
@@ -43,7 +43,7 @@ class Result(Generic[TState]):
         return self._path
 
     @property
-    def sequence(self) -> SequenceABC:
+    def sequence(self) -> SubSequence:
         return self._sequence
 
     def __del__(self):

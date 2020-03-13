@@ -3,7 +3,7 @@ from typing import Dict, TypeVar, Generic
 from .._cdata import CData
 from .._ffi import ffi, lib
 from ._alphabet import Alphabet
-from ._lprob import lprob_is_valid, lprob_zero
+from ._lprob import lprob_is_valid, lprob_zero, lprob_is_zero
 from ._path import Path
 from ._results import Results
 from ._sequence import Sequence
@@ -127,6 +127,24 @@ class HMM(Generic[TState]):
             raise RuntimeError("Could not run viterbi.")
 
         return wrap_imm_results(imm_results, seq, self._states)
+
+    def view(self):
+        from graphviz import Digraph
+
+        dot = Digraph(comment="HMM")
+
+        for state in self._states.values():
+            dot.node(state.name.decode(), state.name.decode())
+
+        for state0 in self._states.values():
+            for state1 in self._states.values():
+                t = self.transition(state0, state1)
+                if lprob_is_zero(t):
+                    continue
+                label = f"{t:.6f}"
+                dot.edge(state0.name.decode(), state1.name.decode(), label=label)
+
+        dot.view()
 
     def __del__(self):
         if self._hmm != ffi.NULL:
