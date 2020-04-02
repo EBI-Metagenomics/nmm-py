@@ -114,6 +114,16 @@ class HMM(Generic[TState]):
             raise ValueError("Could not calculate the likelihood.")
         return lprob
 
+    def create_dp(self, end_state: TState):
+        from ._dp import DP
+
+        imm_state = end_state.imm_state
+        imm_dp = lib.imm_hmm_create_dp(self._hmm, imm_state)
+        if imm_dp == ffi.NULL:
+            raise RuntimeError("Could not create dp.")
+
+        return DP(imm_dp, self)
+
     def viterbi(
         self, seq: Sequence, end_state: TState, window_length: int = 0
     ) -> Results[TState]:

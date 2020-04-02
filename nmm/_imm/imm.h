@@ -1,4 +1,5 @@
 struct imm_abc;
+struct imm_dp;
 struct imm_hmm;
 struct imm_mute_state;
 struct imm_normal_state;
@@ -26,8 +27,8 @@ struct imm_seq
 
 struct imm_subseq
 {
-    struct imm_seq const *seq;
-    struct imm_seq        subseq;
+    struct imm_seq const *parent;
+    struct imm_seq        seq;
 };
 
 /* Alphabet */
@@ -40,6 +41,7 @@ bool                  imm_abc_has_symbol(struct imm_abc const *abc, char symbol_
 int                   imm_abc_symbol_idx(struct imm_abc const *abc, char symbol_id);
 char                  imm_abc_symbol_id(struct imm_abc const *abc, unsigned symbol_idx);
 char                  imm_abc_any_symbol(struct imm_abc const *abc);
+enum imm_symbol_type  imm_abc_symbol_type(struct imm_abc const *abc, char symbol_id);
 
 /* Alphabet table */
 struct imm_abc_table const *imm_abc_table_create(struct imm_abc const *abc, double const *lprobs);
@@ -75,10 +77,12 @@ unsigned              imm_seq_table_max_seq(struct imm_seq_table const *table);
 
 /* State */
 char const *            imm_state_get_name(struct imm_state const *state);
+struct imm_abc const *  imm_state_get_abc(struct imm_state const *state);
 double                  imm_state_lprob(struct imm_state const *state, struct imm_seq const *seq);
 unsigned                imm_state_min_seq(struct imm_state const *state);
 unsigned                imm_state_max_seq(struct imm_state const *state);
 struct imm_state const *imm_state_cast_c(void const *state);
+void const *            imm_state_get_impl_c(struct imm_state const *state);
 
 /* Normal state */
 struct imm_normal_state const *imm_normal_state_create(char const *name, struct imm_abc const *abc,
@@ -94,7 +98,9 @@ struct imm_table_state *imm_table_state_create(char const *name, struct imm_seq_
 void                    imm_table_state_destroy(struct imm_table_state const *state);
 
 /* Results */
-struct imm_results *     imm_results_create(struct imm_seq const *seq, unsigned nresults);
+struct imm_results *imm_results_create(struct imm_seq const *seq, unsigned nresults);
+void imm_results_set(struct imm_results *results, unsigned idx, struct imm_subseq subseq,
+                     struct imm_path const *path, double loglik);
 struct imm_result const *imm_results_get(struct imm_results const *results, unsigned idx);
 unsigned                 imm_results_size(struct imm_results const *results);
 void                     imm_results_destroy(struct imm_results const *results);
@@ -104,6 +110,7 @@ void                     imm_results_free(struct imm_results const *results);
 double                 imm_result_loglik(struct imm_result const *result);
 struct imm_path const *imm_result_path(struct imm_result const *result);
 struct imm_subseq      imm_result_subseq(struct imm_result const *result);
+void                   imm_result_destroy(struct imm_result const *result);
 void                   imm_result_free(struct imm_result const *result);
 
 /* HMM */
@@ -118,10 +125,15 @@ double imm_hmm_get_trans(struct imm_hmm const *hmm, struct imm_state const *src_
                          struct imm_state const *dst_state);
 double imm_hmm_likelihood(struct imm_hmm const *hmm, struct imm_seq const *seq,
                           struct imm_path const *path);
-struct imm_results const *imm_hmm_viterbi(struct imm_hmm const *hmm, struct imm_seq const *seq,
-                                          struct imm_state const *end_state, unsigned window_length);
-int                       imm_hmm_normalize(struct imm_hmm *hmm);
-int                       imm_hmm_normalize_trans(struct imm_hmm *hmm, struct imm_state const *src);
+struct imm_dp const *imm_hmm_create_dp(struct imm_hmm const *hmm, struct imm_state const *end_state);
+int                  imm_hmm_normalize(struct imm_hmm *hmm);
+int                  imm_hmm_normalize_start(struct imm_hmm *hmm);
+int                  imm_hmm_normalize_trans(struct imm_hmm *hmm, struct imm_state const *src);
+
+/* DP */
+struct imm_results const *imm_dp_viterbi(struct imm_dp const *dp, struct imm_seq const *seq,
+                                         unsigned window_length);
+void                      imm_dp_destroy(struct imm_dp const *dp);
 
 /* Path */
 struct imm_path *      imm_path_create(void);

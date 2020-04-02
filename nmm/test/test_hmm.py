@@ -379,7 +379,8 @@ def test_hmm_viterbi_1():
     assert_allclose(hmm.transition(S, E), lprob_zero())
     assert_allclose(hmm.transition(E, S), lprob_zero())
 
-    results = hmm.viterbi(Sequence.create(b"AC", alphabet), E)
+    dp = hmm.create_dp(E)
+    results = dp.viterbi(Sequence.create(b"AC", alphabet))
     assert_equal(len(results), 1)
     assert_allclose(results[0].loglikelihood, log(0.3))
 
@@ -407,24 +408,26 @@ def test_hmm_viterbi_2():
     hmm.normalize()
     hmm.set_transition(E, E, lprob_zero())
 
-    score = hmm.viterbi(Sequence.create(b"AC", alphabet), E)[0].loglikelihood
+    dp = hmm.create_dp(E)
+    score = dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.48))
 
-    score = hmm.viterbi(Sequence.create(b"AA", alphabet), E)[0].loglikelihood
+    score = dp.viterbi(Sequence.create(b"AA", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.32))
 
-    score = hmm.viterbi(Sequence.create(b"CA", alphabet), E)[0].loglikelihood
+    score = dp.viterbi(Sequence.create(b"CA", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.08))
 
-    score = hmm.viterbi(Sequence.create(b"CC", alphabet), E)[0].loglikelihood
+    score = dp.viterbi(Sequence.create(b"CC", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.12))
 
     hmm.set_transition(M1, E, log(1.0))
 
-    score = hmm.viterbi(Sequence.create(b"AC", alphabet), E)[0].loglikelihood
+    dp = hmm.create_dp(E)
+    score = dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.48))
 
-    score = hmm.viterbi(Sequence.create(b"AA", alphabet), E)[0].loglikelihood
+    score = dp.viterbi(Sequence.create(b"AA", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.32))
 
 
@@ -465,7 +468,8 @@ def test_hmm_viterbi_3():
     hmm.normalize()
     hmm.set_transition(E, E, lprob_zero())
 
-    results = hmm.viterbi(Sequence.create(b"AC", alphabet), E)
+    dp = hmm.create_dp(E)
+    results = dp.viterbi(Sequence.create(b"AC", alphabet))
     score = results[0].loglikelihood
     assert_equal(bytes(results[0].sequence), b"AC")
     path = results[0].path
@@ -477,24 +481,26 @@ def test_hmm_viterbi_3():
 
     assert_allclose(score, log(0.3072))
 
-    score = hmm.viterbi(Sequence.create(b"AA", alphabet), E)[0].loglikelihood
+    score = dp.viterbi(Sequence.create(b"AA", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.2048))
 
-    score = hmm.viterbi(Sequence.create(b"A", alphabet), E)[0].loglikelihood
+    score = dp.viterbi(Sequence.create(b"A", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.128))
 
-    score = hmm.viterbi(Sequence.create(b"AC", alphabet), E)[0].loglikelihood
+    score = dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.3072))
 
-    score = hmm.viterbi(Sequence.create(b"AC", alphabet), M2)[0].loglikelihood
+    dp = hmm.create_dp(M2)
+    score = dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.3072))
 
     hmm.del_state(E)
 
-    score = hmm.viterbi(Sequence.create(b"AC", alphabet), M2)[0].loglikelihood
+    dp = hmm.create_dp(M2)
+    score = dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.3072))
 
-    results = hmm.viterbi(Sequence.create(b"ACAC", alphabet), M2, 2)
+    results = dp.viterbi(Sequence.create(b"ACAC", alphabet), 2)
     assert_equal(len(results), 3)
 
     assert_allclose(results[0].loglikelihood, log(0.3072))
