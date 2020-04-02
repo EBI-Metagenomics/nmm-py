@@ -1,5 +1,6 @@
 from ._alphabet import Alphabet
 from ._alphabet_table import AlphabetTable
+from ._dp import DP
 from ._fragment import Fragment, FragStep
 from ._hmm import HMM
 from ._lprob import (
@@ -20,24 +21,25 @@ from ._step import Step
 __all__ = [
     "Alphabet",
     "AlphabetTable",
-    "Result",
-    "Results",
-    "State",
+    "DP",
     "FragStep",
     "Fragment",
     "HMM",
-    "lprob_invalid",
-    "lprob_zero",
     "MuteState",
     "NormalState",
     "Path",
+    "Result",
+    "Results",
     "Sequence",
     "SequenceABC",
     "SequenceTable",
+    "State",
     "Step",
     "SubSequence",
     "TableState",
+    "lprob_invalid",
     "lprob_is_valid",
     "lprob_is_zero",
     "lprob_normalize",
+    "lprob_zero",
 ]
