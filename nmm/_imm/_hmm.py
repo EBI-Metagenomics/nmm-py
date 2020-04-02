@@ -124,20 +124,6 @@ class HMM(Generic[TState]):
 
         return DP(imm_dp, self)
 
-    def viterbi(
-        self, seq: Sequence, end_state: TState, window_length: int = 0
-    ) -> Results[TState]:
-        from ._results import wrap_imm_results
-
-        imm_seq = seq.imm_seq
-        imm_state = end_state.imm_state
-
-        imm_results = lib.imm_hmm_viterbi(self._hmm, imm_seq, imm_state, window_length)
-        if imm_results == ffi.NULL:
-            raise RuntimeError("Could not run viterbi.")
-
-        return wrap_imm_results(imm_results, seq, self._states)
-
     def view(self):
         from graphviz import Digraph
 
