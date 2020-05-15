@@ -32,7 +32,7 @@ struct imm_seq
 
 struct imm_subseq
 {
-    struct imm_seq const *parent;
+    struct imm_seq const *super;
     struct imm_seq        seq;
 };
 
@@ -138,6 +138,7 @@ struct imm_subseq      imm_result_subseq(struct imm_result const *result);
 /* Results */
 struct imm_results *     imm_results_create(struct imm_seq const *seq, unsigned nresults);
 void                     imm_results_destroy(struct imm_results const *results);
+void                     imm_results_free(struct imm_results const *results);
 struct imm_result const *imm_results_get(struct imm_results const *results, unsigned idx);
 void     imm_results_set(struct imm_results *results, unsigned idx, struct imm_subseq subseq,
                          struct imm_path const *path, double loglik);
@@ -168,7 +169,7 @@ struct imm_state const *imm_state_create(char const *name, struct imm_abc const 
                                          struct imm_state_vtable vtable, void *derived);
 void                    imm_state_destroy(struct imm_state const *state);
 struct imm_abc const *  imm_state_get_abc(struct imm_state const *state);
-char const *            imm_state_get_name(struct imm_state const *state) { return state->name; }
+char const *            imm_state_get_name(struct imm_state const *state);
 double                  imm_state_lprob(struct imm_state const *state, struct imm_seq const *seq);
 uint8_t                 imm_state_max_seq(struct imm_state const *state);
 uint8_t                 imm_state_min_seq(struct imm_state const *state);

@@ -19,14 +19,11 @@ class AminoAlphabet(Alphabet):
         Alphabet.
     """
 
-    def __init__(self, nmm_amino_abc: CData, alphabet: Alphabet):
+    def __init__(self, nmm_amino_abc: CData):
         if nmm_amino_abc == ffi.NULL:
             raise RuntimeError("`nmm_amino_abc` is NULL.")
-        if lib.nmm_amino_abc_cast(nmm_amino_abc) != alphabet.imm_abc:
-            raise ValueError("Alphabets must be the same.")
         self._nmm_amino_abc = nmm_amino_abc
-        self._alphabet = alphabet
-        super().__init__(lib.nmm_amino_abc_cast(nmm_amino_abc))
+        super().__init__(lib.nmm_amino_abc_super(nmm_amino_abc))
 
     @classmethod
     def create(
@@ -44,16 +41,11 @@ class AminoAlphabet(Alphabet):
         """
         if len(any_symbol) != 1:
             raise ValueError("`any_symbol` has length different than 1.")
-        abc = Alphabet.create(symbols, any_symbol)
-        return cls(lib.nmm_amino_abc_create(abc.imm_abc), abc)
+        return cls(lib.nmm_amino_abc_create(symbols, any_symbol))
 
     @property
     def nmm_amino_abc(self) -> CData:
         return self._nmm_amino_abc
-
-    def __del__(self):
-        if self._nmm_amino_abc != ffi.NULL:
-            lib.nmm_amino_abc_destroy(self._nmm_amino_abc)
 
     def __str__(self) -> str:
         return f"{{{self.symbols.decode()}}}"

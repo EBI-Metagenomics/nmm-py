@@ -19,14 +19,11 @@ class BaseAlphabet(Alphabet):
         Alphabet.
     """
 
-    def __init__(self, nmm_base_abc: CData, alphabet: Alphabet):
+    def __init__(self, nmm_base_abc: CData):
         if nmm_base_abc == ffi.NULL:
             raise RuntimeError("`nmm_base_abc` is NULL.")
-        if lib.nmm_base_abc_cast(nmm_base_abc) != alphabet.imm_abc:
-            raise ValueError("Alphabets must be the same.")
         self._nmm_base_abc = nmm_base_abc
-        self._alphabet = alphabet
-        super().__init__(lib.nmm_base_abc_cast(nmm_base_abc))
+        super().__init__(lib.nmm_base_abc_super(nmm_base_abc))
 
     @classmethod
     def create(
@@ -44,8 +41,7 @@ class BaseAlphabet(Alphabet):
         """
         if len(any_symbol) != 1:
             raise ValueError("`any_symbol` has length different than 1.")
-        abc = Alphabet.create(symbols, any_symbol)
-        return cls(lib.nmm_base_abc_create(abc.imm_abc), abc)
+        return cls(lib.nmm_base_abc_create(symbols, any_symbol))
 
     @property
     def nmm_base_abc(self) -> CData:

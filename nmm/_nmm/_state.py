@@ -35,7 +35,7 @@ class FrameState(State[BaseAlphabet]):
         self._epsilon = epsilon
         self._nmm_frame_state = state
         alphabet = baset.alphabet
-        super().__init__(lib.imm_state_cast_c(self._nmm_frame_state), alphabet)
+        super().__init__(lib.nmm_frame_state_super(self._nmm_frame_state), alphabet)
 
     def decode(self, seq: Sequence) -> Tuple[float, Codon]:
         state = self._nmm_frame_state

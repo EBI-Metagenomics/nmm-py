@@ -47,7 +47,7 @@ class Result(Generic[TState]):
 
     def __del__(self):
         if self._imm_result != ffi.NULL:
-            lib.imm_result_destroy(self._imm_result)
+            lib.imm_result_free(self._imm_result)
 
     def __repr__(self) -> str:
         return str(self.loglikelihood)
