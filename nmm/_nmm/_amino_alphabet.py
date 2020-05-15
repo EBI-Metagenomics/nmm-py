@@ -62,8 +62,7 @@ class CanonicalAminoAlphabet(AminoAlphabet):
     """
 
     def __init__(self):
-        abc = Alphabet.create(b"ACDEFGHIKLMNPQRSTVWY", b"X")
-        super().__init__(lib.nmm_amino_abc_create(abc.imm_abc), abc)
+        super().__init__(lib.nmm_amino_abc_create(b"ACDEFGHIKLMNPQRSTVWY", b"X"))
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

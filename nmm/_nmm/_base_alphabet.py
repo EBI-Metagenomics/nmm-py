@@ -64,8 +64,7 @@ class RNAAlphabet(BaseAlphabet):
     """
 
     def __init__(self):
-        abc = Alphabet.create(b"ACGU", b"X")
-        super().__init__(lib.nmm_base_abc_create(abc.imm_abc), abc)
+        super().__init__(lib.nmm_base_abc_create(b"ACGU", b"X"))
 
 
 class DNAAlphabet(BaseAlphabet):
@@ -74,5 +73,4 @@ class DNAAlphabet(BaseAlphabet):
     """
 
     def __init__(self):
-        abc = Alphabet.create(b"ACGT", b"X")
-        super().__init__(lib.nmm_base_abc_create(abc.imm_abc), abc)
+        super().__init__(lib.nmm_base_abc_create(b"ACGT", b"X"))
