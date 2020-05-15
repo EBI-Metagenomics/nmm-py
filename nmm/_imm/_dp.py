@@ -17,6 +17,10 @@ class DP(Generic[TState]):
         self._imm_dp = imm_dp
         self._hmm = hmm
 
+    @property
+    def imm_dp(self) -> CData:
+        return self._imm_dp
+
     def viterbi(self, seq: Sequence, window_length: int = 0) -> Results[TState]:
         from ._results import wrap_imm_results
 

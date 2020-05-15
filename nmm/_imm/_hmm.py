@@ -5,7 +5,6 @@ from .._ffi import ffi, lib
 from ._alphabet import Alphabet
 from ._lprob import lprob_is_valid, lprob_is_zero, lprob_zero
 from ._path import Path
-from ._results import Results
 from ._sequence import Sequence
 from ._state import State
 
@@ -25,15 +24,19 @@ class HMM(Generic[TState]):
     def __init__(self, alphabet: Alphabet):
         self._alphabet = alphabet
         self._states: Dict[CData, TState] = {}
-        self._hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
-        if self._hmm == ffi.NULL:
+        self._imm_hmm = lib.imm_hmm_create(self._alphabet.imm_abc)
+        if self._imm_hmm == ffi.NULL:
             raise RuntimeError("`imm_hmm_create` failed.")
+
+    @property
+    def imm_hmm(self) -> CData:
+        return self._imm_hmm
 
     def states(self) -> Dict[CData, TState]:
         return self._states
 
     def set_start_lprob(self, state: TState, lprob: float):
-        if lib.imm_hmm_set_start(self._hmm, state.imm_state, lprob) != 0:
+        if lib.imm_hmm_set_start(self._imm_hmm, state.imm_state, lprob) != 0:
             raise RuntimeError("Could not set start probability.")
 
     def transition(self, a: TState, b: TState):
@@ -45,7 +48,7 @@ class HMM(Generic[TState]):
         b
             Destination state.
         """
-        lprob: float = lib.imm_hmm_get_trans(self._hmm, a.imm_state, b.imm_state)
+        lprob: float = lib.imm_hmm_get_trans(self._imm_hmm, a.imm_state, b.imm_state)
         if not lprob_is_valid(lprob):
             raise RuntimeError("Could not retrieve transition probability.")
         return lprob
@@ -67,7 +70,7 @@ class HMM(Generic[TState]):
         if b.imm_state not in self._states:
             raise ValueError(f"State {b} not found.")
 
-        err: int = lib.imm_hmm_set_trans(self._hmm, a.imm_state, b.imm_state, lprob)
+        err: int = lib.imm_hmm_set_trans(self._imm_hmm, a.imm_state, b.imm_state, lprob)
         if err != 0:
             raise RuntimeError("Could not set transition probability.")
 
@@ -84,7 +87,7 @@ class HMM(Generic[TState]):
         start_lprob
             Log-space probability of being the initial state.
         """
-        if lib.imm_hmm_add_state(self._hmm, state.imm_state, start_lprob) != 0:
+        if lib.imm_hmm_add_state(self._imm_hmm, state.imm_state, start_lprob) != 0:
             raise ValueError(f"Could not add state {str(state.name)}.")
         self._states[state.imm_state] = state
 
@@ -92,23 +95,23 @@ class HMM(Generic[TState]):
         if state.imm_state not in self._states:
             raise ValueError(f"State {state} not found.")
 
-        err: int = lib.imm_hmm_del_state(self._hmm, state.imm_state)
+        err: int = lib.imm_hmm_del_state(self._imm_hmm, state.imm_state)
         if err != 0:
             raise RuntimeError(f"Could not delete state {state}.")
 
         del self._states[state.imm_state]
 
     def normalize(self):
-        if lib.imm_hmm_normalize(self._hmm) != 0:
+        if lib.imm_hmm_normalize(self._imm_hmm) != 0:
             raise ValueError("Normalization error.")
 
     def normalize_transitions(self, state: TState):
-        err: int = lib.imm_hmm_normalize_trans(self._hmm, state.imm_state)
+        err: int = lib.imm_hmm_normalize_trans(self._imm_hmm, state.imm_state)
         if err != 0:
             raise ValueError("Normalization error.")
 
     def likelihood(self, seq: Sequence, path: Path) -> float:
-        lprob: float = lib.imm_hmm_likelihood(self._hmm, seq.imm_seq, path.imm_path)
+        lprob: float = lib.imm_hmm_likelihood(self._imm_hmm, seq.imm_seq, path.imm_path)
         if not lprob_is_valid(lprob):
             raise ValueError("Could not calculate the likelihood.")
         return lprob
@@ -117,7 +120,7 @@ class HMM(Generic[TState]):
         from ._dp import DP
 
         imm_state = end_state.imm_state
-        imm_dp = lib.imm_hmm_create_dp(self._hmm, imm_state)
+        imm_dp = lib.imm_hmm_create_dp(self._imm_hmm, imm_state)
         if imm_dp == ffi.NULL:
             raise RuntimeError("Could not create dp.")
 
@@ -142,5 +145,5 @@ class HMM(Generic[TState]):
         dot.view()
 
     def __del__(self):
-        if self._hmm != ffi.NULL:
-            lib.imm_hmm_destroy(self._hmm)
+        if self._imm_hmm != ffi.NULL:
+            lib.imm_hmm_destroy(self._imm_hmm)

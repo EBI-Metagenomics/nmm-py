@@ -1,8 +1,7 @@
-from . import alphabet, codon, fragment, path, prob, result, sequence, state
+from . import alphabet, codon, fragment, io, path, prob, result, sequence, state
 from ._cdata import CData
 from ._gencode import GeneticCode
-from ._imm import HMM
-from ._imm import DP
+from ._imm import DP, HMM
 from ._interval import Interval
 from ._testit import test
 
@@ -30,6 +29,7 @@ __all__ = [
     "alphabet",
     "codon",
     "fragment",
+    "io",
     "path",
     "prob",
     "result",
