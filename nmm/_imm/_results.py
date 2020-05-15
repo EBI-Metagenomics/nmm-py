@@ -1,4 +1,4 @@
-from typing import Mapping, Iterable, List, TypeVar, Generic
+from typing import Generic, Iterable, List, Mapping, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib
@@ -47,7 +47,7 @@ class Results(Generic[TState]):
 
     def __del__(self):
         if self._imm_results != ffi.NULL:
-            lib.imm_results_free(self._imm_results)
+            lib.imm_results_destroy(self._imm_results)
 
     def __repr__(self) -> str:
         return "[" + ",".join([str(r) for r in self]) + "]"

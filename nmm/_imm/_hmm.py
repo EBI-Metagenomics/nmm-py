@@ -1,14 +1,13 @@
-from typing import Dict, TypeVar, Generic
+from typing import Dict, Generic, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib
 from ._alphabet import Alphabet
-from ._lprob import lprob_is_valid, lprob_zero, lprob_is_zero
+from ._lprob import lprob_is_valid, lprob_is_zero, lprob_zero
 from ._path import Path
 from ._results import Results
 from ._sequence import Sequence
 from ._state import State
-
 
 TState = TypeVar("TState", bound=State)
 

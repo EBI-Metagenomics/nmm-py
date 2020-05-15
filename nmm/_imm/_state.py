@@ -1,4 +1,4 @@
-from typing import Iterable, Generic, TypeVar
+from typing import Generic, Iterable, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib
@@ -77,7 +77,7 @@ class MuteState(State[T]):
         if self._imm_mute_state == ffi.NULL:
             raise RuntimeError("`imm_mute_state_create` failed.")
 
-        super().__init__(lib.imm_state_cast_c(self._imm_mute_state), alphabet)
+        super().__init__(lib.imm_mute_state_super(self._imm_mute_state), alphabet)
 
     def __del__(self):
         if self._imm_mute_state != ffi.NULL:
@@ -106,7 +106,7 @@ class NormalState(State[T]):
             raise RuntimeError("`imm_normal_state_create` failed.")
 
         self._imm_normal_state = state
-        super().__init__(lib.imm_state_cast_c(self._imm_normal_state), alphabet)
+        super().__init__(lib.imm_normal_state_super(self._imm_normal_state), alphabet)
 
     def __del__(self):
         if self._imm_normal_state != ffi.NULL:
@@ -132,7 +132,7 @@ class TableState(State[T]):
 
         self._imm_table_state = state
         alphabet = sequence_table.alphabet
-        super().__init__(lib.imm_state_cast_c(self._imm_table_state), alphabet)
+        super().__init__(lib.imm_table_state_super(self._imm_table_state), alphabet)
 
     def __del__(self):
         if self._imm_table_state != ffi.NULL:

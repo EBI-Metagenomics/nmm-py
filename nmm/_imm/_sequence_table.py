@@ -51,12 +51,12 @@ class SequenceTable(Generic[T]):
 
     @property
     def length(self) -> int:
-        imm_abc = lib.imm_seq_table_get_abc(self._imm_seq_table)
+        imm_abc = lib.imm_seq_table_abc(self._imm_seq_table)
         return lib.imm_abc_length(imm_abc)
 
     @property
     def symbols(self) -> bytes:
-        imm_abc = lib.imm_seq_table_get_abc(self._imm_seq_table)
+        imm_abc = lib.imm_seq_table_abc(self._imm_seq_table)
         return ffi.string(lib.imm_abc_string(imm_abc))
 
     def add(self, sequence: Sequence, lprob: float):

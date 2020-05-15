@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Mapping, Generic, Iterable, Iterator, List, Type, TypeVar
+from typing import Generic, Iterable, Iterator, List, Mapping, Type, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib

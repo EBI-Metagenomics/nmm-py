@@ -1,12 +1,11 @@
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib
-from ._sequence import Sequence
-from ._results import Results
-from ._state import State
 from ._hmm import HMM
-
+from ._results import Results
+from ._sequence import Sequence
+from ._state import State
 
 TState = TypeVar("TState", bound=State)
 

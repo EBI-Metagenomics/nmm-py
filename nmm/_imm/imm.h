@@ -54,7 +54,7 @@ int                   imm_abc_write(struct imm_abc const *abc, FILE *stream);
 /* Alphabet table */
 struct imm_abc_table const *imm_abc_table_create(struct imm_abc const *abc, double const *lprobs);
 void                        imm_abc_table_destroy(struct imm_abc_table const *abc_table);
-struct imm_abc const *      imm_abc_table_get_abc(struct imm_abc_table const *abc_table);
+struct imm_abc const *      imm_abc_table_abc(struct imm_abc_table const *abc_table);
 double                      imm_abc_table_lprob(struct imm_abc_table const *abc_table, char symbol);
 
 /* DP */

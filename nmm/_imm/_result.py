@@ -1,12 +1,11 @@
-from typing import Mapping, TypeVar, Generic
+from typing import Generic, Mapping, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib
 from ._path import Path, wrap_imm_path
-from ._step import Step
 from ._sequence import Sequence, SubSequence
 from ._state import State
-
+from ._step import Step
 
 TState = TypeVar("TState", bound=State)
 
@@ -48,7 +47,7 @@ class Result(Generic[TState]):
 
     def __del__(self):
         if self._imm_result != ffi.NULL:
-            lib.imm_result_free(self._imm_result)
+            lib.imm_result_destroy(self._imm_result)
 
     def __repr__(self) -> str:
         return str(self.loglikelihood)
