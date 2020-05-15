@@ -1,16 +1,18 @@
 from math import log
+from pathlib import Path
+from numpy.testing import assert_allclose
 
 from nmm import HMM
 from nmm.alphabet import Alphabet
-from nmm.io import Model, Output
+from nmm.io import Model, Output, Input
 from nmm.prob import lprob_zero
 from nmm.state import MuteState, NormalState
+from nmm.sequence import Sequence
 
 
-def test_nmm_model():
-
+def test_nmm_model(tmpdir):
     alphabet = Alphabet.create(b"AC", b"X")
-    hmm = HMM(alphabet)
+    hmm = HMM.create(alphabet)
 
     S = MuteState(b"S", alphabet)
     hmm.add_state(S, log(1.0))
@@ -33,6 +35,17 @@ def test_nmm_model():
 
     dp = hmm.create_dp(E)
 
+    score = dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
+    assert_allclose(score, log(0.48))
+
+    filepath = bytes(Path(tmpdir / "model.nmm"))
     model = Model.create(hmm, dp)
-    output = Output.create(b"model1.nmm")
+    output = Output.create(bytes(filepath))
     output.write(model)
+    output.close()
+
+    input = Input.create(bytes(filepath))
+    model = input.read()
+    alphabet = model.alphabet
+    score = model.dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
+    assert_allclose(score, log(0.48))

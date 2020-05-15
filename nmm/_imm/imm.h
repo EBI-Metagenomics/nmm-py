@@ -115,8 +115,9 @@ int imm_normal_state_write(struct imm_state const *state, struct imm_model const
                            FILE *stream);
 
 /* Output */
+int                imm_output_close(struct imm_output *output);
 struct imm_output *imm_output_create(char const *filepath);
-int                imm_output_destroy(struct imm_output const *output);
+int                imm_output_destroy(struct imm_output *output);
 int                imm_output_write(struct imm_output *output, struct imm_model const *model);
 
 /* Path */
@@ -131,6 +132,7 @@ void                   imm_path_prepend(struct imm_path *path, struct imm_step *
 
 /* Result */
 void                   imm_result_destroy(struct imm_result const *result);
+void                   imm_result_free(struct imm_result const *result);
 double                 imm_result_loglik(struct imm_result const *result);
 struct imm_path const *imm_result_path(struct imm_result const *result);
 struct imm_subseq      imm_result_subseq(struct imm_result const *result);

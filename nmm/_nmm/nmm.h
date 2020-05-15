@@ -115,8 +115,9 @@ struct nmm_model const *      nmm_model_read(FILE *stream);
 int                           nmm_model_write(struct nmm_model const *io, FILE *stream);
 
 /* Output */
+int                nmm_output_close(struct nmm_output *output);
 struct nmm_output *nmm_output_create(char const *filepath);
-int                nmm_output_destroy(struct nmm_output const *output);
+int                nmm_output_destroy(struct nmm_output *output);
 int                nmm_output_write(struct nmm_output *output, struct nmm_model const *model);
 
 /* Triplet */

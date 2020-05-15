@@ -18,8 +18,16 @@ class Output:
         return cls(lib.nmm_output_create(filepath))
 
     def write(self, model: Model):
-        lib.nmm_output_write(self._nmm_output, model.nmm_model)
+        err: int = lib.nmm_output_write(self._nmm_output, model.nmm_model)
+        if err != 0:
+            raise RuntimeError("Could not write model.")
+
+    def close(self):
+        err: int = lib.nmm_output_close(self._nmm_output)
+        if err != 0:
+            raise RuntimeError("Could not close output.")
 
     def __del__(self):
         if self._nmm_output != ffi.NULL:
+            self.close()
             lib.nmm_output_destroy(self._nmm_output)

@@ -4,7 +4,7 @@ from typing import Type
 
 from .._cdata import CData
 from .._ffi import ffi, lib
-from .._imm import HMM, DP
+from .._imm import HMM, DP, Alphabet
 
 
 class Model:
@@ -22,6 +22,18 @@ class Model:
     @classmethod
     def create(cls: Type[Model], hmm: HMM, dp: DP) -> Model:
         return cls(lib.nmm_model_create(hmm.imm_hmm, dp.imm_dp), hmm, dp)
+
+    @property
+    def alphabet(self) -> Alphabet:
+        return self._hmm.alphabet
+
+    @property
+    def dp(self) -> DP:
+        return self._dp
+
+    @property
+    def hmm(self) -> HMM:
+        return self._hmm
 
     # @property
     # def alphabet(self) -> BaseAlphabet:
