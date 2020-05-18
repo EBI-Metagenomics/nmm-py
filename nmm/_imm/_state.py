@@ -87,7 +87,7 @@ class MuteState(State[T]):
         super().__init__(lib.imm_mute_state_super(self._imm_mute_state), alphabet)
 
     @classmethod
-    def create(cls: Type[MuteState], name: bytes, alphabet: T) -> MuteState:
+    def create(cls: Type[MuteState[T]], name: bytes, alphabet: T) -> MuteState[T]:
         """
         Mute state.
 
@@ -128,8 +128,8 @@ class NormalState(State[T]):
 
     @classmethod
     def create(
-        cls: Type[NormalState], name: bytes, alphabet: T, lprobs: Iterable[float]
-    ) -> NormalState:
+        cls: Type[NormalState[T]], name: bytes, alphabet: T, lprobs: Iterable[float]
+    ) -> NormalState[T]:
         """
         Normal state.
 
@@ -172,8 +172,8 @@ class TableState(State[T]):
 
     @classmethod
     def create(
-        cls: Type[TableState], name: bytes, sequence_table: SequenceTable
-    ) -> TableState:
+        cls: Type[TableState[T]], name: bytes, sequence_table: SequenceTable
+    ) -> TableState[T]:
         """
         Table state.
 
