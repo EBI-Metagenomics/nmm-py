@@ -35,6 +35,11 @@ class Input:
         dp = DP(lib.nmm_model_dp(nmm_model), hmm)
         return Model(nmm_model, hmm, dp)
 
+    def close(self):
+        err: int = lib.nmm_input_close(self._nmm_input)
+        if err != 0:
+            raise RuntimeError("Could not close input.")
+
     def __del__(self):
         if self._nmm_input != ffi.NULL:
             lib.nmm_input_destroy(self._nmm_input)

@@ -95,8 +95,9 @@ struct imm_state const *nmm_frame_state_super(struct nmm_frame_state const *stat
 int nmm_frame_state_write(struct imm_state const *state, struct nmm_model const *model, FILE *stream);
 
 /* Input */
+int                     nmm_input_close(struct nmm_input *input);
 struct nmm_input *      nmm_input_create(char const *filepath);
-int                     nmm_input_destroy(struct nmm_input const *input);
+int                     nmm_input_destroy(struct nmm_input *input);
 bool                    nmm_input_eof(struct nmm_input const *input);
 struct nmm_model const *nmm_input_read(struct nmm_input *input);
 

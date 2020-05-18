@@ -85,8 +85,9 @@ int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state const *src_state,
                       struct imm_state const *tgt_state, double lprob);
 
 /* Input */
+int                     imm_input_close(struct imm_input *input);
 struct imm_input *      imm_input_create(char const *filepath);
-int                     imm_input_destroy(struct imm_input const *input);
+int                     imm_input_destroy(struct imm_input *input);
 bool                    imm_input_eof(struct imm_input const *input);
 struct imm_model const *imm_input_read(struct imm_input *input);
 
