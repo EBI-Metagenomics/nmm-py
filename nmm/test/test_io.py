@@ -1,6 +1,7 @@
+import pytest
 from math import log
 from pathlib import Path
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 
 from nmm import HMM
 from nmm.alphabet import Alphabet
@@ -10,7 +11,8 @@ from nmm.state import MuteState, NormalState
 from nmm.sequence import Sequence
 
 
-def test_imm_model(tmpdir):
+@pytest.fixture
+def example():
     alphabet = Alphabet.create(b"AC", b"X")
     hmm = HMM.create(alphabet)
 
@@ -35,6 +37,14 @@ def test_imm_model(tmpdir):
 
     dp = hmm.create_dp(E)
 
+    return {"hmm": hmm, "dp": dp, "alphabet": alphabet}
+
+
+def test_imm_model(tmpdir, example):
+    alphabet = example["alphabet"]
+    hmm = example["hmm"]
+    dp = example["dp"]
+
     score = dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.48))
 
@@ -49,6 +59,42 @@ def test_imm_model(tmpdir):
     alphabet = model.alphabet
     score = model.dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
     assert_allclose(score, log(0.48))
+
+
+def test_imm_model_iter(tmpdir, example):
+    alphabet = example["alphabet"]
+    hmm = example["hmm"]
+    dp = example["dp"]
+
+    score = dp.viterbi(Sequence.create(b"AC", alphabet))[0].loglikelihood
+    assert_allclose(score, log(0.48))
+
+    filepath = Path(tmpdir / "model.nmm")
+    with Output.create(bytes(filepath)) as output:
+        output.write(Model.create(hmm, dp))
+        output.write(Model.create(hmm, dp))
+        output.write(Model.create(hmm, dp))
+
+    input = Input.create(bytes(filepath))
+    nmodels = 0
+    for model in input:
+        alphabet = model.alphabet
+        seq = Sequence.create(b"AC", alphabet)
+        score = model.dp.viterbi(seq)[0].loglikelihood
+        assert_allclose(score, log(0.48))
+        nmodels += 1
+    input.close()
+    assert_equal(nmodels, 3)
+
+    with Input.create(bytes(filepath)) as input:
+        nmodels = 0
+        for model in input:
+            alphabet = model.alphabet
+            seq = Sequence.create(b"AC", alphabet)
+            score = model.dp.viterbi(seq)[0].loglikelihood
+            assert_allclose(score, log(0.48))
+            nmodels += 1
+        assert_equal(nmodels, 3)
 
 
 # def test_nmm_model(tmpdir):

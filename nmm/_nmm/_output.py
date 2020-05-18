@@ -31,3 +31,12 @@ class Output:
         if self._nmm_output != ffi.NULL:
             self.close()
             lib.nmm_output_destroy(self._nmm_output)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        del exception_type
+        del exception_value
+        del traceback
+        self.close()

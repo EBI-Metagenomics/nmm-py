@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Mapping, Type
+from typing import Dict, Type, Iterator
 
 from .._cdata import CData
 from .._ffi import ffi, lib
@@ -19,14 +19,16 @@ class Input:
     def create(cls: Type[Input], filepath: bytes) -> Input:
         return cls(lib.nmm_input_create(filepath))
 
-    def read(self):
+    def read(self) -> Model:
         nmm_model = lib.nmm_input_read(self._nmm_input)
         if nmm_model == ffi.NULL:
+            if lib.nmm_input_eof(self._nmm_input):
+                raise StopIteration
             raise RuntimeError("Could not read model.")
 
         abc = Alphabet(lib.nmm_model_abc(nmm_model))
         nstates: int = lib.nmm_model_nstates(nmm_model)
-        states: Mapping[CData, State] = {}
+        states: Dict[CData, State] = {}
         for i in range(nstates):
             imm_state = lib.nmm_model_state(nmm_model, i)
             states[imm_state] = wrap_imm_state(imm_state, abc)
@@ -43,3 +45,19 @@ class Input:
     def __del__(self):
         if self._nmm_input != ffi.NULL:
             lib.nmm_input_destroy(self._nmm_input)
+
+    def __iter__(self) -> Iterator[Model]:
+        while True:
+            try:
+                yield self.read()
+            except StopIteration:
+                return
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        del exception_type
+        del exception_value
+        del traceback
+        self.close()
