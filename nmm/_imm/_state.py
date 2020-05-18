@@ -195,12 +195,12 @@ class TableState(State[T]):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-def wrap_imm_state(imm_state: CData) -> State:
-    state_type: int = lib.imm_state_type_id(imm_state)
+def wrap_imm_state(imm_state: CData, alphabet: T) -> State:
+    state_type = StateType(lib.imm_state_type_id(imm_state))
     if state_type == StateType.MUTE:
-        pass
-    elif state_type == StateType.NORMAL:
-        pass
-    elif state_type == StateType.TABLE:
-        pass
+        return MuteState(lib.imm_mute_state_derived(imm_state), alphabet)
+    if state_type == StateType.NORMAL:
+        return NormalState(lib.imm_normal_state_derived(imm_state), alphabet)
+    if state_type == StateType.TABLE:
+        return TableState(lib.imm_table_state_derived(imm_state), alphabet)
     raise ValueError(f"Unknown state type: {state_type}.")

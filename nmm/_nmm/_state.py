@@ -1,15 +1,12 @@
 from __future__ import annotations
-from typing import Dict, Tuple, Type
+from typing import Tuple, Type, TypeVar
 
 from enum import Enum
 from .._cdata import CData
 from .._ffi import ffi, lib
 from .._imm import (
-    Alphabet,
     Sequence,
-    SequenceTable,
     State,
-    TableState,
     wrap_imm_state as imm_wrap_imm_state,
 )
 from ._codon_prob import CodonProb
@@ -17,6 +14,9 @@ from ._base_alphabet import BaseAlphabet
 from ._base_table import BaseTable
 from ._codon import Codon
 from ._codon_table import CodonTable
+from .._imm import Alphabet
+
+T = TypeVar("T", bound=Alphabet)
 
 
 class StateType(Enum):
@@ -132,11 +132,13 @@ class CodonState(State[BaseAlphabet]):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-# states: Mapping[CData, TState]
-def wrap_imm_state(imm_state: CData) -> State:
-    state_type: int = lib.imm_state_type_id(imm_state)
+def wrap_imm_state(imm_state: CData, alphabet: T) -> State:
+    try:
+        state_type = StateType(lib.imm_state_type_id(imm_state))
+    except ValueError:
+        return imm_wrap_imm_state(imm_state, alphabet)
     if state_type == StateType.CODON:
         pass
     elif state_type == StateType.FRAME:
         pass
-    return imm_wrap_imm_state(imm_state)
+    raise ValueError(f"Unknown state type: {lib.imm_state_type_id(imm_state)}.")

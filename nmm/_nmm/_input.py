@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Type
+from typing import Mapping, Type
 
 from .._cdata import CData
 from .._ffi import ffi, lib
-from .._imm import DP, HMM
-from .._imm import Alphabet
+from .._imm import DP, HMM, Alphabet
 from ._model import Model
-from ._state import wrap_imm_state
+from ._state import State, wrap_imm_state
 
 
 class Input:
@@ -24,15 +23,15 @@ class Input:
         nmm_model = lib.nmm_input_read(self._nmm_input)
         if nmm_model == ffi.NULL:
             raise RuntimeError("Could not read model.")
-        abc = Alphabet(lib.nmm_model_abc(nmm_model))
 
-        # states: Mapping[CData, TState] = []
-        hmm = HMM(lib.nmm_model_hmm(nmm_model), abc)
+        abc = Alphabet(lib.nmm_model_abc(nmm_model))
         nstates: int = lib.nmm_model_nstates(nmm_model)
+        states: Mapping[CData, State] = {}
         for i in range(nstates):
             imm_state = lib.nmm_model_state(nmm_model, i)
-            state = wrap_imm_state(imm_state)
+            states[imm_state] = wrap_imm_state(imm_state, abc)
 
+        hmm = HMM(lib.nmm_model_hmm(nmm_model), abc, states)
         dp = DP(lib.nmm_model_dp(nmm_model), hmm)
         return Model(nmm_model, hmm, dp)
 

@@ -79,6 +79,7 @@ double               imm_hmm_likelihood(struct imm_hmm const *hmm, struct imm_se
 int                  imm_hmm_normalize(struct imm_hmm *hmm);
 int                  imm_hmm_normalize_start(struct imm_hmm *hmm);
 int                  imm_hmm_normalize_trans(struct imm_hmm *hmm, struct imm_state const *src_state);
+double               imm_hmm_get_start(struct imm_hmm const *hmm, struct imm_state const *state);
 int imm_hmm_set_start(struct imm_hmm *hmm, struct imm_state const *state, double lprob);
 int imm_hmm_set_trans(struct imm_hmm *hmm, struct imm_state const *src_state,
                       struct imm_state const *tgt_state, double lprob);

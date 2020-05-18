@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Generic, Type, TypeVar
+from typing import Dict, Generic, Optional, Type, TypeVar
 
 from .._cdata import CData
 from .._ffi import ffi, lib
@@ -23,11 +23,19 @@ class HMM(Generic[TState]):
         Alphabet.
     """
 
-    def __init__(self, imm_hmm: CData, alphabet: Alphabet):
+    def __init__(
+        self,
+        imm_hmm: CData,
+        alphabet: Alphabet,
+        states: Optional[Dict[CData, TState]] = None,
+    ):
         if imm_hmm == ffi.NULL:
             raise RuntimeError("`imm_hmm` is NULL.")
         self._alphabet = alphabet
-        self._states: Dict[CData, TState] = {}
+        if states is None:
+            self._states: Dict[CData, TState] = {}
+        else:
+            self._states = states
         self._imm_hmm = imm_hmm
 
     @classmethod
