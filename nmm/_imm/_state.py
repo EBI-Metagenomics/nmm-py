@@ -168,14 +168,14 @@ class TableState(State[T]):
         if imm_table_state == ffi.NULL:
             raise RuntimeError("`imm_table_state` is NULL.")
         self._imm_table_state = imm_table_state
-        super().__init__(lib.imm_table_state_super(self._imm_table_state), alphabet)
+        super().__init__(lib.imm_table_state_super(imm_table_state), alphabet)
 
     @classmethod
     def create(
         cls: Type[TableState[T]], name: bytes, sequence_table: SequenceTable
     ) -> TableState[T]:
         """
-        Table state.
+        Create table state.
 
         Parameters
         ----------

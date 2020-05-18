@@ -1,13 +1,14 @@
 from math import log
 
 import pytest
+from numpy import inf
 from numpy.testing import assert_allclose, assert_equal
 
 from nmm.alphabet import Alphabet, BaseAlphabet
 from nmm.codon import Codon
 from nmm.prob import BaseTable, CodonProb, CodonTable, SequenceTable, lprob_is_zero
 from nmm.sequence import Sequence
-from nmm.state import FrameState, MuteState, NormalState, TableState
+from nmm.state import FrameState, MuteState, NormalState, TableState, CodonState
 
 
 def test_normal_state():
@@ -58,6 +59,18 @@ def test_table_state():
     assert_allclose(state.lprob(Sequence.create(b"AUU", alphabet)), log(0.4))
     assert_equal(str(state), "M2")
     assert_equal(repr(state), "<TableState:M2>")
+
+
+def test_codon_state():
+    base = BaseAlphabet.create(b"ACGU", b"X")
+    codonp = CodonProb.create(base)
+    codonp.set_lprob(Codon.create(b"AUG", base), log(0.8))
+    codonp.set_lprob(Codon.create(b"AUU", base), log(0.1))
+    state = CodonState.create(b"M1", codonp)
+    assert_equal(state.name, b"M1")
+    assert_allclose(state.lprob(Sequence.create(b"AUG", base)), log(0.8))
+    assert_allclose(state.lprob(Sequence.create(b"AUU", base)), log(0.1))
+    assert_allclose(state.lprob(Sequence.create(b"ACU", base)), -inf)
 
 
 def test_frame_state():

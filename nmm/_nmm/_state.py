@@ -1,4 +1,5 @@
-from typing import Dict, Tuple
+from __future__ import annotations
+from typing import Dict, Tuple, Type
 
 from enum import Enum
 from .._cdata import CData
@@ -11,6 +12,7 @@ from .._imm import (
     TableState,
     wrap_imm_state as imm_wrap_imm_state,
 )
+from ._codon_prob import CodonProb
 from ._base_alphabet import BaseAlphabet
 from ._base_table import BaseTable
 from ._codon import Codon
@@ -66,24 +68,43 @@ class FrameState(State[BaseAlphabet]):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class CodonState(TableState):
-    def __init__(self, name: bytes, alphabet: Alphabet, emission: Dict[Codon, float]):
+class CodonState(State[BaseAlphabet]):
+    def __init__(self, nmm_codon_state: CData, codonp: CodonProb):
         """
+        Codon state.
+
+        Parameters
+        ----------
+        nmm_codon_state
+            State pointer.
+        codonp
+            Codon probabilities.
+        """
+        if nmm_codon_state == ffi.NULL:
+            raise RuntimeError("`nmm_codon_state` is NULL.")
+        self._nmm_codon_state = nmm_codon_state
+        self._codonp = codonp
+        alphabet = codonp.alphabet
+        super().__init__(lib.nmm_codon_state_super(nmm_codon_state), alphabet)
+
+    @classmethod
+    def create(cls: Type[CodonState], name: bytes, codonp: CodonProb) -> CodonState:
+        """
+        Create codon state.
+
         Parameters
         ----------
         name
             State name.
-        alphabet
-            Alphabet.
-        emission
+        codonp
             Codon probabilities.
         """
+        ptr = lib.nmm_codon_state_create(name, codonp.nmm_codon_lprob)
+        return CodonState(ptr, codonp)
 
-        seqt = SequenceTable.create(alphabet)
-        for codon, lprob in emission.items():
-            seqt.add(Sequence.create(codon.symbols, codon.alphabet), lprob)
-
-        super().__init__(name, seqt)
+    def __del__(self):
+        if self._nmm_codon_state != ffi.NULL:
+            lib.nmm_codon_state_destroy(self._nmm_codon_state)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{str(self)}>"
