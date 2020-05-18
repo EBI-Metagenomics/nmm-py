@@ -12,6 +12,9 @@ struct nmm_input;
 struct nmm_model;
 struct nmm_output;
 
+#define NMM_CODON_STATE_TYPE_ID 0x10
+#define NMM_FRAME_STATE_TYPE_ID 0x11
+
 struct nmm_triplet
 {
     char a;

@@ -15,7 +15,7 @@ from ._result import Result
 from ._results import Results
 from ._sequence import Sequence, SequenceABC, SubSequence
 from ._sequence_table import SequenceTable
-from ._state import MuteState, NormalState, State, TableState
+from ._state import MuteState, NormalState, State, TableState, StateType, wrap_imm_state
 from ._step import Step
 
 __all__ = [
@@ -34,6 +34,7 @@ __all__ = [
     "SequenceABC",
     "SequenceTable",
     "State",
+    "StateType",
     "Step",
     "SubSequence",
     "TableState",
@@ -42,4 +43,5 @@ __all__ = [
     "lprob_is_zero",
     "lprob_normalize",
     "lprob_zero",
+    "wrap_imm_state",
 ]

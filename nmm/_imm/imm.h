@@ -16,6 +16,10 @@ struct imm_step;
 struct imm_table_state;
 struct imm_window;
 
+#define IMM_MUTE_STATE_TYPE_ID 0x00
+#define IMM_NORMAL_STATE_TYPE_ID 0x01
+#define IMM_TABLE_STATE_TYPE_ID 0x02
+
 enum imm_symbol_type
 {
     IMM_SYMBOL_UNKNOWN = 0,

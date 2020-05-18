@@ -1,4 +1,6 @@
-from typing import Generic, Iterable, TypeVar
+from __future__ import annotations
+from enum import Enum
+from typing import Generic, Iterable, TypeVar, Type
 
 from .._cdata import CData
 from .._ffi import ffi, lib
@@ -8,6 +10,12 @@ from ._sequence import Sequence
 from ._sequence_table import SequenceTable
 
 T = TypeVar("T", bound=Alphabet)
+
+
+class StateType(Enum):
+    MUTE = 0x00
+    NORMAL = 0x01
+    TABLE = 0x02
 
 
 class State(Generic[T]):
@@ -62,7 +70,24 @@ class State(Generic[T]):
 
 
 class MuteState(State[T]):
-    def __init__(self, name: bytes, alphabet: T):
+    def __init__(self, imm_mute_state: CData, alphabet: T):
+        """
+        Mute state.
+
+        Parameters
+        ----------
+        imm_mute_state
+            State pointer.
+        alphabet
+            Alphabet.
+        """
+        if imm_mute_state == ffi.NULL:
+            raise RuntimeError("`imm_mute_state` is NULL.")
+        self._imm_mute_state = imm_mute_state
+        super().__init__(lib.imm_mute_state_super(self._imm_mute_state), alphabet)
+
+    @classmethod
+    def create(cls: Type[MuteState], name: bytes, alphabet: T) -> MuteState:
         """
         Mute state.
 
@@ -73,11 +98,8 @@ class MuteState(State[T]):
         alphabet
             Alphabet.
         """
-        self._imm_mute_state = lib.imm_mute_state_create(name, alphabet.imm_abc)
-        if self._imm_mute_state == ffi.NULL:
-            raise RuntimeError("`imm_mute_state_create` failed.")
-
-        super().__init__(lib.imm_mute_state_super(self._imm_mute_state), alphabet)
+        imm_mute_state = lib.imm_mute_state_create(name, alphabet.imm_abc)
+        return MuteState(imm_mute_state, alphabet)
 
     def __del__(self):
         if self._imm_mute_state != ffi.NULL:
@@ -88,7 +110,26 @@ class MuteState(State[T]):
 
 
 class NormalState(State[T]):
-    def __init__(self, name: bytes, alphabet: T, lprobs: Iterable[float]):
+    def __init__(self, imm_normal_state: CData, alphabet: T):
+        """
+        Normal state.
+
+        Parameters
+        ----------
+        imm_normal_state
+            State pointer.
+        alphabet
+            Alphabet.
+        """
+        if imm_normal_state == ffi.NULL:
+            raise RuntimeError("`imm_normal_state` is NULL.")
+        self._imm_normal_state = imm_normal_state
+        super().__init__(lib.imm_normal_state_super(self._imm_normal_state), alphabet)
+
+    @classmethod
+    def create(
+        cls: Type[NormalState], name: bytes, alphabet: T, lprobs: Iterable[float]
+    ) -> NormalState:
         """
         Normal state.
 
@@ -101,12 +142,8 @@ class NormalState(State[T]):
         lprobs
             Emission probabilities in log-space for each alphabet letter.
         """
-        state = lib.imm_normal_state_create(name, alphabet.imm_abc, list(lprobs))
-        if state == ffi.NULL:
-            raise RuntimeError("`imm_normal_state_create` failed.")
-
-        self._imm_normal_state = state
-        super().__init__(lib.imm_normal_state_super(self._imm_normal_state), alphabet)
+        ptr = lib.imm_normal_state_create(name, alphabet.imm_abc, list(lprobs))
+        return NormalState(ptr, alphabet)
 
     def __del__(self):
         if self._imm_normal_state != ffi.NULL:
@@ -117,8 +154,29 @@ class NormalState(State[T]):
 
 
 class TableState(State[T]):
-    def __init__(self, name: bytes, sequence_table: SequenceTable):
+    def __init__(self, imm_table_state: CData, alphabet: T):
         """
+        Table state.
+
+        Parameters
+        ----------
+        imm_table_state
+            State pointer.
+        alphabet
+            Alphabet.
+        """
+        if imm_table_state == ffi.NULL:
+            raise RuntimeError("`imm_table_state` is NULL.")
+        self._imm_table_state = imm_table_state
+        super().__init__(lib.imm_table_state_super(self._imm_table_state), alphabet)
+
+    @classmethod
+    def create(
+        cls: Type[TableState], name: bytes, sequence_table: SequenceTable
+    ) -> TableState:
+        """
+        Table state.
+
         Parameters
         ----------
         name
@@ -126,13 +184,8 @@ class TableState(State[T]):
         sequence_table
             Table of sequence probabilities.
         """
-        state = lib.imm_table_state_create(name, sequence_table.imm_seq_table)
-        if state == ffi.NULL:
-            raise RuntimeError("`imm_table_state_create` failed.")
-
-        self._imm_table_state = state
-        alphabet = sequence_table.alphabet
-        super().__init__(lib.imm_table_state_super(self._imm_table_state), alphabet)
+        ptr = lib.imm_table_state_create(name, sequence_table.imm_seq_table)
+        return TableState(ptr, sequence_table.alphabet)
 
     def __del__(self):
         if self._imm_table_state != ffi.NULL:
@@ -140,3 +193,14 @@ class TableState(State[T]):
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+def wrap_imm_state(imm_state: CData) -> State:
+    state_type: int = lib.imm_state_type_id(imm_state)
+    if state_type == StateType.MUTE:
+        pass
+    elif state_type == StateType.NORMAL:
+        pass
+    elif state_type == StateType.TABLE:
+        pass
+    raise ValueError(f"Unknown state type: {state_type}.")

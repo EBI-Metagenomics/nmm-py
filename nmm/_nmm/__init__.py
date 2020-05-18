@@ -9,7 +9,7 @@ from ._codon_table import CodonTable
 from ._input import Input
 from ._model import Model
 from ._output import Output
-from ._state import CodonState, FrameState
+from ._state import CodonState, FrameState, StateType, wrap_imm_state
 
 __all__ = [
     "AminoAlphabet",
@@ -27,5 +27,7 @@ __all__ = [
     "Model",
     "Output",
     "RNAAlphabet",
+    "StateType",
     "codon_iter",
+    "wrap_imm_state",
 ]

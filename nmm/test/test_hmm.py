@@ -15,14 +15,14 @@ def test_hmm_states():
     alphabet = Alphabet.create(b"ACGU", b"X")
     hmm = HMM.create(alphabet)
 
-    S = MuteState(b"S", alphabet)
+    S = MuteState.create(b"S", alphabet)
     hmm.add_state(S)
 
     seqt = SequenceTable.create(alphabet)
     seqt.add(Sequence.create(b"AGU", alphabet), log(0.8))
     seqt.add(Sequence.create(b"AGG", alphabet), log(0.2))
 
-    M = TableState(b"M", seqt)
+    M = TableState.create(b"M", seqt)
     hmm.add_state(M)
 
     with pytest.raises(ValueError):
@@ -38,12 +38,12 @@ def test_hmm_trans_prob():
     alphabet = Alphabet.create(b"ACGU", b"X")
     hmm = HMM.create(alphabet)
 
-    S = MuteState(b"S", alphabet)
+    S = MuteState.create(b"S", alphabet)
     with pytest.raises(RuntimeError):
         hmm.set_start_lprob(S, log(0.4))
     hmm.add_state(S)
 
-    E = MuteState(b"E", alphabet)
+    E = MuteState.create(b"E", alphabet)
     with pytest.raises(RuntimeError):
         hmm.transition(S, E)
 
@@ -92,16 +92,18 @@ def test_hmm_likelihood():
     alphabet = Alphabet.create(b"ACGU", b"X")
     hmm = HMM.create(alphabet)
 
-    S = MuteState(b"S", alphabet)
+    S = MuteState.create(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    E = MuteState(b"E", alphabet)
+    E = MuteState.create(b"E", alphabet)
     hmm.add_state(E, lprob_zero())
 
-    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), lprob_zero(), lprob_zero()],)
+    M1 = NormalState.create(
+        b"M1", alphabet, [log(0.8), log(0.2), lprob_zero(), lprob_zero()],
+    )
     hmm.add_state(M1, lprob_zero())
 
-    M2 = NormalState(
+    M2 = NormalState.create(
         b"M2", alphabet, [log(0.4 / 1.6), log(0.6 / 1.6), lprob_zero(), log(0.6 / 1.6)]
     )
     hmm.add_state(M2, lprob_zero())
@@ -333,7 +335,9 @@ def test_hmm_likelihood():
     )
     assert_allclose(p, lprob_zero())
 
-    M3 = NormalState(b"M2", alphabet, [log(0.4), log(0.6), lprob_zero(), log(0.6)],)
+    M3 = NormalState.create(
+        b"M2", alphabet, [log(0.4), log(0.6), lprob_zero(), log(0.6)],
+    )
 
     with pytest.raises(ValueError):
         hmm.likelihood(
@@ -353,16 +357,18 @@ def test_hmm_viterbi_1():
     alphabet = Alphabet.create(b"ACGU", b"X")
     hmm = HMM.create(alphabet)
 
-    S = MuteState(b"S", alphabet)
+    S = MuteState.create(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    E = MuteState(b"E", alphabet)
+    E = MuteState.create(b"E", alphabet)
     hmm.add_state(E, lprob_zero())
 
-    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2), lprob_zero(), lprob_zero()],)
+    M1 = NormalState.create(
+        b"M1", alphabet, [log(0.8), log(0.2), lprob_zero(), lprob_zero()],
+    )
     hmm.add_state(M1, lprob_zero())
 
-    M2 = NormalState(
+    M2 = NormalState.create(
         b"M2", alphabet, [log(0.4 / 1.6), log(0.6 / 1.6), lprob_zero(), log(0.6 / 1.6)],
     )
     hmm.add_state(M2, lprob_zero())
@@ -389,16 +395,16 @@ def test_hmm_viterbi_2():
     alphabet = Alphabet.create(b"AC", b"X")
     hmm = HMM.create(alphabet)
 
-    S = MuteState(b"S", alphabet)
+    S = MuteState.create(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    E = MuteState(b"E", alphabet)
+    E = MuteState.create(b"E", alphabet)
     hmm.add_state(E, lprob_zero())
 
-    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2)])
+    M1 = NormalState.create(b"M1", alphabet, [log(0.8), log(0.2)])
     hmm.add_state(M1, lprob_zero())
 
-    M2 = NormalState(b"M2", alphabet, [log(0.4), log(0.6)])
+    M2 = NormalState.create(b"M2", alphabet, [log(0.4), log(0.6)])
     hmm.add_state(M2, lprob_zero())
 
     hmm.set_transition(S, M1, log(1.0))
@@ -435,22 +441,22 @@ def test_hmm_viterbi_3():
     alphabet = Alphabet.create(b"AC", b"X")
     hmm = HMM.create(alphabet)
 
-    S = MuteState(b"S", alphabet)
+    S = MuteState.create(b"S", alphabet)
     hmm.add_state(S, log(1.0))
 
-    E = MuteState(b"E", alphabet)
+    E = MuteState.create(b"E", alphabet)
     hmm.add_state(E, lprob_zero())
 
-    M1 = NormalState(b"M1", alphabet, [log(0.8), log(0.2)])
+    M1 = NormalState.create(b"M1", alphabet, [log(0.8), log(0.2)])
     hmm.add_state(M1, lprob_zero())
 
-    D1 = MuteState(b"D1", alphabet)
+    D1 = MuteState.create(b"D1", alphabet)
     hmm.add_state(D1, lprob_zero())
 
-    M2 = NormalState(b"M2", alphabet, [log(0.4), log(0.6)])
+    M2 = NormalState.create(b"M2", alphabet, [log(0.4), log(0.6)])
     hmm.add_state(M2, lprob_zero())
 
-    D2 = MuteState(b"D2", alphabet)
+    D2 = MuteState.create(b"D2", alphabet)
     hmm.add_state(D2, lprob_zero())
 
     hmm.set_transition(S, M1, log(0.8))

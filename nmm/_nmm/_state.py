@@ -1,11 +1,25 @@
 from typing import Dict, Tuple
 
+from enum import Enum
+from .._cdata import CData
 from .._ffi import ffi, lib
-from .._imm import Alphabet, Sequence, SequenceTable, State, TableState
+from .._imm import (
+    Alphabet,
+    Sequence,
+    SequenceTable,
+    State,
+    TableState,
+    wrap_imm_state as imm_wrap_imm_state,
+)
+from ._base_alphabet import BaseAlphabet
 from ._base_table import BaseTable
 from ._codon import Codon
 from ._codon_table import CodonTable
-from ._base_alphabet import BaseAlphabet
+
+
+class StateType(Enum):
+    CODON = 0x10
+    FRAME = 0x11
 
 
 class FrameState(State[BaseAlphabet]):
@@ -73,3 +87,13 @@ class CodonState(TableState):
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{str(self)}>"
+
+
+# states: Mapping[CData, TState]
+def wrap_imm_state(imm_state: CData) -> State:
+    state_type: int = lib.imm_state_type_id(imm_state)
+    if state_type == StateType.CODON:
+        pass
+    elif state_type == StateType.FRAME:
+        pass
+    return imm_wrap_imm_state(imm_state)
