@@ -26,32 +26,54 @@ class StateType(Enum):
 
 class FrameState(State[BaseAlphabet]):
     def __init__(
-        self, name: bytes, baset: BaseTable, codont: CodonTable, epsilon: float
+        self, nmm_frame_state: CData, baset: BaseTable, codont: CodonTable,
     ):
         """
+        Frame state.
+
         Parameters
         ----------
-        name : bytes
-            State name.
-        baset : `BaseTable`
+        nmm_frame_state
+            State pointer.
+        baset
             Base table of probabilities.
-        codont : `CodonTable`
+        codont
             Codon table of probabilities.
-        epsilon : float
-            Epsilon.
         """
-        state = lib.nmm_frame_state_create(
-            name, baset.nmm_base_table, codont.nmm_codon_table, epsilon
-        )
-        if state == ffi.NULL:
-            raise RuntimeError("`nmm_frame_state_create` failed.")
-
+        if nmm_frame_state == ffi.NULL:
+            raise RuntimeError("`nmm_frame_state` is NULL.")
+        self._nmm_frame_state = nmm_frame_state
         self._baset = baset
         self._codont = codont
-        self._epsilon = epsilon
-        self._nmm_frame_state = state
         alphabet = baset.alphabet
         super().__init__(lib.nmm_frame_state_super(self._nmm_frame_state), alphabet)
+
+    @classmethod
+    def create(
+        cls: Type[FrameState],
+        name: bytes,
+        baset: BaseTable,
+        codont: CodonTable,
+        epsilon: float,
+    ) -> FrameState:
+        """
+        Create frame state.
+
+        Parameters
+        ----------
+        name
+            State name.
+        baset
+            Base table of probabilities.
+        codont
+            Codon table of probabilities.
+        epsilon
+            Epsilon.
+        """
+        ptr = lib.nmm_frame_state_create(
+            name, baset.nmm_base_table, codont.nmm_codon_table, epsilon
+        )
+        return FrameState(ptr, baset, codont)
 
     def decode(self, seq: Sequence) -> Tuple[float, Codon]:
         state = self._nmm_frame_state
