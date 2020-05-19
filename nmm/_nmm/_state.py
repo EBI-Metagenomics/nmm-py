@@ -143,18 +143,27 @@ def wrap_imm_state(
         state_type = StateType(lib.imm_state_type_id(imm_state))
     except ValueError:
         return imm_wrap_imm_state(imm_state, alphabet)
+
     if state_type == StateType.CODON:
-        pass
-    elif state_type == StateType.FRAME:
+        nmm_codon_state = lib.nmm_codon_state_derived(imm_state)
+        if nmm_codon_state == ffi.NULL:
+            raise RuntimeError("`nmm_codon_state` is NULL.")
+
+        nmm_codon_lprob = lib.nmm_codon_state_codonp(nmm_codon_state)
+        codonp = codon_probs[nmm_codon_lprob]
+        return CodonState(nmm_codon_lprob, codonp)
+
+    if state_type == StateType.FRAME:
         nmm_frame_state = lib.nmm_frame_state_derived(imm_state)
         if nmm_frame_state == ffi.NULL:
             raise RuntimeError("`nmm_frame_state` is NULL.")
 
-        nmm_base_table = lib.nmm_frame_state_baset(nmm_frame_state)
-        nmm_codon_table = lib.nmm_frame_state_codont(nmm_frame_state)
+        nmm_base_table = lib.nmm_frame_state_base_table(nmm_frame_state)
+        nmm_codon_table = lib.nmm_frame_state_codon_table(nmm_frame_state)
 
         baset = base_tables[nmm_base_table]
         codont = codon_tables[nmm_codon_table]
 
         return FrameState(nmm_frame_state, baset, codont)
+
     raise ValueError(f"Unknown state type: {lib.imm_state_type_id(imm_state)}.")

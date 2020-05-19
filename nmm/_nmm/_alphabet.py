@@ -2,6 +2,7 @@ from enum import Enum
 from .._cdata import CData
 from ._base_alphabet import BaseAlphabet
 from ._amino_alphabet import AminoAlphabet
+from .._imm import Alphabet
 
 from .._ffi import lib
 
@@ -15,8 +16,7 @@ def wrap_imm_abc(imm_abc: CData):
     try:
         alphabet_type = AlphabetType(lib.imm_abc_type_id(imm_abc))
     except ValueError:
-        raise NotImplementedError("Wrap it around super alphabet")
-        # return imm_wrap_imm_state(imm_state, alphabet)
+        return Alphabet(imm_abc)
     if alphabet_type == AlphabetType.BASE:
         nmm_base_abc = lib.nmm_base_abc_derived(imm_abc)
         return BaseAlphabet(nmm_base_abc)

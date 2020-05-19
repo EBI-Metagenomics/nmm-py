@@ -65,6 +65,7 @@ int    nmm_codon_lprob_normalize(struct nmm_codon_lprob *codonp);
 int nmm_codon_lprob_set(struct nmm_codon_lprob *codonp, struct nmm_codon const *codon, double lprob);
 
 /* Codon state */
+struct nmm_codon_lprob const *nmm_codon_state_codon_lprob(struct nmm_codon_state const *state);
 struct nmm_codon_state const *nmm_codon_state_create(char const *                  name,
                                                      struct nmm_codon_lprob const *codonp);
 struct nmm_codon_state const *nmm_codon_state_derived(struct imm_state const *state);
@@ -80,8 +81,8 @@ void                          nmm_codon_table_destroy(struct nmm_codon_table con
 double nmm_codon_table_lprob(struct nmm_codon_table const *codont, struct nmm_codon const *codon);
 
 /* Frame state */
-struct nmm_base_table const * nmm_frame_state_baset(struct nmm_frame_state const *state);
-struct nmm_codon_table const *nmm_frame_state_codont(struct nmm_frame_state const *state);
+struct nmm_base_table const * nmm_frame_state_base_table(struct nmm_frame_state const *state);
+struct nmm_codon_table const *nmm_frame_state_codon_table(struct nmm_frame_state const *state);
 struct nmm_frame_state const *nmm_frame_state_create(char const *                  name,
                                                      struct nmm_base_table const * baset,
                                                      struct nmm_codon_table const *codont,
