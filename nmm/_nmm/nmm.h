@@ -80,6 +80,8 @@ void                          nmm_codon_table_destroy(struct nmm_codon_table con
 double nmm_codon_table_lprob(struct nmm_codon_table const *codont, struct nmm_codon const *codon);
 
 /* Frame state */
+struct nmm_base_table const * nmm_frame_state_baset(struct nmm_frame_state const *state);
+struct nmm_codon_table const *nmm_frame_state_codont(struct nmm_frame_state const *state);
 struct nmm_frame_state const *nmm_frame_state_create(char const *                  name,
                                                      struct nmm_base_table const * baset,
                                                      struct nmm_codon_table const *codont,

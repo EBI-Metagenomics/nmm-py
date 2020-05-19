@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Tuple, Type, TypeVar
+from typing import Tuple, Type, TypeVar, Dict
 
 from enum import Enum
 from .._cdata import CData
@@ -132,7 +132,13 @@ class CodonState(State[BaseAlphabet]):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-def wrap_imm_state(imm_state: CData, alphabet: T) -> State:
+def wrap_imm_state(
+    imm_state: CData,
+    alphabet: T,
+    base_tables: Dict[CData, BaseTable],
+    codon_tables: Dict[CData, CodonTable],
+    codon_probs: Dict[CData, CodonProb],
+) -> State:
     try:
         state_type = StateType(lib.imm_state_type_id(imm_state))
     except ValueError:
@@ -140,5 +146,15 @@ def wrap_imm_state(imm_state: CData, alphabet: T) -> State:
     if state_type == StateType.CODON:
         pass
     elif state_type == StateType.FRAME:
-        pass
+        nmm_frame_state = lib.nmm_frame_state_derived(imm_state)
+        if nmm_frame_state == ffi.NULL:
+            raise RuntimeError("`nmm_frame_state` is NULL.")
+
+        nmm_base_table = lib.nmm_frame_state_baset(nmm_frame_state)
+        nmm_codon_table = lib.nmm_frame_state_codont(nmm_frame_state)
+
+        baset = base_tables[nmm_base_table]
+        codont = codon_tables[nmm_codon_table]
+
+        return FrameState(nmm_frame_state, baset, codont)
     raise ValueError(f"Unknown state type: {lib.imm_state_type_id(imm_state)}.")
