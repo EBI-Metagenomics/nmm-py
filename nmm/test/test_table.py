@@ -1,10 +1,21 @@
 from math import log
 
+import pytest
 from numpy.testing import assert_allclose
 
-from nmm.alphabet import BaseAlphabet
-from nmm.codon import Codon
-from nmm.prob import CodonProb, CodonTable
+from nmm import BaseAlphabet, BaseTable, Codon, CodonProb, CodonTable
+
+
+def test_base_table():
+    base = BaseAlphabet.create(b"ACGT", b"X")
+    baset = BaseTable.create(base, (log(0.1), log(0.2), log(0.3), log(0.4)))
+    assert_allclose(baset.lprob(b"A"), log(0.1))
+    assert_allclose(baset.lprob(b"C"), log(0.2))
+    assert_allclose(baset.lprob(b"G"), log(0.3))
+    assert_allclose(baset.lprob(b"T"), log(0.4))
+
+    with pytest.raises(Exception):
+        baset = BaseTable.create(base, (log(0.1), log(0.2), log(0.3)))
 
 
 def test_codon_table():

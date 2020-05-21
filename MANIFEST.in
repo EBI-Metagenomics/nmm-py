@@ -1,7 +1,5 @@
 include LICENSE.md
 include README.md
 include build_ext.py
-include libpath.py
-include nmm/_imm/imm.h
-include nmm/_nmm/nmm.h
+include nmm/nmm.h
 include version.py

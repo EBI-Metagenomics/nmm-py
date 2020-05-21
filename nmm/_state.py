@@ -1,20 +1,22 @@
 from __future__ import annotations
-from typing import Tuple, Type, TypeVar, Dict
 
 from enum import Enum
-from .._cdata import CData
-from .._ffi import ffi, lib
-from .._imm import (
-    Sequence,
-    State,
-    wrap_imm_state as imm_wrap_imm_state,
-)
-from ._codon_prob import CodonProb
-from ._base_alphabet import BaseAlphabet
-from ._base_table import BaseTable
+from typing import Tuple, Type, TypeVar
+
+from imm import Alphabet, Sequence, State
+
+from ._alphabet import BaseAlphabet
+from ._cdata import CData
 from ._codon import Codon
-from ._codon_table import CodonTable
-from .._imm import Alphabet
+from ._codon_prob import CodonProb
+from ._ffi import ffi, lib
+from ._table import BaseTable, CodonTable
+
+__all__ = [
+    "CodonState",
+    "FrameState",
+    "StateType",
+]
 
 T = TypeVar("T", bound=Alphabet)
 
@@ -130,40 +132,3 @@ class CodonState(State[BaseAlphabet]):
 
     def __repr__(self):
         return f"<{self.__class__.__name__}:{str(self)}>"
-
-
-def wrap_imm_state(
-    imm_state: CData,
-    alphabet: T,
-    base_tables: Dict[CData, BaseTable],
-    codon_tables: Dict[CData, CodonTable],
-    codon_probs: Dict[CData, CodonProb],
-) -> State:
-    try:
-        state_type = StateType(lib.imm_state_type_id(imm_state))
-    except ValueError:
-        return imm_wrap_imm_state(imm_state, alphabet)
-
-    if state_type == StateType.CODON:
-        nmm_codon_state = lib.nmm_codon_state_derived(imm_state)
-        if nmm_codon_state == ffi.NULL:
-            raise RuntimeError("`nmm_codon_state` is NULL.")
-
-        nmm_codon_lprob = lib.nmm_codon_state_codonp(nmm_codon_state)
-        codonp = codon_probs[nmm_codon_lprob]
-        return CodonState(nmm_codon_lprob, codonp)
-
-    if state_type == StateType.FRAME:
-        nmm_frame_state = lib.nmm_frame_state_derived(imm_state)
-        if nmm_frame_state == ffi.NULL:
-            raise RuntimeError("`nmm_frame_state` is NULL.")
-
-        nmm_base_table = lib.nmm_frame_state_base_table(nmm_frame_state)
-        nmm_codon_table = lib.nmm_frame_state_codon_table(nmm_frame_state)
-
-        baset = base_tables[nmm_base_table]
-        codont = codon_tables[nmm_codon_table]
-
-        return FrameState(nmm_frame_state, baset, codont)
-
-    raise ValueError(f"Unknown state type: {lib.imm_state_type_id(imm_state)}.")

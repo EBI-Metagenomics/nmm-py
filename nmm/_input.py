@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-from typing import Dict, Type, Iterator
+from typing import Dict, Iterator, Type
 
-from .._cdata import CData
-from .._ffi import ffi, lib
-from .._imm import DP, HMM
-from ._model import Model
-from ._base_alphabet import BaseAlphabet
-from ._state import State, wrap_imm_state
-from ._alphabet import wrap_imm_abc
-from ._base_table import BaseTable
-from ._codon_table import CodonTable
+from imm import DP, HMM, State
+
+from . import wrap
+from ._alphabet import BaseAlphabet
+from ._table import BaseTable, CodonTable
+from ._cdata import CData
 from ._codon_prob import CodonProb
+from ._ffi import ffi, lib
+from ._model import Model
+
+__all__ = ["Input"]
 
 
 class Input:
@@ -31,7 +32,7 @@ class Input:
                 raise StopIteration
             raise RuntimeError("Could not read model.")
 
-        abc = wrap_imm_abc(lib.nmm_model_abc(nmm_model))
+        abc = wrap.imm_abc(lib.nmm_model_abc(nmm_model))
 
         base_tables = read_base_tables(nmm_model, abc)
         codon_tables = read_codon_tables(nmm_model, abc)
@@ -40,7 +41,7 @@ class Input:
         states: Dict[CData, State] = {}
         for i in range(lib.nmm_model_nstates(nmm_model)):
             imm_state = lib.nmm_model_state(nmm_model, i)
-            states[imm_state] = wrap_imm_state(
+            states[imm_state] = wrap.imm_state(
                 imm_state, abc, base_tables, codon_tables, codon_probs
             )
 

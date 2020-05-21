@@ -3,9 +3,8 @@ from math import log
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from nmm.alphabet import BaseAlphabet
-from nmm.codon import Codon
-from nmm.prob import CodonProb, lprob_is_zero
+from imm import lprob_is_zero
+from nmm import BaseAlphabet, Codon, CodonProb
 
 
 def test_codon_prob():

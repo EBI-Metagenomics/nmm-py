@@ -3,11 +3,8 @@ from typing import Union
 
 from numpy.testing import assert_equal
 
-from nmm.alphabet import BaseAlphabet
-from nmm.fragment import Fragment
-from nmm.path import Path, Step
-from nmm.sequence import Sequence
-from nmm.state import MuteState, NormalState
+from imm import Fragment, MuteState, NormalState, Path, Sequence, Step
+from nmm import BaseAlphabet
 
 
 def test_fragment():

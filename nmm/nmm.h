@@ -1,3 +1,7 @@
+struct imm_abc;
+struct imm_dp;
+struct imm_hmm;
+struct imm_seq;
 struct imm_state;
 struct nmm_amino_abc;
 struct nmm_amino_table;

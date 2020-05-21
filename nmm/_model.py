@@ -2,9 +2,12 @@ from __future__ import annotations
 
 from typing import Type
 
-from .._cdata import CData
-from .._ffi import ffi, lib
-from .._imm import HMM, DP, Alphabet
+from imm import DP, HMM, Alphabet
+
+from ._cdata import CData
+from ._ffi import ffi, lib
+
+__all__ = ["Model"]
 
 
 class Model:

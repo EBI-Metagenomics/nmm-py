@@ -1,8 +1,7 @@
 import pytest
 from numpy.testing import assert_equal
 
-from nmm.alphabet import BaseAlphabet
-from nmm.codon import Codon
+from nmm import BaseAlphabet, Codon, codon_iter
 
 
 def test_codon():
@@ -22,3 +21,12 @@ def test_codon():
 
     with pytest.raises(ValueError):
         codon.symbols = b"ADA"
+
+
+def test_codon_iter():
+    base = BaseAlphabet.create(b"ACGT", b"X")
+
+    codons = list(codon_iter(base))
+    assert_equal(len(codons), 64)
+    assert_equal(codons[0].symbols, b"AAA")
+    assert_equal(codons[1].symbols, b"AAC")

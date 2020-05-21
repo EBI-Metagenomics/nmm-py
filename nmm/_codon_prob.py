@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from typing import Type
 
-from .._cdata import CData
-from .._ffi import ffi, lib
-from .._imm import lprob_is_valid
-from ._base_alphabet import BaseAlphabet
+from imm import lprob_is_valid
+
+from ._alphabet import BaseAlphabet
+from ._cdata import CData
 from ._codon import Codon
+from ._ffi import ffi, lib
+
+__all__ = ["CodonProb"]
 
 
 class CodonProb:

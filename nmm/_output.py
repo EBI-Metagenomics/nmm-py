@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from typing import Type
 
-from .._cdata import CData
-from .._ffi import ffi, lib
+from ._cdata import CData
+from ._ffi import ffi, lib
 from ._model import Model
+
+__all__ = ["Output"]
 
 
 class Output:

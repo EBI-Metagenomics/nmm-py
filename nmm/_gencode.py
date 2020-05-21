@@ -1,6 +1,9 @@
 from typing import Dict, List, Set, Union
 
-from ._nmm import AminoAlphabet, Codon, DNAAlphabet, RNAAlphabet
+from ._alphabet import AminoAlphabet, DNAAlphabet, RNAAlphabet
+from ._codon import Codon
+
+__all__ = ["GeneticCode"]
 
 GENCODE: Dict[str, Dict[bytes, List[bytes]]] = {
     "standard": {

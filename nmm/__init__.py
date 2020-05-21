@@ -1,8 +1,20 @@
-from . import alphabet, codon, fragment, io, path, prob, result, sequence, state
+from ._alphabet import (
+    AlphabetType,
+    AminoAlphabet,
+    BaseAlphabet,
+    CanonicalAminoAlphabet,
+    DNAAlphabet,
+    RNAAlphabet,
+)
 from ._cdata import CData
+from ._codon import Codon, codon_iter
+from ._codon_prob import CodonProb
 from ._gencode import GeneticCode
-from ._imm import DP, HMM
-from ._interval import Interval
+from ._input import Input
+from ._model import Model
+from ._output import Output
+from ._state import CodonState, FrameState, StateType
+from ._table import AminoTable, BaseTable, CodonTable
 from ._testit import test
 
 try:
@@ -17,23 +29,29 @@ and reinstall the package again."""
 
     raise RuntimeError(str(e) + _ffi_err)
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 
 __all__ = [
+    "AlphabetType",
+    "AminoAlphabet",
+    "AminoTable",
+    "BaseAlphabet",
+    "BaseTable",
     "CData",
-    "DP",
+    "CanonicalAminoAlphabet",
+    "Codon",
+    "CodonProb",
+    "CodonState",
+    "CodonTable",
+    "DNAAlphabet",
+    "FrameState",
     "GeneticCode",
-    "HMM",
-    "Interval",
+    "Input",
+    "Model",
+    "Output",
+    "RNAAlphabet",
+    "StateType",
     "__version__",
-    "alphabet",
-    "codon",
-    "fragment",
-    "io",
-    "path",
-    "prob",
-    "result",
-    "sequence",
-    "state",
+    "codon_iter",
     "test",
 ]

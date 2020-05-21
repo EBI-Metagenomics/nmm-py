@@ -1,31 +1,11 @@
 import pytest
 from numpy.testing import assert_equal
 
-from nmm import Interval
-from nmm.alphabet import Alphabet, BaseAlphabet
-from nmm.sequence import Sequence
+from imm import Interval, Sequence
+from nmm import BaseAlphabet
 
 
 def test_sequence():
-    alphabet = Alphabet.create(b"ACGT", b"X")
-    seq = Sequence.create(b"ACAAAGATX", alphabet)
-
-    assert_equal(len(seq), 9)
-    assert_equal(bytes(seq), b"ACAAAGATX")
-
-    assert_equal(str(seq), "ACAAAGATX")
-    assert_equal(repr(seq), "<Sequence:ACAAAGATX>")
-
-    Sequence.create(b"ACGXXT", alphabet)
-
-    with pytest.raises(RuntimeError):
-        Sequence.create(b"ACGWT", alphabet)
-
-    with pytest.raises(RuntimeError):
-        Sequence.create("ACGTç".encode(), alphabet)
-
-
-def test_sequence_base():
     alphabet = BaseAlphabet.create(b"ACGT", b"X")
     seq = Sequence.create(b"ACAAAGATX", alphabet)
 

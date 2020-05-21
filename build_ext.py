@@ -1,50 +1,31 @@
 import os
-import platform
 from os.path import join
 from typing import List
 
 from cffi import FFI
 
-from libpath import System, Unix, Windows
+import imm
 
 ffibuilder = FFI()
-libs = ["imm", "nmm"]
+libs = ["nmm"]
+
+ffibuilder.include(imm.ffibuilder)
 
 folder = os.path.dirname(os.path.abspath(__file__))
 
-with open(join(folder, "nmm", "_imm", "imm.h"), "r") as f:
+with open(join(folder, "nmm", "nmm.h"), "r") as f:
     ffibuilder.cdef(f.read())
 
-with open(join(folder, "nmm", "_nmm", "nmm.h"), "r") as f:
-    ffibuilder.cdef(f.read())
-
-if platform.system() == "Windows":
-    win = Windows()
-    progfiles = win.get_programfiles()
-    for lib in libs:
-        win.add_library_dir(join(progfiles, lib, "lib"))
-        win.add_include_dir(join(progfiles, lib, "include"))
-
-    libs = [win.find_libname(lib) for lib in libs]
-    system: System = win
-else:
-    system = Unix()
-
-library_dirs = system.get_library_dirs()
 extra_link_args: List[str] = []
-if platform.system() == "Darwin":
-    if len(library_dirs) > 0:
-        extra_link_args += ["-Wl,-rpath," + ",-rpath,".join(library_dirs)]
+if "NMM_EXTRA_LINK_ARGS" in os.environ:
+    extra_link_args += os.environ["NMM_EXTRA_LINK_ARGS"].split(os.pathsep)
 
 ffibuilder.set_source(
     "nmm._ffi",
     r"""
-    #include "imm/imm.h"
     #include "nmm/nmm.h"
     """,
     libraries=libs,
-    library_dirs=library_dirs,
-    include_dirs=system.get_include_dirs(),
     extra_link_args=extra_link_args,
     language="c",
 )
