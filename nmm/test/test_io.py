@@ -2,9 +2,9 @@ from math import log
 from pathlib import Path
 
 import pytest
-from numpy.testing import assert_allclose, assert_equal
 
 from imm import HMM, MuteState, Sequence
+from imm.testing import assert_allclose
 from nmm import (
     BaseAlphabet,
     BaseTable,
@@ -56,7 +56,7 @@ def test_io(tmpdir, nmm_example):
 
     seq = Sequence.create(b"AUGAUU", alphabet)
     results = dp.viterbi(seq)
-    assert_equal(len(results), 1)
+    assert len(results) == 1
     assert_allclose(results[0].loglikelihood, -7.069201008427531)
 
     filepath = Path(tmpdir / "model.nmm")
@@ -73,4 +73,4 @@ def test_io(tmpdir, nmm_example):
             score = model.dp.viterbi(seq)[0].loglikelihood
             assert_allclose(score, -7.069201008427531)
             nmodels += 1
-        assert_equal(nmodels, 3)
+        assert nmodels == 3

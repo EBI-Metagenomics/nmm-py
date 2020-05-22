@@ -1,5 +1,4 @@
 import pytest
-from numpy.testing import assert_equal
 
 from imm import Interval, Sequence
 from nmm import BaseAlphabet
@@ -9,20 +8,20 @@ def test_sequence():
     alphabet = BaseAlphabet.create(b"ACGT", b"X")
     seq = Sequence.create(b"ACAAAGATX", alphabet)
 
-    assert_equal(len(seq), 9)
-    assert_equal(bytes(seq), b"ACAAAGATX")
+    assert len(seq) == 9
+    assert bytes(seq) == b"ACAAAGATX"
 
-    assert_equal(str(seq), "ACAAAGATX")
-    assert_equal(repr(seq), "<Sequence:ACAAAGATX>")
+    assert str(seq) == "ACAAAGATX"
+    assert repr(seq) == "<Sequence:ACAAAGATX>"
 
     subseq = seq[1:7]
-    assert_equal(str(subseq), "CAAAGA")
+    assert str(subseq) == "CAAAGA"
     subseq = subseq[Interval(0, 5)]
-    assert_equal(str(subseq), "CAAAG")
-    assert_equal(subseq.alphabet.symbols, b"ACGT")
+    assert str(subseq) == "CAAAG"
+    assert subseq.alphabet.symbols == b"ACGT"
 
     del subseq
-    assert_equal(seq.alphabet.symbols, b"ACGT")
+    assert seq.alphabet.symbols == b"ACGT"
 
     Sequence.create(b"ACGXXT", alphabet)
 

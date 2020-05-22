@@ -1,9 +1,7 @@
-from math import log
-
-from numpy import inf
-from numpy.testing import assert_allclose, assert_equal
+from math import log, inf
 
 from imm import Sequence, lprob_is_zero
+from imm.testing import assert_allclose
 from nmm import (
     BaseAlphabet,
     BaseTable,
@@ -21,7 +19,7 @@ def test_codon_state():
     codonp.set_lprob(Codon.create(b"AUG", base), log(0.8))
     codonp.set_lprob(Codon.create(b"AUU", base), log(0.1))
     state = CodonState.create(b"M1", codonp)
-    assert_equal(state.name, b"M1")
+    assert state.name == b"M1"
     assert_allclose(state.lprob(Sequence.create(b"AUG", base)), log(0.8))
     assert_allclose(state.lprob(Sequence.create(b"AUU", base)), log(0.1))
     assert_allclose(state.lprob(Sequence.create(b"ACU", base)), -inf)
@@ -37,15 +35,13 @@ def test_frame_state():
 
     frame_state = FrameState.create(b"M1", baset, CodonTable.create(codonp), 0.0)
 
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence.create(b"AUA", base))), True)
+    assert lprob_is_zero(frame_state.lprob(Sequence.create(b"AUA", base)))
     assert_allclose(frame_state.lprob(Sequence.create(b"AUG", base)), log(0.8))
     assert_allclose(frame_state.lprob(Sequence.create(b"AUU", base)), log(0.1))
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence.create(b"AU", base))), True)
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence.create(b"A", base))), True)
-    assert_equal(lprob_is_zero(frame_state.lprob(Sequence.create(b"AUUA", base))), True)
-    assert_equal(
-        lprob_is_zero(frame_state.lprob(Sequence.create(b"AUUAA", base))), True
-    )
+    assert lprob_is_zero(frame_state.lprob(Sequence.create(b"AU", base)))
+    assert lprob_is_zero(frame_state.lprob(Sequence.create(b"A", base)))
+    assert lprob_is_zero(frame_state.lprob(Sequence.create(b"AUUA", base)))
+    assert lprob_is_zero(frame_state.lprob(Sequence.create(b"AUUAA", base)))
 
     codonp.normalize()
     frame_state = FrameState.create(b"M1", baset, CodonTable.create(codonp), 0.1)
@@ -69,22 +65,20 @@ def test_frame_state():
     assert_allclose(
         frame_state.lprob(Sequence.create(b"AUUAA", base)), -12.08828960987379
     )
-    assert_equal(
-        lprob_is_zero(frame_state.lprob(Sequence.create(b"AUUAAA", base))), True
-    )
+    assert lprob_is_zero(frame_state.lprob(Sequence.create(b"AUUAAA", base)))
 
     lprob, codon = frame_state.decode(Sequence.create(b"AUA", base))
     assert_allclose(lprob, -7.128586690537968)
-    assert_equal(codon.symbols, b"AUG")
+    assert codon.symbols == b"AUG"
 
     lprob, codon = frame_state.decode(Sequence.create(b"AUAG", base))
     assert_allclose(lprob, -4.813151489562624)
-    assert_equal(codon.symbols, b"AUG")
+    assert codon.symbols == b"AUG"
 
     lprob, codon = frame_state.decode(Sequence.create(b"A", base))
     assert_allclose(lprob, -6.032286541628237)
-    assert_equal(codon.symbols, b"AUG")
+    assert codon.symbols == b"AUG"
 
     lprob, codon = frame_state.decode(Sequence.create(b"UUU", base))
     assert_allclose(lprob, -8.110186062956258)
-    assert_equal(codon.symbols, b"AUU")
+    assert codon.symbols == b"AUU"

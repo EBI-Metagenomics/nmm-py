@@ -1,8 +1,8 @@
 from math import log
 
 import pytest
-from numpy.testing import assert_allclose
 
+from imm.testing import assert_allclose
 from nmm import BaseAlphabet, BaseTable, Codon, CodonProb, CodonTable
 
 

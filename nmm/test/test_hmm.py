@@ -1,8 +1,7 @@
 from math import log
 
-from numpy.testing import assert_allclose, assert_equal
-
 from imm import HMM, MuteState, Sequence
+from imm.testing import assert_allclose
 from nmm import BaseAlphabet, BaseTable, Codon, CodonProb, CodonTable, FrameState
 
 
@@ -33,5 +32,5 @@ def test_hmm():
 
     dp = hmm.create_dp(E)
     results = dp.viterbi(Sequence.create(b"AUGAUU", abc))
-    assert_equal(len(results), 1)
+    assert len(results) == 1
     assert_allclose(results[0].loglikelihood, -7.069201008427531)
