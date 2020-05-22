@@ -18,9 +18,7 @@ from ._table import AminoTable, BaseTable, CodonTable
 from ._testit import test
 
 try:
-    from ._ffi import ffi
-
-    del ffi
+    from ._ffi import lib
 except Exception as e:
     _ffi_err = """
 It is likely caused by a broken installation of this package.
@@ -53,5 +51,6 @@ __all__ = [
     "StateType",
     "__version__",
     "codon_iter",
+    "lib",
     "test",
 ]
