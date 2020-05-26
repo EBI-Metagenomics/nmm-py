@@ -1,3 +1,5 @@
-from cffi.backend_ctypes import CTypesData as CData
+from typing import Any
 
 __all__ = ["CData"]
+
+CData = Any

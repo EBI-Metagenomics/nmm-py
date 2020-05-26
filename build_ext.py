@@ -4,12 +4,12 @@ from typing import List
 
 from cffi import FFI
 
-import imm
+import imm.build_ext
 
 ffibuilder = FFI()
 libs = ["nmm"]
 
-ffibuilder.include(imm.ffibuilder)
+ffibuilder.include(imm.build_ext.ffibuilder)
 
 folder = os.path.dirname(os.path.abspath(__file__))
 
