@@ -32,7 +32,7 @@ addons:
       - cmake
 install:
   - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp bash
-  # - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=imm bash
+  - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=imm bash
   - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=nmm bash
   - curl -fsSL $URL/check-readme.sh | bash
   # - curl -fsSL $URL/py-min-deps.sh | bash -s -- --numpy --scipy
