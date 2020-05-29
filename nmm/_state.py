@@ -77,6 +77,14 @@ class FrameState(State[BaseAlphabet]):
         )
         return FrameState(ptr, baset, codont)
 
+    @property
+    def base_table(self) -> BaseTable:
+        return self._baset
+
+    @property
+    def codon_table(self) -> CodonTable:
+        return self._codont
+
     def decode(self, seq: Sequence) -> Tuple[float, Codon]:
         state = self._nmm_frame_state
         any_symbol = self.alphabet.any_symbol
