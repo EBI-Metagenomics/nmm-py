@@ -3,7 +3,7 @@ python: 3.7
 env:
   global:
     - URL=https://raw.githubusercontent.com/horta/ci/master
-    - CIBW_SKIP="cp27-* cp34-* cp35-* cp36-* *i686*"
+    - CIBW_SKIP="pp* cp27-* cp34-* cp35-* cp36-* *i686* *-win32"
     - CIBW_BEFORE_BUILD_LINUX="{project}/ci/linux-deps"
     - CIBW_BEFORE_BUILD_MACOS="{project}/ci/macos-deps"
     - CIBW_TEST_COMMAND="bash {project}/ci/test"
@@ -15,7 +15,12 @@ matrix:
         - LIBRARY_PATH=/usr/local/lib
         - LD_LIBRARY_PATH=/usr/local/lib
     - os: osx
-      osx_image: xcode11.2 # Python 3.7.4 running on macOS 10.14.4
+      osx_image: xcode11.2
+      env:
+        - C_INCLUDE_PATH=/usr/local/include
+        - LIBRARY_PATH=/usr/local/lib
+        - LD_LIBRARY_PATH=/usr/local/lib
+        - NMM_EXTRA_LINK_ARGS="-Wl,-rpath,/usr/local/lib"
       language: shell
       before_install:
         - python3 -m pip install --upgrade pip setuptools
@@ -27,10 +32,10 @@ addons:
       - cmake
 install:
   - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=logaddexp bash
-  - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=imm bash
+  # - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=imm bash
   - curl -fsSL https://git.io/JerYI | GITHUB_USER=EBI-Metagenomics GITHUB_PROJECT=nmm bash
   - curl -fsSL $URL/check-readme.sh | bash
-  - curl -fsSL $URL/py-min-deps.sh | bash -s -- --numpy --scipy
+  # - curl -fsSL $URL/py-min-deps.sh | bash -s -- --numpy --scipy
   - curl -fsSL $URL/py-check-style.sh | bash
   - curl -fsSL $URL/py-dev-test.sh | bash
   - curl -fsSL $URL/py-sdist-test.sh | bash
