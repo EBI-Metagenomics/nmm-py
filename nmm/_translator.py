@@ -6,7 +6,7 @@ from ._alphabet import Alphabet, DNAAlphabet, RNAAlphabet
 Ta = TypeVar("Ta", bound=Alphabet)
 Tb = TypeVar("Tb", bound=Alphabet)
 
-__all__ = ["Translator", "NTTranslator"]
+__all__ = ["Translator", "NTTranslator", "NullTranslator"]
 
 
 class Translator(Generic[Ta, Tb], ABC):
@@ -19,6 +19,13 @@ class Translator(Generic[Ta, Tb], ABC):
         del sequence
         del to_alphabet
         raise NotImplementedError()
+
+
+class NullTranslator(Translator[Ta, Ta]):
+    @abstractmethod
+    def translate(self, sequence: bytes, to_alphabet: Ta) -> bytes:
+        del to_alphabet
+        return sequence
 
 
 class NTTranslator(Translator[DNAAlphabet, RNAAlphabet]):

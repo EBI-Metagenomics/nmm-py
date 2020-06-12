@@ -16,7 +16,7 @@ from ._output import Output
 from ._state import CodonState, FrameState, StateType
 from ._table import AminoTable, BaseTable, CodonTable
 from ._testit import test
-from ._translator import NTTranslator, Translator
+from ._translator import NTTranslator, NullTranslator, Translator
 
 try:
     from ._ffi import lib
@@ -48,6 +48,7 @@ __all__ = [
     "Input",
     "Model",
     "NTTranslator",
+    "NullTranslator",
     "Output",
     "RNAAlphabet",
     "StateType",
