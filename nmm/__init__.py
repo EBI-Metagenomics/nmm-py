@@ -16,6 +16,7 @@ from ._output import Output
 from ._state import CodonState, FrameState, StateType
 from ._table import AminoTable, BaseTable, CodonTable
 from ._testit import test
+from ._translator import NTTranslator, Translator
 
 try:
     from ._ffi import lib
@@ -27,7 +28,7 @@ and reinstall the package again."""
 
     raise RuntimeError(str(e) + _ffi_err)
 
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 
 __all__ = [
     "AlphabetType",
@@ -46,9 +47,11 @@ __all__ = [
     "GeneticCode",
     "Input",
     "Model",
+    "NTTranslator",
     "Output",
     "RNAAlphabet",
     "StateType",
+    "Translator",
     "__version__",
     "codon_iter",
     "lib",
