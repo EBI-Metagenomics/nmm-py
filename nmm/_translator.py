@@ -10,10 +10,6 @@ __all__ = ["Translator", "NTTranslator", "NullTranslator"]
 
 
 class Translator(Generic[Ta, Tb], ABC):
-    def __init__(self, a: Ta, b: Tb):
-        self._a = a
-        self._b = b
-
     @abstractmethod
     def translate(self, sequence: bytes, to_alphabet: Union[Ta, Tb]) -> bytes:
         del sequence
@@ -22,14 +18,16 @@ class Translator(Generic[Ta, Tb], ABC):
 
 
 class NullTranslator(Translator[Ta, Ta]):
-    @abstractmethod
     def translate(self, sequence: bytes, to_alphabet: Ta) -> bytes:
         del to_alphabet
         return sequence
 
 
 class NTTranslator(Translator[DNAAlphabet, RNAAlphabet]):
-    @abstractmethod
+    def __init__(self):
+        self._a = DNAAlphabet()
+        self._b = RNAAlphabet()
+
     def translate(
         self, sequence: bytes, to_alphabet: Union[DNAAlphabet, RNAAlphabet]
     ) -> bytes:
