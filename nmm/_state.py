@@ -92,6 +92,10 @@ class FrameState(State[BaseAlphabet]):
         lprob = lib.nmm_frame_state_decode(state, seq.imm_seq, codon.nmm_codon)
         return lprob, codon
 
+    @property
+    def epsilon(self) -> float:
+        return lib.nmm_frame_state_epsilon(self._nmm_frame_state)
+
     def __del__(self):
         if self._nmm_frame_state != ffi.NULL:
             lib.nmm_frame_state_destroy(self._nmm_frame_state)
