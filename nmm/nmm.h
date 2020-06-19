@@ -107,6 +107,8 @@ int                     nmm_input_close(struct nmm_input *input);
 struct nmm_input *      nmm_input_create(char const *filepath);
 int                     nmm_input_destroy(struct nmm_input *input);
 bool                    nmm_input_eof(struct nmm_input const *input);
+int                     nmm_input_fseek(struct nmm_input *input, long offset);
+long                    nmm_input_ftell(struct nmm_input *input);
 struct nmm_model const *nmm_input_read(struct nmm_input *input);
 
 /* Model */

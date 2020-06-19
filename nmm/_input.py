@@ -25,6 +25,17 @@ class Input:
     def create(cls: Type[Input], filepath: bytes) -> Input:
         return cls(lib.nmm_input_create(filepath))
 
+    def fseek(self, offset: int):
+        err: int = lib.nmm_input_fseek(self._nmm_input, offset)
+        if err != 0:
+            raise RuntimeError("Could not fseek.")
+
+    def ftell(self) -> int:
+        offset: int = lib.nmm_input_ftell(self._nmm_input)
+        if offset < 0:
+            raise RuntimeError("Could not ftell.")
+        return offset
+
     def read(self) -> Model:
         nmm_model = lib.nmm_input_read(self._nmm_input)
         if nmm_model == ffi.NULL:
