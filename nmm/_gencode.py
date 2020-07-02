@@ -52,6 +52,13 @@ class GeneticCode:
         amino_acid = amino_acid.upper()
         return self._gencode.get(amino_acid, [])
 
+    def codons_prob(self, amino_acid: bytes) -> Dict[Codon, float]:
+        codons = self.codons(amino_acid)
+        n = len(codons)
+        if n == 0:
+            return {}
+        return {codon: 1 / n for codon in codons}
+
     def amino_acid(self, codon: Codon) -> bytes:
         return self._amino_acid[codon]
 
