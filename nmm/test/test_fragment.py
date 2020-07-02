@@ -2,6 +2,7 @@ from math import log
 from typing import Union
 
 from imm import Fragment, MuteState, NormalState, Path, Sequence, Step
+
 from nmm import BaseAlphabet
 
 

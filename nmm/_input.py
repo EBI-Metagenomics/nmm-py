@@ -6,11 +6,11 @@ from imm import DP, HMM, State
 
 from . import wrap
 from ._alphabet import BaseAlphabet
-from ._table import BaseTable, CodonTable
 from ._cdata import CData
 from ._codon_prob import CodonProb
 from ._ffi import ffi, lib
 from ._model import Model
+from ._table import BaseTable, CodonTable
 
 __all__ = ["Input"]
 

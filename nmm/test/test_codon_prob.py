@@ -1,9 +1,9 @@
 from math import log
 
 import pytest
-
 from imm import lprob_is_zero
 from imm.testing import assert_allclose
+
 from nmm import BaseAlphabet, Codon, CodonProb
 
 

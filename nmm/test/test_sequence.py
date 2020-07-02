@@ -1,6 +1,6 @@
 import pytest
-
 from imm import Interval, Sequence
+
 from nmm import BaseAlphabet
 
 

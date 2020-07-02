@@ -1,7 +1,8 @@
-from math import log, inf
+from math import inf, log
 
 from imm import Sequence, lprob_is_zero
 from imm.testing import assert_allclose
+
 from nmm import (
     BaseAlphabet,
     BaseTable,

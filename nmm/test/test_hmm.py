@@ -2,6 +2,7 @@ from math import log
 
 from imm import HMM, MuteState, Sequence
 from imm.testing import assert_allclose
+
 from nmm import BaseAlphabet, BaseTable, Codon, CodonProb, CodonTable, FrameState
 
 
