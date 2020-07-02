@@ -5,32 +5,6 @@ from ._codon import Codon
 
 __all__ = ["GeneticCode"]
 
-GENCODE: Dict[str, Dict[bytes, List[bytes]]] = {
-    "standard": {
-        b"F": [b"UUU", b"UUC"],
-        b"L": [b"UUA", b"UUG", b"CUU", b"CUC", b"CUA", b"CUG"],
-        b"I": [b"AUU", b"AUC", b"AUA"],
-        b"M": [b"AUG"],
-        b"V": [b"GUU", b"GUC", b"GUA", b"GUG"],
-        b"S": [b"UCU", b"UCC", b"UCA", b"UCG", b"AGU", b"AGC"],
-        b"P": [b"CCU", b"CCC", b"CCA", b"CCG"],
-        b"T": [b"ACU", b"ACC", b"ACA", b"ACG"],
-        b"A": [b"GCU", b"GCC", b"GCA", b"GCG"],
-        b"Y": [b"UAU", b"UAC"],
-        b"*": [b"UAA", b"UAG", b"UGA"],
-        b"H": [b"CAU", b"CAC"],
-        b"Q": [b"CAA", b"CAG"],
-        b"N": [b"AAU", b"AAC"],
-        b"K": [b"AAA", b"AAG"],
-        b"D": [b"GAU", b"GAC"],
-        b"E": [b"GAA", b"GAG"],
-        b"C": [b"UGU", b"UGC"],
-        b"W": [b"UGG"],
-        b"R": [b"CGU", b"CGC", b"CGA", b"CGG", b"AGA", b"AGG"],
-        b"G": [b"GGU", b"GGC", b"GGA", b"GGG"],
-    }
-}
-
 
 class GeneticCode:
     """
@@ -50,21 +24,21 @@ class GeneticCode:
         self,
         base_abc: Union[DNAAlphabet, RNAAlphabet],
         amino_abc: AminoAlphabet,
-        name: str = "standard",
+        name: str = "Standard",
     ):
 
         self._base_alphabet = base_abc
         self._amino_alphabet = amino_abc
 
-        self._gencode: Dict[bytes, List[Codon]] = {
-            aa: [] for aa in GENCODE[name].keys()
-        }
+        table = get_translation_table(name)
 
-        for aa, triplets in GENCODE[name].items():
+        self._gencode: Dict[bytes, List[Codon]] = {aa: [] for aa in table}
+
+        for aa, triplets in table.items():
             gcode = self._gencode[aa]
             for triplet in triplets:
-                if isinstance(base_abc, DNAAlphabet):
-                    triplet = triplet.replace(b"U", b"T")
+                if isinstance(base_abc, RNAAlphabet):
+                    triplet = triplet.replace(b"T", b"U")
                 gcode.append(Codon.create(triplet, base_abc))
 
         self._amino_acid: Dict[Codon, bytes] = {}
@@ -89,3 +63,28 @@ class GeneticCode:
     @property
     def amino_alphabet(self) -> AminoAlphabet:
         return self._amino_alphabet
+
+
+def get_translation_table(name: str = "Standard"):
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=PendingDeprecationWarning)
+        from Bio.Data import CodonTable
+
+    if name not in CodonTable.unambiguous_dna_by_name:
+        names = str(list(CodonTable.unambiguous_dna_by_name.keys()))
+        msg = f"Unknown translation table {name}. Possible names are: {names}."
+        raise ValueError(msg)
+
+    table = CodonTable.unambiguous_dna_by_name[name]
+
+    btable: Dict[bytes, List[bytes]] = {}
+
+    for codon, aa in table.forward_table.items():
+        baa = aa.encode()
+        if baa not in btable:
+            btable[baa] = []
+        btable[baa].append(codon.encode())
+
+    return btable
