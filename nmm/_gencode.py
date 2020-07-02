@@ -17,7 +17,9 @@ class GeneticCode:
     amino_abc
         Amino acid alphabet.
     name
-        It only accepts `"standard"` for now.
+        NCBI `translation table name`_. Defaults to `"Standard"`.
+
+    .. _translation table name: https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
     """
 
     def __init__(
