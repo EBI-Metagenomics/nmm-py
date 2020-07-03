@@ -27,7 +27,7 @@ and reinstall the package again."""
 
     raise RuntimeError(str(e) + _ffi_err)
 
-__version__ = "0.0.12"
+__version__ = "0.0.13"
 
 __all__ = [
     "AlphabetType",
