@@ -9,7 +9,6 @@ from ._alphabet import (
 from ._cdata import CData
 from ._codon import Codon, codon_iter
 from ._codon_prob import CodonProb
-from ._gencode import GeneticCode
 from ._input import Input
 from ._model import Model
 from ._output import Output
@@ -44,7 +43,6 @@ __all__ = [
     "CodonTable",
     "DNAAlphabet",
     "FrameState",
-    "GeneticCode",
     "Input",
     "Model",
     "NTTranslator",
