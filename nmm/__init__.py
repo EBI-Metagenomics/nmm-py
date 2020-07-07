@@ -2,8 +2,8 @@ from ._alphabet import (
     AlphabetType,
     AminoAlphabet,
     BaseAlphabet,
-    CanonicalAminoAlphabet,
     DNAAlphabet,
+    IUPACAminoAlphabet,
     RNAAlphabet,
 )
 from ._cdata import CData
@@ -27,7 +27,7 @@ and reinstall the package again."""
 
     raise RuntimeError(str(e) + _ffi_err)
 
-__version__ = "0.0.13"
+__version__ = "0.0.14"
 
 __all__ = [
     "AlphabetType",
@@ -36,13 +36,13 @@ __all__ = [
     "BaseAlphabet",
     "BaseTable",
     "CData",
-    "CanonicalAminoAlphabet",
     "Codon",
     "CodonProb",
     "CodonState",
     "CodonTable",
     "DNAAlphabet",
     "FrameState",
+    "IUPACAminoAlphabet",
     "Input",
     "Model",
     "NTTranslator",

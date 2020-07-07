@@ -12,7 +12,7 @@ __all__ = [
     "AlphabetType",
     "AminoAlphabet",
     "BaseAlphabet",
-    "CanonicalAminoAlphabet",
+    "IUPACAminoAlphabet",
     "DNAAlphabet",
     "RNAAlphabet",
 ]
@@ -139,9 +139,9 @@ class AminoAlphabet(Alphabet):
         return f"<{self.__class__.__name__}:{str(self)}>"
 
 
-class CanonicalAminoAlphabet(AminoAlphabet):
+class IUPACAminoAlphabet(AminoAlphabet):
     """
-    Canonical amino acid alphabet.
+    IUPAC amino acid alphabet.
 
     The canonical symbols are `ACDEFGHIKLMNPQRSTVWY`.
     """
