@@ -40,7 +40,7 @@ install:
   - python3 -m pip install --upgrade isort
   - flake8 nmm
   - black --check nmm
-  - isort --recursive --check-only nmm
+  - isort --check-only
   - python3 -m pip install --upgrade imm
   - curl -fsSL $URL/py-dev-test.sh | bash
   - curl -fsSL $URL/py-sdist-test.sh | bash
