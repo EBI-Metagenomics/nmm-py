@@ -73,6 +73,9 @@ class Codon:
         if self._nmm_codon != ffi.NULL:
             lib.nmm_codon_destroy(self._nmm_codon)
 
+    def __lt__(self, another):
+        return self.symbols < another.symbols
+
     def __eq__(self, another):
         return bytes(self) == bytes(another)
 

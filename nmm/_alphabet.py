@@ -129,6 +129,10 @@ class AminoAlphabet(Alphabet):
         return cls(lib.nmm_amino_abc_create(symbols, any_symbol))
 
     @property
+    def stop_symbol(self) -> bytes:
+        return b"*"
+
+    @property
     def nmm_amino_abc(self) -> CData:
         return self._nmm_amino_abc
 
@@ -148,6 +152,10 @@ class IUPACAminoAlphabet(AminoAlphabet):
 
     def __init__(self):
         super().__init__(lib.nmm_amino_abc_create(b"ACDEFGHIKLMNPQRSTVWY", b"X"))
+
+    @property
+    def stop_symbol(self) -> bytes:
+        return b"*"
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}:{str(self)}>"

@@ -2,9 +2,8 @@ import os
 from os.path import join
 from typing import List
 
-from cffi import FFI
-
 import imm.build_ext
+from cffi import FFI
 
 ffibuilder = FFI()
 libs = ["nmm"]
