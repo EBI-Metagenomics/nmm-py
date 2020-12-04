@@ -34,10 +34,10 @@ struct imm_abc const *      nmm_amino_abc_super(struct nmm_amino_abc const *amin
 
 /* Amino table */
 struct nmm_amino_table const *nmm_amino_table_create(struct nmm_amino_abc const *abc,
-                                                     double const *              lprobs);
+                                                     float const *               lprobs);
 void                          nmm_amino_table_destroy(struct nmm_amino_table const *tbl);
 struct nmm_amino_abc const *  nmm_amino_table_abc(struct nmm_amino_table const *tbl);
-double nmm_amino_table_lprob(struct nmm_amino_table const *tbl, char const amino);
+float nmm_amino_table_lprob(struct nmm_amino_table const *tbl, char const amino);
 
 /* Base abc */
 struct nmm_base_abc const *nmm_base_abc_create(char const *symbols, char const any_symbol);
@@ -47,10 +47,10 @@ struct imm_abc const *     nmm_base_abc_super(struct nmm_base_abc const *base_ab
 
 /* Base table */
 struct nmm_base_abc const *  nmm_base_table_abc(struct nmm_base_table const *baset);
-struct nmm_base_table const *nmm_base_table_create(struct nmm_base_abc const *abc, double a, double b,
-                                                   double c, double d);
+struct nmm_base_table const *nmm_base_table_create(struct nmm_base_abc const *abc, float a, float b,
+                                                   float c, float d);
 void                         nmm_base_table_destroy(struct nmm_base_table const *baset);
-double nmm_base_table_lprob(struct nmm_base_table const *baset, char const base);
+float nmm_base_table_lprob(struct nmm_base_table const *baset, char const base);
 
 /* Codon */
 struct nmm_base_abc const *nmm_codon_abc(struct nmm_codon const *codon);
@@ -64,9 +64,9 @@ int                        nmm_codon_set_triplet(struct nmm_codon *codon, struct
 struct nmm_base_abc const *nmm_codon_lprob_abc(struct nmm_codon_lprob const *codonp);
 struct nmm_codon_lprob *   nmm_codon_lprob_create(struct nmm_base_abc const *abc);
 void                       nmm_codon_lprob_destroy(struct nmm_codon_lprob const *codonp);
-double nmm_codon_lprob_get(struct nmm_codon_lprob const *codonp, struct nmm_codon const *codon);
-int    nmm_codon_lprob_normalize(struct nmm_codon_lprob *codonp);
-int nmm_codon_lprob_set(struct nmm_codon_lprob *codonp, struct nmm_codon const *codon, double lprob);
+float nmm_codon_lprob_get(struct nmm_codon_lprob const *codonp, struct nmm_codon const *codon);
+int   nmm_codon_lprob_normalize(struct nmm_codon_lprob *codonp);
+int   nmm_codon_lprob_set(struct nmm_codon_lprob *codonp, struct nmm_codon const *codon, float lprob);
 
 /* Codon state */
 struct nmm_codon_lprob const *nmm_codon_state_codon_lprob(struct nmm_codon_state const *state);
@@ -82,7 +82,7 @@ int nmm_codon_state_write(struct imm_state const *state, struct nmm_model const 
 struct nmm_base_abc const *   nmm_codon_table_abc(struct nmm_codon_table const *codont);
 struct nmm_codon_table const *nmm_codon_table_create(struct nmm_codon_lprob const *prob);
 void                          nmm_codon_table_destroy(struct nmm_codon_table const *codont);
-double nmm_codon_table_lprob(struct nmm_codon_table const *codont, struct nmm_codon const *codon);
+float nmm_codon_table_lprob(struct nmm_codon_table const *codont, struct nmm_codon const *codon);
 
 /* Frame state */
 struct nmm_base_table const * nmm_frame_state_base_table(struct nmm_frame_state const *state);
@@ -90,14 +90,14 @@ struct nmm_codon_table const *nmm_frame_state_codon_table(struct nmm_frame_state
 struct nmm_frame_state const *nmm_frame_state_create(char const *                  name,
                                                      struct nmm_base_table const * baset,
                                                      struct nmm_codon_table const *codont,
-                                                     double                        epsilon);
-double nmm_frame_state_decode(struct nmm_frame_state const *state, struct imm_seq const *seq,
-                              struct nmm_codon *codon);
+                                                     float                         epsilon);
+float nmm_frame_state_decode(struct nmm_frame_state const *state, struct imm_seq const *seq,
+                             struct nmm_codon *codon);
 struct nmm_frame_state const *nmm_frame_state_derived(struct imm_state const *state);
 void                          nmm_frame_state_destroy(struct nmm_frame_state const *state);
-double                        nmm_frame_state_epsilon(struct nmm_frame_state const *state);
-double nmm_frame_state_lposterior(struct nmm_frame_state const *state, struct nmm_codon const *codon,
-                                  struct imm_seq const *seq);
+float                         nmm_frame_state_epsilon(struct nmm_frame_state const *state);
+float nmm_frame_state_lposterior(struct nmm_frame_state const *state, struct nmm_codon const *codon,
+                                 struct imm_seq const *seq);
 struct imm_state const *nmm_frame_state_read(FILE *stream, struct nmm_model const *model);
 struct imm_state const *nmm_frame_state_super(struct nmm_frame_state const *state);
 int nmm_frame_state_write(struct imm_state const *state, struct nmm_model const *model, FILE *stream);
